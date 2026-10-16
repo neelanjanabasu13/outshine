@@ -92,21 +92,21 @@
   --secondary-foreground: oklch(0.2 0.02 60);
   --muted: oklch(0.94 0.012 85);
   --muted-foreground: oklch(0.5 0.02 60);
-  --accent: oklch(0.92 0.06 150);
-  --accent-foreground: oklch(0.3 0.08 155);
+  --accent: oklch(0.95 0.035 30);
+  --accent-foreground: oklch(0.4 0.14 20);
   --destructive: oklch(0.6 0.2 30);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.89 0.012 80);
   --input: oklch(0.89 0.012 80);
-  --ring: oklch(0.55 0.14 155);
-  --fix: oklch(0.52 0.14 155);
-  --fix-foreground: oklch(0.98 0.01 150);
+  --ring: oklch(0.62 0.22 15);
+  --fix: oklch(0.62 0.22 15);
+  --fix-foreground: oklch(0.99 0.005 30);
   --grade-a: oklch(0.6 0.15 155);
   --grade-b: oklch(0.7 0.14 125);
   --grade-c: oklch(0.78 0.15 80);
   --grade-d: oklch(0.68 0.17 50);
   --grade-f: oklch(0.6 0.2 28);
-  --chart-1: oklch(0.52 0.14 155);
+  --chart-1: oklch(0.62 0.22 15);
   --chart-2: oklch(0.6 0.2 28);
   --chart-3: oklch(0.78 0.15 80);
   --chart-4: oklch(0.5 0.02 60);
@@ -178,3 +178,10 @@
 @utility animate-rise { animation: rise 0.6s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes blink { 50% { opacity: 0; } }
 @utility animate-caret { animation: blink 1s step-end infinite; }
+
+@utility text-brand-gradient {
+  background: linear-gradient(90deg, oklch(0.7 0.19 45), oklch(0.62 0.24 10), oklch(0.58 0.2 300));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
