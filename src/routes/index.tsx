@@ -35,13 +35,13 @@ function Home() {
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
         <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up · UK trades</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
-          Are local rivals <em className="font-display italic text-fix">winning jobs that should be yours?</em>
+          Are local rivals <em className="font-display italic text-brand-gradient">winning jobs that should be yours?</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
           Find out how much money you lose each month when customers pick a nearby competitor instead of you, and let our agent fix why.
         </p>
 
-        <div className="mt-12 max-w-2xl">
+        <div className="mt-8 max-w-2xl">
           <div className="flex flex-wrap gap-2">
             {(Object.keys(TRADES) as Trade[]).map((t) => (
               <button key={t} onClick={() => { setTrade(trade === t ? null : t); setPicked(null); }}
@@ -86,7 +86,7 @@ function Home() {
           )}
         </div>
 
-        <section className="mt-28">
+        <section className="mt-14">
           <h2 className="max-w-xl text-3xl font-semibold md:text-4xl">Customers decide in seconds. We make sure they pick you.</h2>
           <div className="mt-10 grid gap-4 md:grid-cols-[1.4fr_1fr_1fr]">
             {[
@@ -94,7 +94,7 @@ function Home() {
               { img: TRADE_PHOTOS.salon, k: "02", t: "See why", d: "Five reasons, in plain English" },
               { img: TRADE_PHOTOS.landscaping, k: "03", t: "Get it done", d: "The agent fixes it, not you" },
             ].map((c, i) => (
-              <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "md:row-span-2 min-h-96" : "min-h-56"}`}>
+              <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "min-h-80" : "min-h-80"}`}>
                 <img src={c.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
                 <figcaption className="absolute inset-x-0 bottom-0 p-6 text-paper">
