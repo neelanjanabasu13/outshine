@@ -47,7 +47,7 @@ function Scan() {
     return () => clearTimeout(to);
   }, [n, all.length, b.id, navigate]);
 
-  const current = n < all.length ? all[n].i : steps.length;
+  const current = n < all.length ? all[n]!.i : steps.length;
   const pct = Math.round((n / all.length) * 100);
 
   return (

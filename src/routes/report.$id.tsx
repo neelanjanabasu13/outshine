@@ -74,18 +74,18 @@ function Report() {
         </section>
 
         <section className="mt-20 grid items-center gap-10 md:grid-cols-2">
-          <Radar you={areas} them={comps[0].areas} />
+          <Radar you={areas} them={comps[0]!.areas} />
           <div>
             <h2 className="text-2xl font-semibold">Where you're winning, and losing</h2>
             <ul className="mt-6 space-y-4">
               {(Object.keys(areas) as Area[]).map((a) => (
                 <li key={a}>
-                  <div className="flex justify-between text-sm"><span>{a}</span><span className="font-mono">{areas[a]} / {comps[0].areas[a]}</span></div>
+                  <div className="flex justify-between text-sm"><span>{a}</span><span className="font-mono">{areas[a]} / {comps[0]!.areas[a]}</span></div>
                   <div className="mt-1.5 h-1.5 rounded-full bg-secondary"><div className="h-full rounded-full bg-fix" style={{ width: `${areas[a]}%` }} /></div>
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-xs text-muted-foreground">You vs {comps[0].name}, the strongest local profile.</p>
+            <p className="mt-4 text-xs text-muted-foreground">You vs {comps[0]!.name}, the strongest local profile.</p>
           </div>
         </section>
 
