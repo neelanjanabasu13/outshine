@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_PER_FIX } from "./audit";
+import { estimateLostRevenue, evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_PER_FIX } from "./audit";
 import { BUSINESSES } from "./sample";
 
 describe("grading", () => {
@@ -23,5 +23,13 @@ describe("grading", () => {
   it("uses the placeholder prices of £5 per fix and £29 for all", () => {
     expect(PRICE_PER_FIX).toBe(5);
     expect(PRICE_BUNDLE).toBe(29);
+  });
+
+  it("estimates no lost revenue when you match or beat rivals", () => {
+    expect(estimateLostRevenue("plumbing", 80, 70)).toEqual({ jobs: 0, pounds: 0 });
+  });
+
+  it("estimates lost plumbing jobs from a 30 point gap at £180 each", () => {
+    expect(estimateLostRevenue("plumbing", 50, 80)).toEqual({ jobs: 4, pounds: 720 });
   });
 });
