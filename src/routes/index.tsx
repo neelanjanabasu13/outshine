@@ -38,7 +38,7 @@ function Home() {
           How do you <em className="font-display italic text-brand-gradient">stack up against local rivals?</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          See how you compare with nearby competitors, find out what is holding you back, and let our agent fix it for you.
+          We'll find what's holding you back, and we'll fix it for you.
         </p>
 
         <div className="mt-8 max-w-2xl">
