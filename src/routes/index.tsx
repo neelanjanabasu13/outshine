@@ -1,24 +1,107 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { Header } from "@/components/Brand";
+import { TRADES, type Trade } from "@/lib/audit";
+import { BUSINESSES, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "FixFirst · Free Google profile audit for UK trades" },
+      { name: "description", content: "Get a free A to F grade for your plumbing, electrical, cleaning, landscaping or salon business in under a minute, then let our agent fix it." },
+      { property: "og:title", content: "FixFirst · Free Google profile audit for UK trades" },
+      { property: "og:description", content: "A to F grade, the five things costing you calls, and an agent that fixes them for you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
+  const [q, setQ] = useState("");
+  const [trade, setTrade] = useState<Trade | null>(null);
+  const [picked, setPicked] = useState<Business | null>(null);
+  const navigate = useNavigate();
+
+  const results = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return BUSINESSES.filter((b) => (!trade || b.trade === trade) && (!s || b.name.toLowerCase().includes(s) || b.area.toLowerCase().includes(s)));
+  }, [q, trade]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen">
+      <Header />
+      <main className="mx-auto max-w-6xl px-6 pb-24 pt-10 md:pt-20">
+        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up</p>
+        <h1 className="animate-rise mt-5 max-w-4xl text-5xl font-semibold leading-[0.95] md:text-7xl">
+          How does your business <em className="font-display italic text-fix">really</em> look on Google?
+        </h1>
+        <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
+          We grade your profile A to F against the best in your trade nearby, show you the five things costing you calls, then our agent fixes them for you.
+        </p>
+
+        <div className="mt-12 max-w-2xl">
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(TRADES) as Trade[]).map((t) => (
+              <button key={t} onClick={() => { setTrade(trade === t ? null : t); setPicked(null); }}
+                className={`rounded-full border px-4 py-1.5 text-sm transition ${trade === t ? "border-ink bg-ink text-paper" : "border-border bg-card hover:border-ink"}`}>
+                {TRADES[t].label}
+              </button>
+            ))}
+          </div>
+
+          {!picked ? (
+            <div className="relative mt-4">
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type your business name…"
+                className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
+              <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
+                {results.map((b) => (
+                  <li key={b.id}>
+                    <button onClick={() => setPicked(b)} className="flex w-full items-center gap-4 px-5 py-3 text-left hover:bg-secondary">
+                      <img src={TRADE_PHOTOS[b.trade]} alt="" className="h-10 w-10 rounded-lg object-cover" loading="lazy" width={40} height={40} />
+                      <span className="flex-1"><span className="block font-medium">{b.name}</span><span className="text-sm text-muted-foreground">{b.address}</span></span>
+                      <span className="text-xs text-muted-foreground">{TRADES[b.trade].label}</span>
+                    </button>
+                  </li>
+                ))}
+                {!results.length && <li className="px-5 py-4 text-sm text-muted-foreground">No match in the sample list yet. Live Google search arrives once it's connected.</li>}
+              </ul>
+              <p className="mt-3 text-xs text-muted-foreground">Preview mode: these are sample businesses until live Google search is switched on.</p>
+            </div>
+          ) : (
+            <div className="animate-rise mt-4 flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 sm:flex-row sm:items-center">
+              <img src={TRADE_PHOTOS[picked.trade]} alt={picked.name} className="h-32 w-full rounded-2xl object-cover sm:w-44" width={176} height={128} />
+              <div className="flex-1">
+                <p className="font-display text-2xl font-semibold">{picked.name}</p>
+                <p className="text-sm text-muted-foreground">{picked.address}</p>
+                <p className="mt-1 text-sm">{picked.signals.rating.toFixed(1)} ★ · {picked.signals.reviewCount} reviews</p>
+                <div className="mt-4 flex gap-3">
+                  <button onClick={() => navigate({ to: "/scan/$id", params: { id: picked.id } })}
+                    className="rounded-full bg-fix px-6 py-3 font-medium text-fix-foreground transition hover:opacity-90">Grade my business →</button>
+                  <button onClick={() => setPicked(null)} className="text-sm text-muted-foreground underline-offset-4 hover:underline">Not this one</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <section className="mt-28 grid gap-12 md:grid-cols-[1fr_1.4fr]">
+          <h2 className="text-3xl font-semibold md:text-4xl">Not another to-do list.</h2>
+          <ol className="space-y-8">
+            {[
+              ["We grade you", "Your reviews, photos, profile and trade credentials, checked against the three best-rated competitors near you."],
+              ["We show you five things", "Only the problems that cost you the most calls, each with proof and a before and after."],
+              ["Our agent does the work", "Review replies, a new description, Google posts, a review-request text and a live website. Done for you."],
+            ].map(([t, d], i) => (
+              <li key={t} className="flex gap-6 border-t border-border pt-6">
+                <span className="font-mono text-sm text-muted-foreground">0{i + 1}</span>
+                <div><p className="font-display text-xl font-semibold">{t}</p><p className="mt-1 text-muted-foreground">{d}</p></div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </main>
     </div>
   );
 }
