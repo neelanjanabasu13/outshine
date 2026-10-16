@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportIdRouteImport } from './routes/report.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
+import { Route as SiteIdRouteImport } from './routes/site.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportIdRoute = ReportIdRouteImport.update({
+  id: '/report/$id',
+  path: '/report/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScanIdRoute = ScanIdRouteImport.update({
@@ -22,31 +29,44 @@ const ScanIdRoute = ScanIdRouteImport.update({
   path: '/scan/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SiteIdRoute = SiteIdRouteImport.update({
+  id: '/site/$id',
+  path: '/site/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/site/$id': typeof SiteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/site/$id': typeof SiteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/site/$id': typeof SiteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/scan/$id'
+  fullPaths: '/' | '/report/$id' | '/scan/$id' | '/site/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/scan/$id'
-  id: '__root__' | '/' | '/scan/$id'
+  to: '/' | '/report/$id' | '/scan/$id' | '/site/$id'
+  id: '__root__' | '/' | '/report/$id' | '/scan/$id' | '/site/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReportIdRoute: typeof ReportIdRoute
   ScanIdRoute: typeof ScanIdRoute
+  SiteIdRoute: typeof SiteIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report/$id': {
+      id: '/report/$id'
+      path: '/report/$id'
+      fullPath: '/report/$id'
+      preLoaderRoute: typeof ReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scan/$id': {
       id: '/scan/$id'
       path: '/scan/$id'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScanIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/site/$id': {
+      id: '/site/$id'
+      path: '/site/$id'
+      fullPath: '/site/$id'
+      preLoaderRoute: typeof SiteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReportIdRoute: ReportIdRoute,
   ScanIdRoute: ScanIdRoute,
+  SiteIdRoute: SiteIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
