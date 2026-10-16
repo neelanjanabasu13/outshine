@@ -94,7 +94,7 @@ function Home() {
               { img: TRADE_PHOTOS.salon, k: "02", t: "See why", d: "Five reasons, in plain English" },
               { img: TRADE_PHOTOS.landscaping, k: "03", t: "Get it done", d: "The agent fixes it, not you" },
             ].map((c, i) => (
-              <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "md:row-span-2 min-h-96" : "min-h-56"}`}>
+              <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "min-h-80" : "min-h-80"}`}>
                 <img src={c.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
                 <figcaption className="absolute inset-x-0 bottom-0 p-6 text-paper">
