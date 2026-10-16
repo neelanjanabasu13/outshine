@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { gradeColor, Header } from "@/components/Brand";
-import { areaScores, evaluate, gradeOf, PRICE_BUNDLE, PRICE_PER_FIX, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
+import { areaScores, estimateLostRevenue, evaluate, gradeOf, PRICE_BUNDLE, PRICE_PER_FIX, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
 import { findBusiness, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
@@ -36,20 +36,41 @@ function Report() {
   });
   const avgTop = Math.round(comps.reduce((a, c) => a + c.score, 0) / comps.length);
   const problems = topProblems(findings);
+  const lost = estimateLostRevenue(b.trade, score, avgTop);
   const [all, setAll] = useState(false);
 
   return (
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-28">
-        <section className="grid items-center gap-12 pt-6 md:grid-cols-[auto_1fr]">
+        <section className="animate-rise pt-6">
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
+          <h1 className="mt-2 text-4xl font-semibold md:text-6xl">{b.name}</h1>
+          <div className="mt-8 overflow-hidden rounded-[2rem] bg-ink p-8 text-paper md:p-12">
+            {lost.jobs > 0 ? (
+              <>
+                <p className="text-sm uppercase tracking-[0.2em] opacity-60">Likely going to rivals each month</p>
+                <p className="mt-3 font-display text-6xl font-semibold md:text-8xl">£{lost.pounds.toLocaleString("en-GB")}</p>
+                <p className="mt-4 max-w-xl text-lg opacity-80">That is about {lost.jobs} jobs a month that pick a nearby competitor, because their profile gives customers more reasons to trust them first.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm uppercase tracking-[0.2em] opacity-60">Good news</p>
+                <p className="mt-3 font-display text-5xl font-semibold md:text-7xl">You're ahead locally.</p>
+                <p className="mt-4 max-w-xl text-lg opacity-80">Customers comparing you with nearby rivals are more likely to call you. Let's keep it that way.</p>
+              </>
+            )}
+            <p className="mt-6 text-xs opacity-40">Estimate based on your score gap and a typical {TRADES[b.trade].label.toLowerCase()} job of £{TRADES[b.trade].avgJob}.</p>
+          </div>
+        </section>
+
+        <section className="mt-16 grid items-center gap-12 md:grid-cols-[auto_1fr]">
           <Gauge score={score} grade={grade} />
-          <div className="animate-rise">
-            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
-            <h1 className="mt-2 text-4xl font-semibold md:text-6xl">{b.name}</h1>
-            <p className="mt-4 max-w-lg text-lg text-muted-foreground">
-              You scored <b className="text-foreground">{score}</b>. The three nearest top competitors average <b className="text-foreground">{avgTop}</b>.
-              {score < avgTop ? ` That gap is roughly where your missing calls are going.` : " You're ahead, so let's keep it that way."}
+          <div>
+            <h2 className="text-2xl font-semibold">Your trust score</h2>
+            <p className="mt-3 max-w-lg text-lg text-muted-foreground">
+              You scored <b className="text-foreground">{score} out of 100</b>, a grade {grade}. The three nearest top competitors average <b className="text-foreground">{avgTop}</b>.
+              It measures how confident a stranger feels about calling you after a quick look.
             </p>
           </div>
         </section>

@@ -26,6 +26,8 @@ export interface TradeProfile {
   label: string;
   credential: string; // the trade standard customers look for
   credentialWhy: string;
+  credentialPlain: string; // what the badge means to a homeowner who has never heard of it
+  avgJob: number; // typical job value in GBP, placeholder until real data
   expectedPhotos: string;
   minPhotos: number;
   minServices: number;
@@ -36,30 +38,35 @@ export const TRADES: Record<Trade, TradeProfile> = {
   plumbing: {
     trade: "plumbing", label: "Plumbing & heating", credential: "Gas Safe registration",
     credentialWhy: "Anyone booking boiler or gas work checks for Gas Safe first, and Google shows it in the profile.",
+    credentialPlain: "Checked and legally allowed to work on your gas boiler, so it is safe.", avgJob: 180,
     expectedPhotos: "the van, finished bathrooms, and boiler installs", minPhotos: 15, minServices: 6,
     weights: { Reputation: 25, Response: 20, Visuals: 15, Profile: 20, Credentials: 20 },
   },
   electrician: {
     trade: "electrician", label: "Electricians", credential: "NICEIC or NAPIT approval",
     credentialWhy: "Homeowners need Part P certified work, so NICEIC or NAPIT is the first trust signal they scan for.",
+    credentialPlain: "Their wiring is inspected and signed off, so it passes building rules and insurance.", avgJob: 220,
     expectedPhotos: "consumer units, tidy wiring and EV charger installs", minPhotos: 12, minServices: 6,
     weights: { Reputation: 25, Response: 20, Visuals: 10, Profile: 20, Credentials: 25 },
   },
   cleaning: {
     trade: "cleaning", label: "Cleaning", credential: "Public liability insurance and a waste carrier licence",
     credentialWhy: "Cleaners are let into homes and offices, so proof of insurance and licensed waste removal wins the booking.",
+    credentialPlain: "If something gets broken, you are covered, and rubbish is disposed of legally.", avgJob: 75,
     expectedPhotos: "before and after rooms, the team in uniform", minPhotos: 10, minServices: 5,
     weights: { Reputation: 30, Response: 25, Visuals: 15, Profile: 15, Credentials: 15 },
   },
   landscaping: {
     trade: "landscaping", label: "Landscaping", credential: "A waste carrier licence and APL or BALI membership",
     credentialWhy: "Garden waste must go with a licensed carrier, and APL or BALI membership reassures bigger-budget clients.",
+    credentialPlain: "Garden waste goes somewhere legal, so you cannot be fined for fly-tipping.", avgJob: 450,
     expectedPhotos: "finished gardens, patios and seasonal before and afters", minPhotos: 20, minServices: 5,
     weights: { Reputation: 20, Response: 15, Visuals: 30, Profile: 20, Credentials: 15 },
   },
   salon: {
     trade: "salon", label: "Hair & beauty", credential: "Hygiene and treatment licences, plus stylist qualifications",
     credentialWhy: "Clients choose salons on looks and trust, so recent work photos and visible qualifications matter most.",
+    credentialPlain: "Trained, qualified staff working in a clean, inspected space.", avgJob: 55,
     expectedPhotos: "recent cuts and colours, the interior, and the team", minPhotos: 25, minServices: 8,
     weights: { Reputation: 25, Response: 20, Visuals: 30, Profile: 15, Credentials: 10 },
   },
@@ -144,10 +151,10 @@ export function evaluate(trade: Trade, s: Signals, businessName: string): Findin
     {
       id: "credential", area: "Credentials", fix: "description", weight: w.Credentials,
       score: s.credentialMentioned ? 1 : 0,
-      title: `${t.credential.split(" and ")[0]} isn't visible`,
+      title: "Customers can't see you're safe to hire",
       evidence: s.credentialMentioned ? `${t.credential} is mentioned.` : `There's no mention of ${t.credential.toLowerCase()} anywhere on your profile.`,
-      impact: t.credentialWhy,
-      before: "Credentials not shown", after: `${t.credential} stated clearly in your description and site`,
+      impact: `${t.credentialWhy} In plain words for customers: ${t.credentialPlain}`,
+      before: "Credentials not shown", after: `${t.credential}, explained in plain English: ${t.credentialPlain}`,
     },
   ];
 }
@@ -186,3 +193,11 @@ export function topProblems(findings: Finding[], n = 5): Finding[] {
 
 export const PRICE_PER_FIX = 5; // placeholder, final pricing tbc
 export const PRICE_BUNDLE = 29; // placeholder, final pricing tbc
+
+/** Rough monthly revenue going to better-looking rivals. Placeholder model until real call data exists:
+ * each point behind the local leaders costs about 0.4 enquiries a month, a third of which become paid jobs. */
+export function estimateLostRevenue(trade: Trade, yourScore: number, rivalsScore: number): { jobs: number; pounds: number } {
+  const gap = Math.max(0, rivalsScore - yourScore);
+  const jobs = Math.round(gap * 0.4 / 3);
+  return { jobs, pounds: jobs * TRADES[trade].avgJob };
+}
