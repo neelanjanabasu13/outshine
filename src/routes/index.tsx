@@ -33,12 +33,12 @@ function Home() {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-10 md:pt-20">
-        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up</p>
+        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up · UK trades</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-5xl font-semibold leading-[0.95] md:text-7xl">
-          How does your business <em className="font-display italic text-fix">really</em> look on Google?
+          Is the business down the road <em className="font-display italic text-fix">taking your calls?</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          We grade your profile A to F against the best in your trade nearby, show you the five things costing you calls, then our agent fixes them for you.
+          See how much work goes to your nearest rivals each month, why customers pick them, and let our agent fix it for you.
         </p>
 
         <div className="mt-12 max-w-2xl">
@@ -86,20 +86,25 @@ function Home() {
           )}
         </div>
 
-        <section className="mt-28 grid gap-12 md:grid-cols-[1fr_1.4fr]">
-          <h2 className="text-3xl font-semibold md:text-4xl">Not another to-do list.</h2>
-          <ol className="space-y-8">
+        <section className="mt-28">
+          <h2 className="max-w-xl text-3xl font-semibold md:text-4xl">Customers decide in seconds. We make sure they pick you.</h2>
+          <div className="mt-10 grid gap-4 md:grid-cols-[1.4fr_1fr_1fr]">
             {[
-              ["We grade you", "Your reviews, photos, profile and trade credentials, checked against the three best-rated competitors near you."],
-              ["We show you five things", "Only the problems that cost you the most calls, each with proof and a before and after."],
-              ["Our agent does the work", "Review replies, a new description, Google posts, a review-request text and a live website. Done for you."],
-            ].map(([t, d], i) => (
-              <li key={t} className="flex gap-6 border-t border-border pt-6">
-                <span className="font-mono text-sm text-muted-foreground">0{i + 1}</span>
-                <div><p className="font-display text-xl font-semibold">{t}</p><p className="mt-1 text-muted-foreground">{d}</p></div>
-              </li>
+              { img: TRADE_PHOTOS.plumbing, k: "01", t: "See the money", d: "Jobs a month going to rivals" },
+              { img: TRADE_PHOTOS.salon, k: "02", t: "See why", d: "Five reasons, in plain English" },
+              { img: TRADE_PHOTOS.landscaping, k: "03", t: "Get it done", d: "The agent fixes it, not you" },
+            ].map((c, i) => (
+              <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "md:row-span-2 min-h-96" : "min-h-56"}`}>
+                <img src={c.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
+                <figcaption className="absolute inset-x-0 bottom-0 p-6 text-paper">
+                  <span className="font-mono text-xs opacity-70">{c.k}</span>
+                  <p className="font-display text-2xl font-semibold">{c.t}</p>
+                  <p className="text-sm opacity-80">{c.d}</p>
+                </figcaption>
+              </figure>
             ))}
-          </ol>
+          </div>
         </section>
       </main>
     </div>
