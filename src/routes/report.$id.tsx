@@ -210,7 +210,7 @@ function Radar({ you, them }: { you: Record<Area, number>; them: Record<Area, nu
   };
   const poly = (d: Record<Area, number>) => keys.map((k, i) => pt(i, d[k]).join(",")).join(" ");
   return (
-    <svg viewBox="0 0 300 300" className="mx-auto w-full max-w-sm">
+    <svg viewBox="-50 -10 400 320" className="mx-auto w-full max-w-sm">
       {[25, 50, 75, 100].map((r) => <polygon key={r} points={keys.map((_, i) => pt(i, r).join(",")).join(" ")} fill="none" stroke="var(--border)" />)}
       <polygon points={poly(them)} fill="var(--muted-foreground)" fillOpacity="0.12" stroke="var(--muted-foreground)" strokeDasharray="4 4" />
       <polygon points={poly(you)} fill="var(--fix)" fillOpacity="0.25" stroke="var(--fix)" strokeWidth="2" />
