@@ -33,7 +33,7 @@ function Home() {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
-        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free scan · No card · No subscription · Pay per fix</p>
+        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free scan · No subscription · Pay only for the fixes you want</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
           How do you <em className="font-display italic text-brand-gradient">stack up against local rivals?</em>
         </h1>
@@ -114,11 +114,11 @@ function Home() {
               No subscription, no free trial that <em className="font-display italic text-brand-gradient">quietly bills you.</em>
             </h2>
             <p className="mt-4 max-w-md text-muted-foreground">
-              Other tools ask for your card up front and charge you every month. Here you pay once for the fix you want, and that is the end of it.
+              Other tools lock you into a monthly plan. Here the scan is free, and you only pay when you want our agent to do a fix for you, once, with nothing recurring.
             </p>
           </div>
           <ul className="flex flex-col justify-center gap-3">
-            {["Scan for free, without a card", "Pay only for the fixes you choose", "Use it once, never get billed again"].map((t) => (
+            {["Your scan is always free", "Pay per fix, only if you want our agent to do it", "One payment, never a monthly bill"].map((t) => (
               <li key={t} className="flex items-center gap-3 rounded-2xl bg-accent px-5 py-4 font-medium text-accent-foreground">
                 <span className="h-2 w-2 rounded-full bg-fix" />{t}
               </li>
