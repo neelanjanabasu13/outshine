@@ -33,7 +33,7 @@ function Home() {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
-        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up · UK trades</p>
+        <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free scan · No card · No subscription · Pay per fix</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
           How do you <em className="font-display italic text-brand-gradient">stack up against local rivals?</em>
         </h1>
@@ -105,6 +105,25 @@ function Home() {
               </figure>
             ))}
           </div>
+        </section>
+
+        <section className="mt-14 grid gap-8 rounded-[2rem] border border-border bg-card p-8 md:grid-cols-[1.3fr_1fr] md:p-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-fix">No strings attached</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
+              No subscription, no free trial that <em className="font-display italic text-brand-gradient">quietly bills you.</em>
+            </h2>
+            <p className="mt-4 max-w-md text-muted-foreground">
+              Other tools ask for your card up front and charge you every month. Here you pay once for the fix you want, and that is the end of it.
+            </p>
+          </div>
+          <ul className="flex flex-col justify-center gap-3">
+            {["Scan for free, without a card", "Pay only for the fixes you choose", "Use it once, never get billed again"].map((t) => (
+              <li key={t} className="flex items-center gap-3 rounded-2xl bg-accent px-5 py-4 font-medium text-accent-foreground">
+                <span className="h-2 w-2 rounded-full bg-fix" />{t}
+              </li>
+            ))}
+          </ul>
         </section>
       </main>
     </div>
