@@ -32,13 +32,13 @@ function Home() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="mx-auto max-w-6xl px-6 pb-24 pt-10 md:pt-20">
+      <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
         <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up · UK trades</p>
-        <h1 className="animate-rise mt-5 max-w-4xl text-5xl font-semibold leading-[0.95] md:text-7xl">
-          Is the business down the road <em className="font-display italic text-fix">taking your calls?</em>
+        <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
+          Are local rivals <em className="font-display italic text-fix">winning jobs that should be yours?</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          See how much work goes to your nearest rivals each month, why customers pick them, and let our agent fix it for you.
+          Find out how much money you lose each month when customers pick a nearby competitor instead of you, and let our agent fix why.
         </p>
 
         <div className="mt-12 max-w-2xl">
@@ -53,9 +53,9 @@ function Home() {
 
           {!picked ? (
             <div className="relative mt-4">
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type your business name…"
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name, e.g. Riverside Plumbing"
                 className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
-              <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
+              {(q.trim() || trade) && <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
                 {results.map((b) => (
                   <li key={b.id}>
                     <button onClick={() => setPicked(b)} className="flex w-full items-center gap-4 px-5 py-3 text-left hover:bg-secondary">
@@ -66,7 +66,7 @@ function Home() {
                   </li>
                 ))}
                 {!results.length && <li className="px-5 py-4 text-sm text-muted-foreground">No match in the sample list yet. Live Google search arrives once it's connected.</li>}
-              </ul>
+              </ul>}
               <p className="mt-3 text-xs text-muted-foreground">Preview mode: these are sample businesses until live Google search is switched on.</p>
             </div>
           ) : (
