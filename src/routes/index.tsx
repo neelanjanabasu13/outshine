@@ -35,10 +35,10 @@ function Home() {
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
         <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free · 60 seconds · No sign-up · UK trades</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
-          Are local rivals <em className="font-display italic text-brand-gradient">winning jobs that should be yours?</em>
+          How do you <em className="font-display italic text-brand-gradient">stack up against local rivals?</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          Find out how much money you lose each month when customers pick a nearby competitor instead of you, and let our agent fix why.
+          See how you compare with nearby competitors, find out what is holding you back, and let our agent fix it for you.
         </p>
 
         <div className="mt-8 max-w-2xl">
@@ -90,9 +90,9 @@ function Home() {
           <h2 className="max-w-xl text-3xl font-semibold md:text-4xl">Customers decide in seconds. We make sure they pick you.</h2>
           <div className="mt-10 grid gap-4 md:grid-cols-[1.4fr_1fr_1fr]">
             {[
-              { img: TRADE_PHOTOS.plumbing, k: "01", t: "See the money", d: "Jobs a month going to rivals" },
-              { img: TRADE_PHOTOS.salon, k: "02", t: "See why", d: "Five reasons, in plain English" },
-              { img: TRADE_PHOTOS.landscaping, k: "03", t: "Get it done", d: "The agent fixes it, not you" },
+              { img: TRADE_PHOTOS.plumbing, k: "01", t: "Compare", d: "You next to your three nearest rivals" },
+              { img: TRADE_PHOTOS.salon, k: "02", t: "Find the problems", d: "Your top five, in plain English" },
+              { img: TRADE_PHOTOS.landscaping, k: "03", t: "Get them fixed", d: "The agent does the work, not you" },
             ].map((c, i) => (
               <figure key={c.k} className={`group relative overflow-hidden rounded-[2rem] ${i === 0 ? "min-h-80" : "min-h-80"}`}>
                 <img src={c.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
