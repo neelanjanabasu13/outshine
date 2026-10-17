@@ -29,12 +29,31 @@ function describe(err: StripeError | undefined, status: number) {
   return null;
 }
 
+/**
+ * The address the customer's browser is actually on. Behind the preview and hosting proxies the
+ * server's own URL is internal (e.g. localhost), so Stripe must return customers to the browser's origin.
+ */
+export function publicOrigin(req: Request): string {
+  const valid = (o: string | null | undefined) => {
+    if (!o) return null;
+    try { const u = new URL(o); return u.protocol === "https:" || u.hostname === "localhost" ? u.origin : null; } catch { return null; }
+  };
+  const h = req.headers;
+  const fromOrigin = valid(h.get("origin"));
+  if (fromOrigin) return fromOrigin;
+  const fromReferer = valid(h.get("referer"));
+  if (fromReferer) return fromReferer;
+  const host = h.get("x-forwarded-host")?.split(",")[0]?.trim();
+  if (host) return `${h.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https"}://${host}`;
+  return new URL(req.url).origin;
+}
+
 export const createCheckout = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({ businessId: z.string().min(1).max(100), businessName: z.string().max(200), item: z.enum(["diy", "all"]), label: z.string().max(200) }).parse(d),
   )
   .handler(async ({ data }) => {
-    const origin = new URL(getRequest().url).origin;
+    const origin = publicOrigin(getRequest());
     const pence = Math.round(checkoutPrice(data.item) * 100);
     const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : `FixFirst done-for-you for ${data.businessName}`;
     const back = `${origin}/report/${encodeURIComponent(data.businessId)}`;
