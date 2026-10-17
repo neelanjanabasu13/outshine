@@ -99,7 +99,7 @@ function Home() {
                   </button>
                 ))}
                 {loading && <span className="text-xs text-muted-foreground">Finding local businesses…</span>}
-                {!loading && !hits.length && <span className="text-xs text-muted-foreground">No 3.5 to 4 star examples here. Try another city.</span>}
+                {!loading && !hits.length && <span className="text-xs text-muted-foreground">No 4 to 4.5 star examples here. Try another city.</span>}
               </div>}
               {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 {hits.map((b) => (

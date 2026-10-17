@@ -26,14 +26,14 @@ describe("trade discovery", () => {
 
 import { pickExamples as _pe, inExampleRange as _ir } from "./discovery";
 describe("example pills", () => {
-  it("only treats 3.5 to 4.0 stars as in range", () => {
-    expect(_ir({ rating: 3.5 })).toBe(true);
+  it("only treats 4.0 to 4.5 stars as in range", () => {
+    expect(_ir({ rating: 4.5 })).toBe(true);
     expect(_ir({ rating: 4.0 })).toBe(true);
-    expect(_ir({ rating: 3.4 })).toBe(false);
-    expect(_ir({ rating: 4.1 })).toBe(false);
+    expect(_ir({ rating: 3.9 })).toBe(false);
+    expect(_ir({ rating: 4.6 })).toBe(false);
   });
   it("leads with in-range businesses", () => {
-    const r = [{ grade: "A", reviewCount: 900, rating: 4.9 }, { grade: "C", reviewCount: 50, rating: 3.8 }];
-    expect(_pe(r).map((b) => b.rating)).toEqual([3.8]);
+    const r = [{ grade: "A", reviewCount: 900, rating: 4.9 }, { grade: "C", reviewCount: 50, rating: 4.2 }];
+    expect(_pe(r).map((b) => b.rating)).toEqual([4.2]);
   });
 });

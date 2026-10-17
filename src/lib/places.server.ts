@@ -144,9 +144,15 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
 }
 
 /** Trade browsing: one search with full fields, graded on the same public evidence rules as a scan. */
-export async function discoverPlaces(trade: Trade, query: string) {
-  const json = await post("places:searchText", { textQuery: query, regionCode: "GB", maxResultCount: 20 }, "places." + FIELDS.split(",").join(",places."));
-  const places = ((json.places ?? []) as any[]).filter((p) => { const g = guessTrade(p.types, p.displayName?.text); return g === null || g === trade; });
+export async function discoverPlaces(trade: Trade, queries: string[], keep: (r: { rating: number }) => boolean = () => true) {
+  const mask = "places." + FIELDS.split(",").join(",places.");
+  const pages = await Promise.all(queries.map((q) => post("places:searchText", { textQuery: q, regionCode: "GB", maxResultCount: 20 }, mask).catch(() => ({ places: [] }))));
+  const seen = new Set<string>();
+  const places = pages.flatMap((j: any) => (j.places ?? []) as any[])
+    .filter((p) => { if (seen.has(p.id)) return false; seen.add(p.id); const g = guessTrade(p.types, p.displayName?.text); return g === null || g === trade; })
+    .filter((p) => keep({ rating: p.rating ?? 0 }))
+    .sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0))
+    .slice(0, 10);
   const creds = await Promise.all(places.map((p) => websiteCredential(p.websiteUri, trade)));
   return places.map((p, i) => ({
     placeId: p.id as string, name: p.displayName?.text ?? "", address: p.formattedAddress ?? "",
