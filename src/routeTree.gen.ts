@@ -14,7 +14,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SolutionRouteImport } from './routes/solution'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as SiteIdRouteImport } from './routes/site.$id'
@@ -45,9 +47,19 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolutionRoute = SolutionRouteImport.update({
   id: '/solution',
   path: '/solution',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportIdRoute = ReportIdRouteImport.update({
@@ -77,7 +89,9 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
+  '/terms': typeof TermsRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -89,7 +103,9 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
+  '/terms': typeof TermsRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -102,7 +118,9 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
+  '/terms': typeof TermsRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -116,7 +134,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/demo'
     | '/pricing'
+    | '/privacy'
     | '/solution'
+    | '/terms'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -128,7 +148,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/demo'
     | '/pricing'
+    | '/privacy'
     | '/solution'
+    | '/terms'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -140,7 +162,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/demo'
     | '/pricing'
+    | '/privacy'
     | '/solution'
+    | '/terms'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -153,7 +177,9 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   SolutionRoute: typeof SolutionRoute
+  TermsRoute: typeof TermsRoute
   ReportIdRoute: typeof ReportIdRoute
   ScanIdRoute: typeof ScanIdRoute
   SiteIdRoute: typeof SiteIdRoute
@@ -197,11 +223,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solution': {
       id: '/solution'
       path: '/solution'
       fullPath: '/solution'
       preLoaderRoute: typeof SolutionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/report/$id': {
@@ -241,7 +281,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   SolutionRoute: SolutionRoute,
+  TermsRoute: TermsRoute,
   ReportIdRoute: ReportIdRoute,
   ScanIdRoute: ScanIdRoute,
   SiteIdRoute: SiteIdRoute,
