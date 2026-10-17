@@ -21,6 +21,7 @@ export interface Business {
   competitors: { name: string; signals: Signals; photo?: string | undefined }[];
   photo?: string | undefined;
   live?: boolean;
+  location?: { latitude: number; longitude: number };
 }
 
 const sig = (o: Partial<Signals>): Signals => ({

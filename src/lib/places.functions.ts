@@ -25,7 +25,7 @@ export const getBusiness = createServerFn({ method: "GET" })
     if (prefix !== "live" || !trade || !isTrade(trade) || !placeId) return null;
     try {
       const business = await getLiveBusiness(data.id, trade, placeId);
-      const city = referenceCity(business.address);
+      const city = referenceCity(business.address, business.location);
       const { getReference } = await import("./references.server");
       const reference = city ? await getReference(city, trade) : null;
       return { ...business, reference };

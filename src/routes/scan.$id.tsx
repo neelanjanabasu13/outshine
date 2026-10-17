@@ -18,7 +18,7 @@ export const Route = createFileRoute("/scan/$id")({
       { title: loaderData ? `Grading ${loaderData.b.name} · FixFirst` : "Grading · FixFirst" },
       { name: "description", content: "FixFirst is checking this business's Google profile against local competitors." },
       { property: "og:title", content: "Live audit in progress · FixFirst" },
-      { property: "og:description", content: "Checking reviews, photos, profile and trade credentials." },
+      { property: "og:description", content: "Checking available Google reviews, photos and profile information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -33,9 +33,9 @@ function Scan() {
   const s = b.signals;
   const steps = [
     { name: "Finding your profile", lines: [`Matched “${b.name}” on Google Maps`, `${b.address}`, `Category: ${t.label}`] },
-    { name: "Reading reviews", lines: [`${s.reviewCount} reviews found, average ${s.rating.toFixed(1)} ★`, `${s.reviewsLast90} in the last 90 days`, `Owner replied to ${Math.round(s.replyRate * 100)}%`] },
-    { name: "Checking photos", lines: [`${s.photoCount} photos, newest ${s.newestPhotoDays} days old`, `Looking for ${t.expectedPhotos}`] },
-    { name: "Checking trade standards", lines: [`Searching for ${t.credential}`, s.credentialMentioned ? "Found a mention ✓" : "Not mentioned anywhere ✕"] },
+    { name: "Reading reviews", lines: [`${s.reviewCount} reviews found, average ${s.rating.toFixed(1)} ★`, ...(b.live ? ["Review velocity and owner replies are not assessed from this feed"] : [`${s.reviewsLast90} in the last 90 days`, `Owner replied to ${Math.round(s.replyRate * 100)}%`])] },
+    { name: "Checking photos", lines: [b.live ? `${s.photoCount} photos returned by the limited public feed; dates are not assessed` : `${s.photoCount} photos, newest ${s.newestPhotoDays} days old`, `Looking for ${t.expectedPhotos}`] },
+    { name: b.live ? "Checking profile links and hours" : "Checking trade standards", lines: b.live ? [s.hasWebsite ? "Website link returned" : "No website link returned", s.hasHours ? "Regular opening hours returned" : "No regular opening hours returned", "Credentials cannot be verified from this feed"] : [`Searching for ${t.credential}`, s.credentialMentioned ? "Found a mention ✓" : "Not mentioned anywhere ✕"] },
     { name: "Comparing with competitors", lines: b.competitors.map((c) => `${c.name}: ${c.signals.rating.toFixed(1)} ★, ${c.signals.reviewCount} reviews`) },
   ];
   const all = steps.flatMap((st, i) => st.lines.map((l) => ({ i, l })));

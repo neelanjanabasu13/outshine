@@ -109,6 +109,7 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
 
   return {
     id, name: p.displayName?.text ?? "Your business", trade,
+    location: p.location,
     address: p.formattedAddress ?? "", area: town ?? p.shortFormattedAddress ?? "your area",
     phone: p.nationalPhoneNumber ?? "",
     signals: toSignals(p, trade),
