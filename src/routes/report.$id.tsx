@@ -5,11 +5,12 @@ import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { areaScores, estimateLostRevenue, evaluate, gradeOf, PRICE_BUNDLE, PRICE_PER_FIX, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
-import { findBusiness, TRADE_PHOTOS, type Business } from "@/lib/sample";
+import { getBusiness } from "@/lib/places.functions";
+import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
 export const Route = createFileRoute("/report/$id")({
-  loader: ({ params }) => {
-    const b = findBusiness(params.id);
+  loader: async ({ params }) => {
+    const b = await getBusiness({ data: { id: params.id } });
     if (!b) throw notFound();
     return { b };
   },
@@ -91,11 +92,11 @@ function Report() {
         <section className="mt-20">
           <h2 className="text-2xl font-semibold">You, next to the competition</h2>
           <div className="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
-            {[{ name: b.name, score, you: true }, ...comps.map((c) => ({ name: c.name, score: c.score, you: false }))].map((c) => {
+            {[{ name: b.name, score, you: true, photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, you: false, photo: c.photo ?? TRADE_PHOTOS[b.trade] }))].map((c) => {
               const g = gradeOf(c.score);
               return (
                 <div key={c.name} className={`min-w-56 flex-1 snap-start overflow-hidden rounded-3xl border bg-card ${c.you ? "border-ink" : "border-border"}`}>
-                  <img src={TRADE_PHOTOS[b.trade]} alt="" loading="lazy" width={400} height={200} className={`h-32 w-full object-cover ${c.you ? "" : "grayscale"}`} />
+                  <img src={c.photo} alt="" loading="lazy" width={400} height={200} className="h-32 w-full object-cover" />
                   <div className="flex items-end justify-between p-4">
                     <div><p className="text-xs text-muted-foreground">{c.you ? "You" : "Nearby"}</p><p className="font-medium leading-tight">{c.name}</p></div>
                     <p className={`font-display text-4xl font-bold ${gradeColor(g)}`}>{g}</p>
@@ -104,7 +105,7 @@ function Report() {
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">Competitor photos will come from Google once live search is connected.</p>
+          {b.live && <p className="mt-3 text-xs text-muted-foreground">Live from Google: the nearest businesses in your trade within about two miles.</p>}
         </section>
 
         <section className="mt-20 grid items-center gap-10 md:grid-cols-2">

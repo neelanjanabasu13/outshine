@@ -1,11 +1,12 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { TRADES } from "@/lib/audit";
-import { findBusiness, TRADE_PHOTOS } from "@/lib/sample";
+import { getBusiness } from "@/lib/places.functions";
+import { photoOf, TRADE_PHOTOS } from "@/lib/sample";
 
 export const Route = createFileRoute("/site/$id")({
-  loader: ({ params }) => {
-    const b = findBusiness(params.id);
+  loader: async ({ params }) => {
+    const b = await getBusiness({ data: { id: params.id } });
     if (!b) throw notFound();
     return { b };
   },
@@ -29,7 +30,7 @@ function Site() {
   return (
     <div className="min-h-screen bg-card">
       <section className="relative">
-        <img src={TRADE_PHOTOS[b.trade]} alt={b.name} className="h-[70vh] w-full object-cover" width={1024} height={768} />
+        <img src={photoOf(b)} alt={b.name} className="h-[70vh] w-full object-cover" width={1024} height={768} />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-12 text-paper">
           <p className="text-sm uppercase tracking-[0.2em] opacity-80">{t.label} · {b.area}</p>

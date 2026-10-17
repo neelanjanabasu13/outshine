@@ -2,11 +2,12 @@ import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Brand";
 import { TRADES } from "@/lib/audit";
-import { findBusiness, TRADE_PHOTOS } from "@/lib/sample";
+import { getBusiness } from "@/lib/places.functions";
+import { photoOf, TRADE_PHOTOS } from "@/lib/sample";
 
 export const Route = createFileRoute("/scan/$id")({
-  loader: ({ params }) => {
-    const b = findBusiness(params.id);
+  loader: async ({ params }) => {
+    const b = await getBusiness({ data: { id: params.id } });
     if (!b) throw notFound();
     return { b };
   },
@@ -56,7 +57,7 @@ function Scan() {
       <main className="mx-auto grid max-w-6xl gap-10 px-6 pb-20 pt-6 md:grid-cols-2">
         <div>
           <div className="relative overflow-hidden rounded-3xl">
-            <img src={TRADE_PHOTOS[b.trade]} alt={b.name} className="aspect-[4/3] w-full object-cover" width={1024} height={768} />
+            <img src={photoOf(b)} alt={b.name} className="aspect-[4/3] w-full object-cover" width={1024} height={768} />
             <div className="absolute inset-0 bg-ink/20" />
             <div className="animate-laser absolute inset-x-0 h-0.5 bg-fix shadow-[0_0_24px_6px_var(--fix)]" />
             <span className="absolute left-4 top-4 rounded-full bg-paper/90 px-3 py-1 font-mono text-xs">LIVE · {pct}%</span>
