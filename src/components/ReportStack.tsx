@@ -13,8 +13,8 @@ const CARDS = [
 // Resting positions, front to back.
 const SLOTS = [
   "translate-x-0 translate-y-0 rotate-[-3deg] z-30",
-  "translate-x-[18%] -translate-y-[6%] rotate-[4deg] z-20 opacity-95",
-  "translate-x-[34%] -translate-y-[10%] rotate-[9deg] z-10 opacity-90",
+  "translate-x-[7%] -translate-y-[4%] rotate-[3deg] z-20",
+  "translate-x-[13%] -translate-y-[8%] rotate-[8deg] z-10",
 ];
 
 export function ReportStack() {
@@ -27,8 +27,8 @@ export function ReportStack() {
   }, [paused]);
 
   return (
-    <div className="relative mx-auto aspect-[4/5] w-full max-w-sm" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-      <p className="absolute -top-7 left-0 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Example reports</p>
+    <div className="relative mx-auto aspect-[4/5] w-full max-w-sm lg:-translate-x-6" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <p className="absolute -bottom-8 left-0 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Example reports</p>
       {CARDS.map((c, i) => {
         const slot = (i - front + CARDS.length) % CARDS.length;
         return (
