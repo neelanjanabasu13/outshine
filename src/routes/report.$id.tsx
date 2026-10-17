@@ -35,7 +35,7 @@ function Report() {
   const { b } = Route.useLoaderData();
   const findings = evaluate(b.trade, b.signals, b.name, b.live);
   const score = scoreOf(findings);
-  const grade = cappedGrade(score, b.live);
+  const grade = cappedGrade(score, !!b.live);
   const areas = assessedAreaScores(findings);
   const reference = b.reference;
   const referenceBusiness = reference?.business;
@@ -49,7 +49,7 @@ function Report() {
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
-  const projectedGrade = cappedGrade(projectedScore, b.live);
+  const projectedGrade = cappedGrade(projectedScore, !!b.live);
   const allClear = problems.length === 0;
   const projectedAreas = assessedAreaScores(projected);
   const [paidItems, setPaidItems] = useState<string[]>([]);
@@ -152,7 +152,7 @@ function Report() {
           <h2 className="text-2xl font-semibold">You, your nearby rivals, and a real reference</h2>
           <div className="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
             {[{ name: b.name, score, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), ...(referenceBusiness ? [{ name: referenceBusiness.name, score: scoreOf(referenceFindings), category: `${reference?.entry?.city} reference`, photo: photoOf(referenceBusiness) }] : [])].map((c) => {
-              const g = cappedGrade(c.score, b.live || c.category.endsWith("reference"));
+              const g = cappedGrade(c.score, !!b.live || c.category.endsWith("reference"));
               return <div key={c.name} className={`w-56 shrink-0 snap-start overflow-hidden rounded-lg border bg-card ${c.category === "You" ? "border-ink" : "border-border"}`}>
                 <img src={c.photo} alt="" loading="lazy" width={400} height={200} className="h-32 w-full object-cover" />
                 <div className="p-4"><p className="text-xs text-muted-foreground">{c.category}</p><div className="mt-2 flex items-start justify-between gap-3"><p className="break-words font-medium leading-tight">{c.name}</p><p className={`shrink-0 font-display text-4xl font-bold ${gradeColor(g)}`}>{g}</p></div></div>
