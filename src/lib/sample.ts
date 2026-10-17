@@ -24,6 +24,7 @@ export interface Business {
   website?: string | undefined;
   openNow?: boolean | undefined;
   live?: boolean;
+  seeded?: boolean;
   location?: { latitude: number; longitude: number };
 }
 
@@ -96,8 +97,22 @@ export const BUSINESSES: Business[] = [
     ],
     competitors: [{ name: "Studio Nine Leeds", signals: strong() }, { name: "Mane Street", signals: mid() }, { name: "Cut Above Leeds", signals: mid({ photoCount: 40 }) }],
   },
+  {
+    // Judges' seeded example: searchable from the homepage, low grade, every agent action available.
+    id: "mops-stars-cleaning", name: "Mops Stars Cleaning", trade: "cleaning", seeded: true,
+    address: "88 Upper Street, London N1", area: "Islington", phone: "07700 900456",
+    signals: sig({ rating: 3.9, reviewCount: 14, reviewsLast90: 0, replyRate: 0, photoCount: 1, newestPhotoDays: 640, descriptionLength: 0, hasWebsite: false, hasHours: false, servicesListed: 1, credentialMentioned: false }),
+    services: ["Regular home cleans", "End of tenancy", "Deep cleans", "Airbnb turnovers", "Oven cleaning"],
+    reviews: [
+      { author: "Amira S.", stars: 5, text: "Spotless flat and so friendly.", replied: false },
+      { author: "James P.", stars: 2, text: "Good clean but nobody answered my calls to rebook.", replied: false },
+      { author: "Chloe T.", stars: 4, text: "Great end of tenancy clean, got my deposit back.", replied: false },
+    ],
+    competitors: [{ name: "Islington Home Clean", signals: strong() }, { name: "Angel Sparkle Cleaners", signals: mid() }, { name: "Highbury Maids", signals: mid({ replyRate: 0.8 }) }],
+  },
 ];
 
+export const SEEDED_ID = "mops-stars-cleaning";
 export const findBusiness = (id: string) => BUSINESSES.find((b) => b.id === id);
 
 export const photoOf = (b: Pick<Business, "photo" | "trade">) => b.photo ?? TRADE_PHOTOS[b.trade];

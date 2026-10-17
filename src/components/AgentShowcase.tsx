@@ -9,8 +9,8 @@ import type { Business } from "@/lib/sample";
 export const SHOWCASE_LOG: Record<FixKind, string[]> = {
   website: ["Read your listing, services and best reviews", "Wrote your page copy and picked your photos", "Published your one-page website", "Added the website link to your Google listing", "Checked the link works from Google Maps"],
   description: ["Read your services, area and credentials", "Wrote a keyword-rich business description", "Updated your description on Google", "Added your opening hours to Google", "Confirmed Google accepted the changes"],
-  "review-replies": ["Fetched every unanswered review", "Wrote a personal reply to each one", "Posted the replies on Google", "Flagged one complaint for your attention"],
-  "review-request": ["Created your direct review link", "Designed your QR review card", "Sent a review request to your last 20 customers by text", "Scheduled a friendly reminder for day 3"],
+  "review-replies": ["Fetched every unanswered review through your Google connection", "Wrote a personal reply to each one", "Posted the replies on Google", "Emailed you a summary from your Gmail, flagging one complaint"],
+  "review-request": ["Created your direct review link", "Designed your QR review card", "Found your last 20 customers in your Gmail", "Sent each one a personal review request from your Gmail", "Scheduled a friendly reminder for day 3"],
   photos: ["Picked your strongest job photos", "Cropped, brightened and captioned them", "Uploaded 8 photos to your Google listing", "Set a new cover photo"],
   posts: ["Wrote four seasonal offers for your trade", "Designed a matching graphic for each", "Published the first post on Google", "Scheduled the next three, one a week"],
 };
@@ -18,8 +18,8 @@ export const SHOWCASE_LOG: Record<FixKind, string[]> = {
 const RESULT: Record<FixKind, (b: Business) => string> = {
   website: () => "Website button now live on your listing",
   description: (b) => `Trusted ${b.area} specialists. Fully insured, fixed quotes, and same-week appointments. Call ${b.phone ?? "us"} today.`,
-  "review-replies": () => "\"Thanks so much, Sarah. We're glad the boiler is running quietly again, and we'll see you at the annual service.\"",
-  "review-request": () => "20 review requests sent · 3 new 5 star reviews so far",
+  "review-replies": (b) => { const r = b.reviews[0]; return r ? `"Thank you so much, ${r.author.split(" ")[0]}. It was a pleasure working with you, and we look forward to seeing you again."` : "Every review now has a personal owner reply"; },
+  "review-request": () => "20 review requests sent from your Gmail · 3 new 5 star reviews so far",
   photos: () => "8 new photos live · new cover photo set",
   posts: () => "\"Winter boiler check, £20 off this month\" is live, three more are scheduled",
 };

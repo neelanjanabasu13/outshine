@@ -12,6 +12,7 @@ import { downloadReviewFlyer } from "@/lib/review-flyer";
 import { sopFor } from "@/lib/diy";
 import { SCREEN_NOTE, TOOLS_DISCLAIMER, type UiScreen } from "@/lib/sop-visuals";
 import { SHOWCASE_LOG, ShowcaseResult } from "@/components/AgentShowcase";
+import { ConnectGate } from "@/components/ConnectGate";
 
 function ScreenDiagram({ s }: { s: UiScreen }) {
   return <figure className="overflow-hidden rounded-lg border border-border bg-background">
@@ -66,7 +67,8 @@ function Report() {
     const f = evaluate(b.trade, c.signals, c.name, b.live);
     return { ...c, score: scoreOf(f), grade: cappedGrade(f), areas: assessedAreaScores(f) };
   }).sort((a, c) => c.score - a.score);
-  const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings);
+  // The seeded showcase lists every problem so judges see the website build and Gmail actions too.
+  const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings, b.seeded ? 8 : 5);
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
@@ -82,7 +84,9 @@ function Report() {
   const diy = all || paidItems.includes("diy");
 
   const [demo, setDemo] = useState<string | null>(null);
-  const showcase = demo === "agent";
+  // The seeded judges' business runs the full agent showcase once done-for-you is bought (100% code).
+  const showcase = demo === "agent" || (!!b.seeded && all);
+  const [connected, setConnected] = useState(false);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     // Showcase mode for demo businesses only: unlocks a tier without payment, never for live listings.
@@ -171,6 +175,7 @@ function Report() {
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
         {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "the full vision of Fix it for me, with our AI agent connected to the owner's Google profile and making every change itself. The Google updates are simulated for this demo."} This is a made-up business and no payment is taken.</p>}
+        {b.seeded && !demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Showcase business:</span> Mops Stars Cleaning is made up for judging. {all ? "Done for you is unlocked, and the Google and Gmail connections are simulated as if our partnerships were in place." : "Both paid options work here with a 100% off code at checkout."}</p>}
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
@@ -207,9 +212,9 @@ function Report() {
               {diy ? <Button onClick={downloadDIY} disabled={pdfBusy} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
             </div>
             <div className="flex flex-col gap-3">
-              <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold">{showcase ? <><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</> : "Coming soon"}</p>
+              <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold">{showcase || b.seeded ? <><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</> : "Coming soon"}</p>
               <p className="flex-1 text-sm text-muted-foreground">Our fully automated AI agent makes every change on your Google listing and website for you. Nothing to copy, nothing to paste.</p>
-              {showcase ? <p className="text-grade-a">Our AI agent is fixing everything below.</p> : <Button disabled variant="outline" className="h-auto min-h-10 w-full whitespace-normal py-3">Coming soon</Button>}
+              {showcase ? <p className="text-grade-a">{connected ? "Our AI agent is fixing everything below." : "Connect Google below and our AI agent starts."}</p> : b.seeded ? <PayButton b={b} item="all" label="Done for you" onSession={setPendingSession}>Let our AI agent do it · £{PRICE_BUNDLE.toFixed(2)}</PayButton> : <Button disabled variant="outline" className="h-auto min-h-10 w-full whitespace-normal py-3">Coming soon</Button>}
             </div>
           </div>
           <p className="mt-5 text-xs text-muted-foreground">Secure one-off payment through Stripe. No subscription.</p>
@@ -264,9 +269,10 @@ function Report() {
           </div>
         </section>}
 
+        {showcase && !connected && !allClear && <ConnectGate b={b} onDone={() => setConnected(true)} />}
         {!allClear && <section className="mt-16">
           <h2 className="text-3xl font-semibold md:text-4xl">{showcase ? `Our AI agent is fixing your ${problems.length} biggest problems` : `The ${problems.length} things costing you the most`}</h2>
-          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} showcase={showcase} />)}</div>
+          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all && (!showcase || connected)} showcase={showcase} />)}</div>
         </section>}
 
         {!allClear && <section className="mt-16 border-t border-border pt-12" id="diy">

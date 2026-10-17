@@ -137,7 +137,7 @@ function Home() {
                 <p className="mt-1 text-sm">{picked.rating.toFixed(1)} ★ · {picked.reviewCount} reviews</p>
                 {!pickedTrade && <p className="mt-2 text-sm font-semibold text-fix">Pick your trade below so we compare you with the right rivals.</p>}
                 <div className="mt-4 flex items-center gap-4">
-                  <button disabled={!pickedTrade} onClick={() => pickedTrade && navigate({ to: "/scan/$id", params: { id: liveId(pickedTrade, picked.placeId) } })}
+                  <button disabled={!pickedTrade} onClick={() => pickedTrade && navigate({ to: "/scan/$id", params: { id: picked.placeId.startsWith("seed:") ? picked.placeId.slice(5) : liveId(pickedTrade, picked.placeId) } })}
                     className="rounded-full bg-fix px-6 py-3 font-semibold text-fix-foreground transition hover:-translate-y-0.5 disabled:opacity-40">Grade my business →</button>
                   <button onClick={() => setPicked(null)} className="text-sm text-muted-foreground underline-offset-4 hover:underline">Not this one</button>
                 </div>

@@ -27,6 +27,7 @@ function Demo() {
     <main className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-display text-4xl font-extrabold">Showcase links</h1>
       <p className="mt-3 text-muted-foreground">Private links for recording the video or sharing with judges. Each uses a made-up business and takes no payment.</p>
+      <a href="/report/mops-stars-cleaning" className="mt-8 block rounded-xl border-2 border-fix bg-card p-5 transition hover:-translate-y-0.5"><p className="font-semibold">Judges' walkthrough: Mops Stars Cleaning, London</p><p className="mt-1 text-sm text-muted-foreground">Type "Mops Stars Cleaning" in the homepage search. It grades D, has no website and unanswered reviews. Buy either paid option with a 100% off code, then watch our AI agent connect to Google and Gmail, build the website and fix everything.</p></a>
       <ul className="mt-8 space-y-3">{LINKS.map((x) => <li key={x.demo}><a href={`/report/${x.id}?demo=${x.demo}`} className="block rounded-xl border border-border bg-card p-5 transition hover:border-fix"><p className="font-semibold">{x.t}</p><p className="mt-1 text-sm text-muted-foreground">{x.d}</p></a></li>)}</ul>
       <section className="mt-12 rounded-xl border border-border bg-card p-6">
         <h2 className="text-2xl font-semibold">What is real today, and what the demo simulates</h2>
