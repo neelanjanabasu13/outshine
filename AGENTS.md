@@ -16,7 +16,7 @@
 - Checkout accepts only whole-report DIY and done-for-you tiers, with prices validated centrally in the audit module; Stripe opens in a separate tab to avoid embedded-preview restrictions, and purchases unlock only after server-side payment verification.
 - DIY packs use trade-specific guidance in `src/lib/diy.ts` and unlock a download separately from agent output.
 - Homepage trade browsing reuses live Places search with pure query and review-count ordering helpers in `src/lib/discovery.ts`, keeping discovery distinct from audit grades.
-- Homepage discovery uses the shared Embla carousel with fixed-height slides, keeping live-result loading and horizontal browsing from expanding the list vertically.
+- Homepage discovery shows trade pills and a single-line, horizontally scrolling row of example business pills under the search box, so browsing never pushes the page down or repeats trade choices.
 - Curated city/trade references live in the browser-safe reference catalogue with source links; public grades use only exposed fields and unknown areas remain unassessed to avoid fabricated evidence.
 - Live grading uses only verifiable evidence: Google Places fields (rating, review count, photo count, website, hours) plus a server-side read of the business's own website for trade credentials; review dates and photo uploaders from the five-review, ten-photo samples are never graded; an overall A requires Credentials to be assessed and no area graded D or F.
 - Trade-specific DIY depth (root causes, shot lists, scripts, guardrails) lives in browser-safe `src/lib/playbook.ts` and is merged into SOPs by `sopFor`, so research updates never touch page code.
