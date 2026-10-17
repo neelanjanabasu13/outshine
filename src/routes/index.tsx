@@ -148,16 +148,6 @@ function Home() {
           )}
         </div>
         <div className="pt-8"><ReportStack />
-          <div className="mt-6 rounded-2xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">See it in action · demo businesses</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
-              {[
-                { id: "sparkle-and-co", demo: "free", t: "1. Free scan", d: "Grade, rivals and a free download" },
-                { id: "the-hair-lab", demo: "diy", t: "2. DIY pack", d: "Unlocked step-by-step guides and PDF" },
-                { id: "riverside-plumbing", demo: "agent", t: "3. Fix it for me", d: "Watch our AI agent do the fixes" },
-              ].map((x) => <a key={x.demo} href={`/report/${x.id}?demo=${x.demo}`} className="rounded-xl border border-border p-3 transition hover:border-fix"><p className="text-sm font-semibold">{x.t}</p><p className="mt-1 text-xs text-muted-foreground">{x.d}</p></a>)}
-            </div>
-          </div>
         </div>
         </div>
 

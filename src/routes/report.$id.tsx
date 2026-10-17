@@ -11,6 +11,7 @@ import { AGENT_ACTION, AGENT_HANDOFF, GOOGLE_PROFILE_URL, HANDOFF_NOTE, reviewLi
 import { downloadReviewFlyer } from "@/lib/review-flyer";
 import { sopFor } from "@/lib/diy";
 import { SCREEN_NOTE, TOOLS_DISCLAIMER, type UiScreen } from "@/lib/sop-visuals";
+import { SHOWCASE_LOG, ShowcaseResult } from "@/components/AgentShowcase";
 
 function ScreenDiagram({ s }: { s: UiScreen }) {
   return <figure className="overflow-hidden rounded-lg border border-border bg-background">
@@ -77,9 +78,11 @@ function Report() {
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
   const verify = useServerFn(verifyCheckout);
   const all = paidItems.includes("all");
-  const diy = paidItems.includes("diy");
+  // The agent tier is the top tier, so it always includes the DIY playbook.
+  const diy = all || paidItems.includes("diy");
 
   const [demo, setDemo] = useState<string | null>(null);
+  const showcase = demo === "agent";
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     // Showcase mode for demo businesses only: unlocks a tier without payment, never for live listings.
@@ -167,7 +170,7 @@ function Report() {
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
-        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "Fix it for me shown as if purchased, so you can watch our AI agent work through each fix."} This is a made-up business and no payment is taken.</p>}
+        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "the full vision of Fix it for me, with our AI agent connected to the owner's Google profile and making every change itself. The Google updates are simulated for this demo."} This is a made-up business and no payment is taken.</p>}
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
@@ -262,21 +265,21 @@ function Report() {
         </section>}
 
         {!allClear && <section className="mt-16">
-          <h2 className="text-3xl font-semibold md:text-4xl">The {problems.length} things costing you the most</h2>
-          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} />)}</div>
+          <h2 className="text-3xl font-semibold md:text-4xl">{showcase ? `Our AI agent is fixing your ${problems.length} biggest problems` : `The ${problems.length} things costing you the most`}</h2>
+          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} showcase={showcase} />)}</div>
         </section>}
 
         {!allClear && <section className="mt-16 border-t border-border pt-12" id="diy">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-semibold md:text-4xl">How to fix it yourself, step by step</h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before.</p>
+              <h2 className="text-3xl font-semibold md:text-4xl">{all ? "Included: how every fix was done" : "How to fix it yourself, step by step"}</h2>
+              <p className="mt-3 max-w-2xl text-muted-foreground">{all ? "Fix it for me includes the full DIY playbook at no extra cost, so you can see exactly what our AI agent changed and repeat it any time." : "A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before."}</p>
             </div>
           </div>
           {diy ? (
             <>
             <div className="sticky top-2 z-30 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-fix bg-card p-4 shadow-lg">
-              <p className="text-sm"><span className="font-semibold">Your DIY pack is unlocked.</span> <span className="text-muted-foreground">Download the full report and every guide as one searchable PDF with clickable contents.</span></p>
+              <p className="text-sm"><span className="font-semibold">{all ? "Your playbook is included." : "Your DIY pack is unlocked."}</span> <span className="text-muted-foreground">Download the full report and every guide as one searchable PDF with clickable contents.</span></p>
               <Button onClick={downloadDIY} disabled={pdfBusy}><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button>
             </div>
             <div className="mt-8 space-y-6">{problems.map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}</div>
@@ -344,7 +347,7 @@ function PayButton({ b, item, label, children, onSession, variant = "default" }:
   </div>;
 }
 
-function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business; autoRun: boolean }) {
+function ProblemCard({ f, n, b, autoRun, showcase = false }: { f: Finding; n: number; b: Business; autoRun: boolean; showcase?: boolean }) {
   const [state, setState] = useState<"idle" | "running" | "done">("idle");
   const [step, setStep] = useState(0);
   const [showAfter, setShowAfter] = useState(false);
@@ -357,13 +360,32 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
     try { await navigator.clipboard.writeText(text); setCopied(true); } catch { setCopied(false); }
     if (!tab) window.location.assign(GOOGLE_PROFILE_URL);
   };
+  const steps = showcase ? SHOWCASE_LOG[f.fix] : run.steps;
   useEffect(() => { if (autoRun && state === "idle") setState("running"); }, [autoRun, state]);
   useEffect(() => {
     if (state !== "running") return;
-    if (step >= run.steps.length) { setState("done"); setShowAfter(true); return; }
-    const to = setTimeout(() => setStep((s) => s + 1), 900);
+    if (step >= steps.length) { setState("done"); setShowAfter(true); return; }
+    const to = setTimeout(() => setStep((s) => s + 1), showcase ? 1100 : 900);
     return () => clearTimeout(to);
-  }, [state, step, run.steps.length]);
+  }, [state, step, steps.length, showcase]);
+  if (showcase) return <article className="animate-rise grid gap-8 rounded-lg border border-border bg-card p-6 md:grid-cols-[1.1fr_1fr] md:p-8">
+    <div>
+      <p className="text-xs text-muted-foreground">0{n} · {f.area}</p>
+      <h3 className="mt-3 text-2xl font-semibold">{f.title}</h3>
+      <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
+      <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">{state === "done" ? "Fixed by our AI agent" : "Our AI agent is fixing this"}</p>
+        <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
+      </div>
+      <ul className="mt-5 space-y-2 rounded-lg bg-secondary p-4 font-mono text-xs">{steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : i === step && state === "running" ? "animate-pulse text-foreground" : "text-muted-foreground"}>{i < step ? "✓" : i === step && state === "running" ? "›" : "○"} {s}</li>)}</ul>
+    </div>
+    <div className="flex flex-col">
+      <div className="inline-flex self-start gap-1 text-xs">{(["Before", "After"] as const).map((l) => <Button key={l} size="sm" variant={showAfter === (l === "After") ? "secondary" : "ghost"} onClick={() => setShowAfter(l === "After")}>{l}</Button>)}</div>
+      <div className={`mt-3 flex-1 rounded-lg p-5 text-sm ${showAfter ? "bg-accent text-accent-foreground" : "bg-secondary"}`}>
+        {!showAfter ? <p>{f.before}</p> : state === "done" ? <ShowcaseResult fix={f.fix} b={b} /> : <p className="text-muted-foreground">Working on it…</p>}
+      </div>
+    </div>
+  </article>;
   return <article className="animate-rise grid gap-8 rounded-lg border border-border bg-card p-6 md:grid-cols-[1.1fr_1fr] md:p-8">
     <div>
       <p className="text-xs text-muted-foreground">0{n} · {f.area}</p>
