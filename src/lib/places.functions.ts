@@ -34,11 +34,11 @@ export const discoverBusinesses = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ trade: z.enum(["plumbing", "electrician", "cleaning", "landscaping", "salon"]), city: z.string().trim().min(2).max(40) }).parse(d))
   .handler(async ({ data }) => {
     const { discoverPlaces } = await import("./places.server");
-    const { discoveryQuery, pickDiscovery } = await import("./discovery");
+    const { discoveryQuery, pickExamples } = await import("./discovery");
     const { evaluate, cappedGrade } = await import("./audit");
     try {
       const found = await discoverPlaces(data.trade, discoveryQuery(data.trade, data.city));
       const graded = found.map(({ signals, ...r }) => ({ ...r, grade: cappedGrade(evaluate(data.trade, signals, r.name, true)) }));
-      return { results: pickDiscovery(graded).map(({ grade: _g, ...r }) => r), error: null };
+      return { results: pickExamples(graded).map(({ grade: _g, ...r }) => r), error: null };
     } catch { return { results: [], error: "Search is having a moment. Please try again." }; }
   });
