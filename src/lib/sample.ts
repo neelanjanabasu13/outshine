@@ -18,8 +18,8 @@ export interface Business {
   signals: Signals;
   services: string[];
   reviews: { author: string; stars: number; text: string; replied: boolean }[];
-  competitors: { name: string; signals: Signals; photo?: string }[];
-  photo?: string;
+  competitors: { name: string; signals: Signals; photo?: string | undefined }[];
+  photo?: string | undefined;
   live?: boolean;
 }
 
