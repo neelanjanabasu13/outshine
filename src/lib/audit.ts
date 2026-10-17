@@ -166,15 +166,18 @@ export function scoreOf(findings: Finding[]): number {
   return total ? Math.round((got / total) * 100) : 0;
 }
 
+/** Review count at which the public review-volume check is fully met. */
+export const PUBLIC_REVIEW_TARGET = 250;
+
 /** Public profile grade only: unexposed fields never contribute a penalty or guessed score. */
 function evaluatePublic(trade: Trade, s: Signals): Finding[] {
   const t = TRADES[trade];
   const photosTarget = Math.min(t.minPhotos, 10); // Places returns at most ten photos, not the full gallery.
   return [
-    { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: s.reviewCount > 0 ? clamp((s.rating - 3.5) / 1.3) : 0,
-      title: s.rating >= 4.8 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.8 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: "Invite honest feedback from satisfied customers" },
-    { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: clamp(s.reviewCount / 50),
-      title: "Build a broader base of customer reviews", evidence: `${s.reviewCount} Google reviews in total; the public-profile target is 50. Review recency and velocity cannot be verified from Google's limited sample.`, impact: "More genuine reviews give customers a broader base of evidence.", before: `${s.reviewCount} published reviews`, after: "A consistent process for requesting honest reviews after jobs" },
+    { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: s.reviewCount > 0 ? clamp((s.rating - 4.0) / 0.9) : 0,
+      title: s.rating >= 4.9 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.9 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: "Invite honest feedback from satisfied customers" },
+    { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: clamp(Math.log10(s.reviewCount + 1) / Math.log10(PUBLIC_REVIEW_TARGET + 1)),
+      title: "Build a broader base of customer reviews", evidence: `${s.reviewCount} Google reviews in total; the public-profile target is ${PUBLIC_REVIEW_TARGET}. Review recency and velocity cannot be verified from Google's limited sample.`, impact: "More genuine reviews give customers a broader base of evidence.", before: `${s.reviewCount} published reviews`, after: "A consistent process for requesting honest reviews after jobs" },
     { id: "photos", area: "Visuals", fix: "photos", weight: t.weights.Visuals, score: clamp(s.photoCount / photosTarget),
       title: "Make your work easier to see", evidence: `${s.photoCount} photos returned by Google, which exposes up to ten, not the full gallery. This check targets ${photosTarget} visible photos; their dates and quality are not graded.`, impact: `Useful photos of ${t.expectedPhotos} help customers inspect your work.`, before: `${s.photoCount} photos available in the public feed`, after: `Add useful photos of ${t.expectedPhotos}` },
     { id: "website", area: "Profile", fix: "website", weight: t.weights.Profile / 2, score: s.hasWebsite ? 1 : 0,
