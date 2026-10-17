@@ -9,6 +9,24 @@ import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { AGENT_ACTION, runAgent } from "@/lib/agent";
 import { sopFor } from "@/lib/diy";
+import { SCREEN_NOTE, TOOLS_DISCLAIMER, type UiScreen } from "@/lib/sop-visuals";
+
+function ScreenDiagram({ s }: { s: UiScreen }) {
+  return <figure className="overflow-hidden rounded-lg border border-border bg-background">
+    <div className="flex items-center gap-2 border-b border-border bg-secondary px-3 py-2">
+      <span className="h-2 w-2 rounded-full bg-muted-foreground/40" /><span className="h-2 w-2 rounded-full bg-muted-foreground/40" />
+      <span className="ml-2 truncate rounded bg-background px-2 py-0.5 text-[11px] text-muted-foreground">{s.url}</span>
+    </div>
+    <div className="space-y-2 p-3">
+      <p className="text-xs font-semibold">{s.title}</p>
+      {s.rows.map((r) => <div key={r.text} className={`relative flex items-center gap-2 rounded-md px-3 py-2 text-xs ${r.kind === "button" ? "border border-border" : r.kind === "field" ? "border border-dashed border-border bg-secondary" : "text-muted-foreground"} ${r.mark ? "ring-2 ring-fix" : ""}`}>
+        {r.mark && <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-fix text-[10px] font-bold text-fix-foreground">{r.mark}</span>}
+        <span className="truncate">{r.text}</span>
+      </div>)}
+    </div>
+    <figcaption className="border-t border-border px-3 py-2 text-xs text-muted-foreground">{s.caption}</figcaption>
+  </figure>;
+}
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
@@ -378,6 +396,25 @@ function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
     <ol className="mt-6 space-y-3">
       {sop.steps.map((s, i) => <li key={i} className="flex gap-3 text-sm"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fix text-xs font-bold text-fix-foreground">{i + 1}</span><span className="pt-0.5">{s}</span></li>)}
     </ol>
+    {sop.screens && <div className="mt-6">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">What you will see</p>
+      <div className="mt-2 grid gap-4 md:grid-cols-2">{sop.screens.map((sc) => <ScreenDiagram key={sc.title} s={sc} />)}</div>
+      <p className="mt-2 text-xs text-muted-foreground">{SCREEN_NOTE}</p>
+    </div>}
+    {sop.tools && <div className="mt-6">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Popular no-code tools</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">{sop.tools.map((t) => <a key={t.name} href={t.url} target="_blank" rel="noopener noreferrer" className="flex items-start justify-between gap-2 rounded-lg border border-border p-3 text-sm hover:border-fix"><span><span className="font-medium">{t.name}</span><span className="block text-muted-foreground">{t.bestFor}</span></span><ArrowUpRight className="h-4 w-4 shrink-0" /></a>)}</div>
+      <p className="mt-2 text-xs italic text-muted-foreground">{TOOLS_DISCLAIMER}</p>
+    </div>}
+    {sop.prompts?.map((pr) => <div key={pr.label} className="mt-6 rounded-lg border border-fix/40 bg-secondary p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium">{pr.label}</p>
+        <Button size="sm" variant="ghost" onClick={() => copy(pr.label, pr.text)}><Copy className="h-3.5 w-3.5" />{copied === pr.label ? "Copied ✓" : "Copy prompt"}</Button>
+      </div>
+      <pre className="mt-2 whitespace-pre-wrap font-sans text-sm text-muted-foreground">{pr.text}</pre>
+      <p className="mt-3 text-xs text-muted-foreground">Fill in the [square brackets], then paste it into: {pr.openIn.map((t, i) => <span key={t.name}>{i > 0 && ", "}<a href={t.url} target="_blank" rel="noopener noreferrer" className="font-medium text-fix underline">{t.name}</a></span>)}. {sop.tools ? "" : TOOLS_DISCLAIMER}</p>
+    </div>)}
+    {f.fix === "website" && <p className="mt-6 rounded-lg bg-fix p-4 text-sm font-semibold text-fix-foreground">Rather not do it yourself? Choose Fix it for me and our AI agent builds your one-page website in under a minute.</p>}
     {sop.shotList && <div className="mt-6">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Your five-shot photo set</p>
       <ul className="mt-2 space-y-2 text-sm">{sop.shotList.map((c) => <li key={c.shot}><span className="font-medium">{c.shot}:</span> <span className="text-muted-foreground">{c.how}</span></li>)}</ul>
