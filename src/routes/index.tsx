@@ -75,7 +75,7 @@ function Home() {
             your business back.
           </h1>
           <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-            A free scan of your online presence, from your Google listing to your website, against nearby rivals. In under a minute you get a letter grade, the exact problems costing you calls, and the choice to fix them yourself with our DIY pack or <span className="font-semibold text-brand-gradient">let our AI agent fix them for you.</span>
+            Free scan of your Google listing and website against local rivals. Fix it yourself, or <span className="font-semibold text-brand-gradient">let our AI agent fix it for you.</span>
           </p>
 
           {!picked ? (
@@ -86,17 +86,17 @@ function Home() {
                 <span className="m-1.5 hidden items-center rounded-xl bg-fix px-5 font-semibold text-fix-foreground sm:flex">Scan free</span>
               </div>
               <div className="mt-5"><TradeDeck selected={trade} onPick={(t) => { setTrade(t); setQ(""); }} /></div>
-              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mt-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mt-3">
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
                     <span className="shrink-0">Try one in</span>
-                    <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-8 rounded-lg border border-border bg-card px-2 text-sm text-foreground">
+                    <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="cursor-pointer bg-transparent font-semibold text-foreground underline decoration-dotted underline-offset-4 outline-none">
                       {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <CarouselPrevious className="static h-8 w-8 translate-y-0" title="Previous businesses" />
-                    <CarouselNext className="static h-8 w-8 translate-y-0" title="Next businesses" />
+                    <CarouselPrevious className="static h-7 w-7 translate-y-0" title="Previous businesses" />
+                    <CarouselNext className="static h-7 w-7 translate-y-0" title="Next businesses" />
                   </div>
                 </div>
                 <div aria-busy={loading} className="h-24">
