@@ -1,3 +1,4 @@
+import type React from "react";
 import { Link } from "@tanstack/react-router";
 
 export const QUIET_CREW_URL = "https://quietcrew.ai/";
@@ -30,7 +31,7 @@ export function Footer() {
           Quietcrew
         </a>
       </span>
-      <span>Free audits for UK trades</span>
+      <span className="flex gap-4"><Link to="/privacy" className="hover:text-foreground">Privacy</Link><Link to="/terms" className="hover:text-foreground">Terms</Link><span>Free audits for UK trades</span></span>
     </footer>
   );
 }
@@ -38,7 +39,7 @@ export function Footer() {
 const gradeClass = { A: "text-grade-a", B: "text-grade-b", C: "text-grade-c", D: "text-grade-d", F: "text-grade-f" } as const;
 export const gradeColor = (g: keyof typeof gradeClass) => gradeClass[g];
 
-export function ShellPage({ title, intro }: { title: string; intro: string }) {
+export function ShellPage({ title, intro, children }: { title: string; intro: string; children?: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       <Header />
@@ -46,10 +47,14 @@ export function ShellPage({ title, intro }: { title: string; intro: string }) {
         <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground">← Back to home</Link>
         <h1 className="mt-6 text-4xl font-semibold md:text-6xl">{title}</h1>
         <p className="mt-6 text-lg text-muted-foreground">{intro}</p>
-        <p className="mt-10 border-l-2 border-border pl-4 text-sm text-muted-foreground">More on this page is coming soon.</p>
+        {children && <div className="mt-10 space-y-8">{children}</div>}
         <Link to="/" className="mt-10 inline-block rounded-full bg-fix px-6 py-3 font-semibold text-fix-foreground">Scan my business free</Link>
       </main>
       <Footer />
     </div>
   );
+}
+
+export function Block({ h, children }: { h: string; children: React.ReactNode }) {
+  return <section><h2 className="text-2xl font-semibold">{h}</h2><div className="mt-3 space-y-3 text-muted-foreground">{children}</div></section>;
 }
