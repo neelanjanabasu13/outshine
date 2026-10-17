@@ -1,14 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowUpRight, Check, Download, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Copy, Download, Lock, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { AGENT_ACTION, runAgent } from "@/lib/agent";
-import { diyInstructions } from "@/lib/diy";
+import { diyInstructions, sopFor } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
@@ -61,9 +61,19 @@ function Report() {
   const diy = paidItems.includes("diy");
 
   useEffect(() => {
+    // Restore a previously verified purchase so returning owners keep their unlock.
+    try {
+      const saved = window.localStorage.getItem(`fixfirst-paid-${b.id}`);
+      if (saved) setPaidItems(JSON.parse(saved) as string[]);
+    } catch { /* private mode etc. */ }
     const sid = new URLSearchParams(window.location.search).get("session_id");
     if (sid) setPendingSession(sid);
   }, [b.id]);
+
+  useEffect(() => {
+    if (!paidItems.length) return;
+    try { window.localStorage.setItem(`fixfirst-paid-${b.id}`, JSON.stringify(paidItems)); } catch { /* ignore */ }
+  }, [paidItems, b.id]);
 
   useEffect(() => {
     if (!pendingSession) return;
@@ -215,6 +225,34 @@ function Report() {
           <h2 className="text-3xl font-semibold md:text-4xl">The {problems.length} things costing you the most</h2>
           <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} />)}</div>
         </section>}
+
+        {!allClear && <section className="mt-16 border-t border-border pt-12" id="diy">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-semibold md:text-4xl">How to fix it yourself, step by step</h2>
+              <p className="mt-3 max-w-2xl text-muted-foreground">A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before.</p>
+            </div>
+            {diy && <Button onClick={downloadDIY}><Download />Download DIY pack</Button>}
+          </div>
+          {diy ? (
+            <div className="mt-8 space-y-6">{problems.map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}</div>
+          ) : (
+            <div className="relative mt-8">
+              <div className="pointer-events-none select-none space-y-6 blur-md" aria-hidden="true">
+                {problems.slice(0, 2).map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}
+              </div>
+              <div className="absolute inset-0 grid place-items-center rounded-lg bg-background/40">
+                <div className="mx-4 max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-lg">
+                  <Lock className="mx-auto h-8 w-8 text-fix" />
+                  <p className="mt-4 text-xl font-semibold">Unlock the full DIY pack</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{problems.length} detailed SOP{problems.length === 1 ? "" : "s"} for your report, with exact clicks, scripts and links. One-off payment, no subscription.</p>
+                  <div className="mt-5"><PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Unlock DIY pack · £{PRICE_DIY.toFixed(2)} <s className="ml-1 text-xs opacity-70">£{WAS_DIY.toFixed(2)}</s></PayButton></div>
+                  <p className="mt-3 text-xs text-muted-foreground">Prefer not to do it yourself? Choose Fix it for me above and our AI agent does the work.</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>}
       </main>
       {!all && !allClear && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY <s>£{WAS_DIY.toFixed(2)}</s> £{PRICE_DIY.toFixed(2)} · Agent <s>£{WAS_BUNDLE.toFixed(2)}</s> £{PRICE_BUNDLE.toFixed(2)} launch prices</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
     </div>
@@ -295,6 +333,45 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
         {showAfter && state === "done" && (f.fix === "website" ? <div><p className="font-medium">Your draft website is ready to preview.</p><Button asChild className="mt-3"><Link to="/site/$id" params={{ id: b.id }} target="_blank">Preview website<ArrowUpRight /></Link></Button></div> : <div><pre className="max-h-72 overflow-auto whitespace-pre-wrap font-sans">{run.output}</pre><Button className="mt-4" onClick={async () => { try { await navigator.clipboard.writeText(run.output); setCopied(true); } catch { setCopied(false); } }}>{copied ? "Copied ✓" : "Copy draft"}</Button></div>)}
       </div>
     </div>
+  </article>;
+}
+
+function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
+  const sop = sopFor(f, b.trade, b.name);
+  const [copied, setCopied] = useState<string | null>(null);
+  const copy = async (label: string, text: string) => {
+    try { await navigator.clipboard.writeText(text); setCopied(label); } catch { setCopied(null); }
+  };
+  return <article className="rounded-lg border border-border bg-card p-6 md:p-8">
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p className="text-xs text-muted-foreground">SOP {n} · {f.area}</p>
+        <h3 className="mt-2 text-2xl font-semibold">{f.title}</h3>
+        <p className="mt-2 max-w-2xl text-muted-foreground">{sop.goal}</p>
+      </div>
+      <p className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{sop.time}</p>
+    </div>
+    {sop.youNeed.length > 0 && <div className="mt-5">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Before you start</p>
+      <ul className="mt-2 space-y-1 text-sm">{sop.youNeed.map((y) => <li key={y} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-grade-a" />{y}</li>)}</ul>
+    </div>}
+    <ol className="mt-6 space-y-3">
+      {sop.steps.map((s, i) => <li key={i} className="flex gap-3 text-sm"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fix text-xs font-bold text-fix-foreground">{i + 1}</span><span className="pt-0.5">{s}</span></li>)}
+    </ol>
+    {sop.scripts.length > 0 && <div className="mt-6 space-y-3">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Word-for-word scripts</p>
+      {sop.scripts.map((sc) => <div key={sc.label} className="rounded-lg bg-secondary p-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-medium">{sc.label}</p>
+          <Button size="sm" variant="ghost" onClick={() => copy(sc.label, sc.text)}><Copy className="h-3.5 w-3.5" />{copied === sc.label ? "Copied ✓" : "Copy"}</Button>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{sc.text}</p>
+      </div>)}
+    </div>}
+    {sop.proTips.length > 0 && <div className="mt-6 border-l-2 border-fix pl-4">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-fix">Pro tips</p>
+      <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">{sop.proTips.map((p) => <li key={p}>{p}</li>)}</ul>
+    </div>}
   </article>;
 }
 
