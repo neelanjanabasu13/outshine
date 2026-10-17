@@ -39,7 +39,9 @@ describe("grading", () => {
   });
 
   it("projects selected improvements without changing the original audit", () => {
-    const findings = evaluate(BUSINESSES[0].trade, BUSINESSES[0].signals, "Business");
+    const business = BUSINESSES[0];
+    if (!business) throw new Error("Expected a demo business");
+    const findings = evaluate(business.trade, business.signals, "Business");
     const before = scoreOf(findings);
     const projected = projectFindings(findings, findings.map((f) => f.id));
     expect(gradeOf(scoreOf(projected))).toBe("A");

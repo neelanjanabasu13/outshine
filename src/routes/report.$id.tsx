@@ -121,7 +121,7 @@ function Report() {
         <section className="mt-12 border-y border-border py-8" id="pricing">
           <h2 className="text-2xl font-semibold">Choose how you want to fix it</h2>
           <p className="mt-2 text-muted-foreground">One payment, never a subscription. Your scan and findings stay free.</p>
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
             <div className="flex flex-col gap-3">
               <p className="font-medium">Free scan</p><p className="font-display text-3xl font-semibold">Free</p>
               <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and the problems worth fixing.</p>
@@ -170,7 +170,7 @@ function Report() {
         </section>
 
         <section className="mt-16 border-y border-border py-8">
-          <div className="grid gap-8 md:grid-cols-[1fr_auto]">
+          <div className="grid gap-8 sm:grid-cols-[1fr_auto]">
             <div>
               <h2 className="text-3xl font-semibold">See what could change</h2>
               <p className="mt-3 text-sm text-muted-foreground">Projected grade if each selected improvement meets its benchmark, not a live update or a promise of more customers.</p>
