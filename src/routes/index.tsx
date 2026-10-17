@@ -7,6 +7,7 @@ import { TRADE_PHOTOS } from "@/lib/sample";
 import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.functions";
 import { Button } from "@/components/ui/button";
 import { ReportStack } from "@/components/ReportStack";
+import { TradeDeck } from "@/components/TradeDeck";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
@@ -84,12 +85,7 @@ function Home() {
                   className="min-w-0 flex-1 rounded-l-2xl bg-transparent px-5 py-4 text-lg outline-none" />
                 <span className="m-1.5 hidden items-center rounded-xl bg-fix px-5 font-semibold text-fix-foreground sm:flex">Scan free</span>
               </div>
-              <div className="mt-4 flex flex-wrap gap-2" aria-label="Pick a trade">
-                {(Object.keys(TRADES) as Trade[]).map((t) => (
-                  <button key={t} onClick={() => { setTrade(t); setQ(""); }} aria-pressed={trade === t}
-                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${trade === t ? "border-ink bg-ink text-background" : "border-border bg-card hover:border-ink"}`}>{TRADES[t].label}</button>
-                ))}
-              </div>
+              <div className="mt-5"><TradeDeck selected={trade} onPick={(t) => { setTrade(t); setQ(""); }} /></div>
               {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mt-4">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
