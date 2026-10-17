@@ -174,15 +174,15 @@ function evaluatePublic(trade: Trade, s: Signals): Finding[] {
   const t = TRADES[trade];
   const photosTarget = Math.min(t.minPhotos, 10); // Places returns at most ten photos, not the full gallery.
   return [
-    { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: s.reviewCount > 0 ? clamp((s.rating - 4.0) / 0.9) : 0,
+    { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation, score: s.reviewCount > 0 ? clamp((s.rating - 4.3) / 0.6) : 0,
       title: s.rating >= 4.9 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.9 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: "Invite honest feedback from satisfied customers" },
-    { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: clamp(Math.log10(s.reviewCount + 1) / Math.log10(PUBLIC_REVIEW_TARGET + 1)),
+    { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation, score: clamp(Math.log10(s.reviewCount + 1) / Math.log10(PUBLIC_REVIEW_TARGET + 1)),
       title: "Build a broader base of customer reviews", evidence: `${s.reviewCount} Google reviews in total; the public-profile target is ${PUBLIC_REVIEW_TARGET}. Review recency and velocity cannot be verified from Google's limited sample.`, impact: "More genuine reviews give customers a broader base of evidence.", before: `${s.reviewCount} published reviews`, after: "A consistent process for requesting honest reviews after jobs" },
-    { id: "photos", area: "Visuals", fix: "photos", weight: t.weights.Visuals, score: clamp(s.photoCount / photosTarget),
+    { id: "photos", area: "Visuals", fix: "photos", weight: t.weights.Visuals / 2, score: clamp(s.photoCount / photosTarget),
       title: "Make your work easier to see", evidence: `${s.photoCount} photos returned by Google, which exposes up to ten, not the full gallery. This check targets ${photosTarget} visible photos; their dates and quality are not graded.`, impact: `Useful photos of ${t.expectedPhotos} help customers inspect your work.`, before: `${s.photoCount} photos available in the public feed`, after: `Add useful photos of ${t.expectedPhotos}` },
-    { id: "website", area: "Profile", fix: "website", weight: t.weights.Profile / 2, score: s.hasWebsite ? 1 : 0,
+    { id: "website", area: "Profile", fix: "website", weight: t.weights.Profile / 4, score: s.hasWebsite ? 1 : 0,
       title: s.hasWebsite ? "Your website is linked" : "No website linked to your profile", evidence: s.hasWebsite ? "Google returns a website link." : "Google returns no website link.", impact: "A website gives customers somewhere to learn more before contacting you.", before: s.hasWebsite ? "Website linked" : "No website link returned", after: "A website linked from your Google profile" },
-    { id: "hours", area: "Profile", fix: "description", weight: t.weights.Profile / 2, score: s.hasHours ? 1 : 0,
+    { id: "hours", area: "Profile", fix: "description", weight: t.weights.Profile / 4, score: s.hasHours ? 1 : 0,
       title: s.hasHours ? "Your opening hours are available" : "Your opening hours are not available", evidence: s.hasHours ? "Google returns regular opening hours." : "Google returns no regular opening hours; confirm whether hours apply to your business.", impact: "Clear availability helps customers decide when to contact you.", before: s.hasHours ? "Opening hours available" : "No regular opening hours returned", after: "Accurate opening hours for your business" },
   ];
 }
