@@ -223,35 +223,33 @@ function Report() {
 
 function PayButton({ b, item, label, children, onSession, variant = "default" }: { b: Business; item: "diy" | "all"; label: string; children: React.ReactNode; onSession: (id: string) => void; variant?: "default" | "outline" }) {
   const go = useServerFn(createCheckout);
-  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const [session, setSession] = useState<{ url: string; id?: string } | null>(null);
+  // Prepare the Stripe session up front so the button is a real link: a direct
+  // click on a link opens Stripe in a new tab reliably, including inside the preview.
+  useEffect(() => {
+    let cancelled = false;
+    go({ data: { businessId: b.id, businessName: b.name, item, label } })
+      .then((r) => {
+        if (cancelled) return;
+        if (r.url) setSession({ url: r.url, id: r.sessionId ?? undefined });
+        else setErr(r.error ?? "We could not prepare the payment page. Please refresh and try again.");
+      })
+      .catch(() => { if (!cancelled) setErr("We could not prepare the payment page. Please refresh and try again."); });
+    return () => { cancelled = true; };
+  }, [b.id, item]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cls = "h-auto min-h-10 w-full whitespace-normal py-3";
   return <div>
-    <Button disabled={busy} variant={variant} className="h-auto min-h-10 w-full whitespace-normal py-3" onClick={async () => {
-      // Open synchronously so browsers do not block the tab after the async RPC.
-      const tab = window.open("about:blank", "_blank");
-      if (tab) {
-        tab.opener = null;
-        tab.document.title = "Opening secure payment · FixFirst";
-        tab.document.body.textContent = "Opening your secure Stripe payment page. Please keep this tab open.";
-      }
-      setBusy(true); setErr(null); setCheckoutUrl(null);
-      try {
-        const r = await go({ data: { businessId: b.id, businessName: b.name, item, label } });
-        if (r.url) {
-          setCheckoutUrl(r.url);
-          if (r.sessionId) onSession(r.sessionId);
-          let navigated = false;
-          if (tab && !tab.closed) {
-            try { tab.location.href = r.url; navigated = true; } catch { navigated = false; }
-          }
-          if (!navigated) tab?.close();
-        } else { tab?.close(); setErr(r.error); }
-      } catch { tab?.close(); setErr("We could not open the payment page. Please try again."); }
-      setBusy(false);
-    }}>{busy ? "Opening secure payment…" : children}<ArrowUpRight /></Button>
+    {session ? (
+      <Button asChild variant={variant} className={cls}>
+        <a href={session.url} target="_blank" rel="noopener noreferrer" onClick={() => { if (session.id) onSession(session.id); }}>
+          {children}<ArrowUpRight />
+        </a>
+      </Button>
+    ) : (
+      <Button disabled variant={variant} className={cls}>{err ? children : "Preparing secure payment…"}<ArrowUpRight /></Button>
+    )}
     {err && <p role="alert" className="mt-2 text-sm text-destructive">{err}</p>}
-    {checkoutUrl && <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block text-sm underline underline-offset-4">Open secure payment in a new tab ↗</a>}
   </div>;
 }
 
