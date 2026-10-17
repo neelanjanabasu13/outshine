@@ -77,9 +77,6 @@ async function websiteCredential(url: string | undefined, trade: Trade): Promise
 }
 
 function toSignals(p: any, trade: Trade, credential: boolean | null = null): Signals {
-  const now = Date.now();
-  const dates = ((p.reviews ?? []) as any[]).map((r) => Date.parse(r.publishTime)).filter((n) => !Number.isNaN(n));
-  const owner = (p.displayName?.text ?? "").trim().toLowerCase();
   const reviews = (p.reviews ?? []) as any[];
   const text = [p.displayName?.text, p.editorialSummary?.text, ...reviews.map((r) => r.text?.text)].join(" ");
   return {
@@ -96,8 +93,8 @@ function toSignals(p: any, trade: Trade, credential: boolean | null = null): Sig
     postsLast30: 0,
     credentialMentioned: false,
     servicesListed: 0,
-    newestReviewDays: dates.length ? Math.max(0, Math.floor((now - Math.max(...dates)) / 86_400_000)) : null,
-    ownerPhotos: ((p.photos ?? []) as any[]).filter((ph) => (ph.authorAttributions ?? []).some((a: any) => (a.displayName ?? "").trim().toLowerCase() === owner)).length,
+    // Review dates and photo uploaders are not graded: Google returns only five reviews chosen by relevance
+    // and ten photos, so neither shows how recent or how active a profile really is.
     websiteCredential: credential,
   };
 }

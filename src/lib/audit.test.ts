@@ -8,8 +8,8 @@ describe("grading", () => {
     for (const trade of Object.keys(TRADES) as Trade[]) {
       const f = evaluate(trade, s, "Real profile", true);
       expect(gradeOf(scoreOf(f))).toBe("A");
-      expect(Object.keys(assessedAreaScores(f)).sort()).toEqual(["Activity", "Profile", "Reputation", "Visuals"]);
-      expect(f.map((x) => x.id)).toEqual(["rating", "velocity", "photos", "website", "hours", "ownerPhotos"]);
+      expect(Object.keys(assessedAreaScores(f)).sort()).toEqual(["Profile", "Reputation", "Visuals"]);
+      expect(f.map((x) => x.id)).toEqual(["rating", "velocity", "photos", "website", "hours"]);
       expect(scoreOf(evaluate(trade, { ...s, replyRate: 1, postsLast30: 4, credentialMentioned: true, descriptionLength: 750, reviewsLast90: 100 }, "Same profile", true))).toBe(scoreOf(f));
     }
   });
@@ -96,9 +96,10 @@ describe("cappedGrade", () => {
   it("allows an A when every area has evidence", () => { expect(_cappedGrade(evaluate("cleaning", { ...base, websiteCredential: true }, "x", true))).toBe("A"); });
   it("never gives an A when an area is graded F", () => { expect(_cappedGrade(evaluate("salon", { ...base, websiteCredential: false }, "x", true))).toBe("B"); });
   it("lowers the grade when the website shows no credentials", () => { expect(_cappedGrade(evaluate("plumbing", { ...base, websiteCredential: false }, "x", true))).not.toBe("A"); });
-  it("lowers the grade when the newest review is over 180 days old", () => {
-    const fresh = scoreOf(evaluate("salon", { ...base, websiteCredential: true }, "x", true));
-    expect(scoreOf(evaluate("salon", { ...base, websiteCredential: true, newestReviewDays: 200 }, "x", true))).toBeLessThan(fresh);
+  it("never grades on Google's five-review sample dates or photo uploaders", () => {
+    const now = scoreOf(evaluate("salon", { ...base, websiteCredential: true }, "x", true));
+    expect(scoreOf(evaluate("salon", { ...base, websiteCredential: true, newestReviewDays: 1659, ownerPhotos: 0 }, "x", true))).toBe(now);
+    expect(evaluate("salon", { ...base, websiteCredential: true, newestReviewDays: 1659 }, "x", true).some((f) => f.area === "Activity")).toBe(false);
   });
 });
 

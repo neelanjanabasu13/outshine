@@ -181,7 +181,7 @@ function evaluatePublic(trade: Trade, s: Signals): Finding[] {
   const photosTarget = Math.min(t.minPhotos, 10); // Places returns at most ten photos, not the full gallery.
   return [
     { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation, score: s.reviewCount > 0 ? clamp((s.rating - 4.3) / 0.6) : 0,
-      title: s.rating >= 4.9 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.9 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: "Invite honest feedback from satisfied customers" },
+      title: s.rating >= 4.9 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.9 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: s.rating >= 4.9 ? `${s.rating.toFixed(1)} ★ kept up with a review request after every job` : `Towards 4.9 ★: ask every happy customer for a review straight after the job, so new 5 star reviews lift your average` },
     { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation, score: clamp(Math.log10(s.reviewCount + 1) / Math.log10(PUBLIC_REVIEW_TARGET + 1)),
       title: "Build a broader base of customer reviews", evidence: `${s.reviewCount} Google reviews in total; the public-profile target is ${PUBLIC_REVIEW_TARGET}. Review recency and velocity cannot be verified from Google's limited sample.`, impact: "More genuine reviews give customers a broader base of evidence.", before: `${s.reviewCount} published reviews`, after: "A consistent process for requesting honest reviews after jobs" },
     { id: "photos", area: "Visuals", fix: "photos", weight: t.weights.Visuals / 2, score: clamp(s.photoCount / photosTarget),
@@ -190,10 +190,6 @@ function evaluatePublic(trade: Trade, s: Signals): Finding[] {
       title: s.hasWebsite ? "Your website is linked" : "No website linked to your profile", evidence: s.hasWebsite ? "Google returns a website link." : "Google returns no website link.", impact: "A website gives customers somewhere to learn more before contacting you.", before: s.hasWebsite ? "Website linked" : "No website link returned", after: "A website linked from your Google profile" },
     { id: "hours", area: "Profile", fix: "description", weight: t.weights.Profile / 4, score: s.hasHours ? 1 : 0,
       title: s.hasHours ? "Your opening hours are available" : "Your opening hours are not available", evidence: s.hasHours ? "Google returns regular opening hours." : "Google returns no regular opening hours; confirm whether hours apply to your business.", impact: "Clear availability helps customers decide when to contact you.", before: s.hasHours ? "Opening hours available" : "No regular opening hours returned", after: "Accurate opening hours for your business" },
-    ...(s.newestReviewDays == null ? [] : [{ id: "recency", area: "Activity" as Area, fix: "review-request" as FixKind, weight: t.weights.Response / 2, score: clamp(1 - (s.newestReviewDays - 30) / 150),
-      title: s.newestReviewDays <= 30 ? "Customers are reviewing you recently" : "No recent reviews showing", evidence: `The newest of the reviews Google shows is ${s.newestReviewDays} days old. Full marks need one within 30 days; it scores zero after 180.`, impact: "Recent reviews tell customers you are busy and still trading.", before: `Newest review ${s.newestReviewDays} days ago`, after: "A steady flow of fresh reviews after every job" }]),
-    { id: "ownerPhotos", area: "Activity", fix: "photos", weight: t.weights.Response / 2, score: clamp((s.ownerPhotos ?? 0) / 3),
-      title: (s.ownerPhotos ?? 0) >= 3 ? "You add your own photos" : "Few photos come from you", evidence: `${s.ownerPhotos ?? 0} of the photos Google shows were uploaded by the business itself. The target is 3 or more.`, impact: "Photos you upload show customers an owner who looks after the profile.", before: `${s.ownerPhotos ?? 0} owner photos`, after: `Your own photos of ${t.expectedPhotos}` },
     ...(s.websiteCredential == null ? [] : [{ id: "credential", area: "Credentials" as Area, fix: "description" as FixKind, weight: t.weights.Credentials, score: s.websiteCredential ? 1 : 0,
       title: s.websiteCredential ? "Your website shows your credentials" : "Your website does not show your credentials", evidence: s.websiteCredential ? `Your website mentions ${t.credential.toLowerCase()} or a similar trade standard.` : `We read your website and found no mention of ${t.credential.toLowerCase()}.`, impact: `${t.credentialWhy} In plain words for customers: ${t.credentialPlain}`, before: "Credentials not shown on your site", after: `${t.credential}, explained in plain English` }]),
   ];
@@ -269,7 +265,8 @@ export function estimateLostRevenue(trade: Trade, yourScore: number, rivalsScore
 export function cappedGrade(findings: Finding[]): Grade {
   const g = gradeOf(scoreOf(findings));
   const areas = new Set(findings.filter((f) => f.weight > 0).map((f) => f.area));
-  const complete = areas.has("Credentials") && (areas.has("Response") || areas.has("Activity"));
+  // Public scans have no review-reply evidence, so Credentials is the area that must be checked.
+  const complete = areas.has("Credentials");
   const weak = Object.values(assessedAreaScores(findings)).some((v) => gradeOf(v) === "D" || gradeOf(v) === "F");
   return g === "A" && (!complete || weak) ? "B" : g;
 }
