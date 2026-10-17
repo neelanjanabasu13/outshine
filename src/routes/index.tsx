@@ -7,6 +7,7 @@ import { TRADE_PHOTOS } from "@/lib/sample";
 import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.functions";
 import { Button } from "@/components/ui/button";
 import { ReportStack } from "@/components/ReportStack";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -89,19 +90,36 @@ function Home() {
                     className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${trade === t ? "border-ink bg-ink text-background" : "border-border bg-card hover:border-ink"}`}>{TRADES[t].label}</button>
                 ))}
               </div>
-              {browsing && <div className="mt-3 flex min-h-9 items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:thin]" aria-label="Example businesses" aria-busy={loading}>
-                <span className="shrink-0 text-xs text-muted-foreground">Try one in</span>
-                <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-7 shrink-0 rounded-full border border-border bg-card px-2 text-xs">
-                  {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-                {hits.map((b) => (
-                  <button key={b.placeId} onClick={() => setPicked(b)} className="max-w-56 shrink-0 truncate rounded-full bg-secondary px-3 py-1.5 text-xs font-medium hover:bg-accent">
-                    {b.name}{b.rating > 0 && ` · ${b.rating.toFixed(1)} ★`}
-                  </button>
-                ))}
-                {loading && <span className="text-xs text-muted-foreground">Finding local businesses…</span>}
-                {!loading && !hits.length && <span className="text-xs text-muted-foreground">No 4 to 4.5 star examples here. Try another city.</span>}
-              </div>}
+              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mt-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+                    <span className="shrink-0">Try one in</span>
+                    <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-8 rounded-lg border border-border bg-card px-2 text-sm text-foreground">
+                      {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <CarouselPrevious className="static h-8 w-8 translate-y-0" title="Previous businesses" />
+                    <CarouselNext className="static h-8 w-8 translate-y-0" title="Next businesses" />
+                  </div>
+                </div>
+                <div aria-busy={loading} className="h-24">
+                  {hits.length > 0 ? <CarouselContent aria-label="Business results" className="-ml-3">
+                    {hits.map((b) => <CarouselItem key={b.placeId} className="basis-[85%] pl-3 sm:basis-1/2">
+                      <Button variant="outline" onClick={() => setPicked(b)} className="flex h-24 w-full justify-start gap-3 rounded-xl bg-card px-3 text-left whitespace-normal hover:-translate-y-0.5">
+                        {b.photo ? <img src={b.photo} alt="" className="h-16 w-14 shrink-0 rounded-md object-cover" loading="lazy" width={56} height={64} /> : <span className="h-16 w-14 shrink-0 rounded-md bg-secondary" />}
+                        <span className="min-w-0 flex-1">
+                          <span className="line-clamp-2 text-sm font-semibold leading-5">{b.name}</span>
+                          <span className="mt-1 block truncate text-xs text-muted-foreground">{b.address}</span>
+                          <span className="mt-1 block text-xs text-muted-foreground">{b.rating > 0 && `${b.rating.toFixed(1)} ★ · `}{b.reviewCount.toLocaleString("en-GB")} reviews</span>
+                        </span>
+                      </Button>
+                    </CarouselItem>)}
+                  </CarouselContent> : <div className="flex h-full items-center rounded-xl border border-border bg-card px-4 text-sm text-muted-foreground" role="status">
+                    {loading ? "Finding local businesses…" : err ?? "No 4 to 4.5 star examples here. Try another city."}
+                  </div>}
+                </div>
+              </Carousel>}
               {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 {hits.map((b) => (
                   <li key={b.placeId}>
