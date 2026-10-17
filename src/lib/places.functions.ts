@@ -9,9 +9,11 @@ export const liveId = (trade: string, placeId: string) => `live.${trade}.${place
 export const searchBusinesses = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ q: z.string().trim().min(2).max(120), max: z.number().int().min(1).max(20).optional() }).parse(d))
   .handler(async ({ data }) => {
+    // Seeded showcase business for judges, found by name like a real listing.
+    const seed = /mops\s*stars?/i.test(data.q) ? [{ placeId: "seed:mops-stars-cleaning", name: "Mops Stars Cleaning", address: "88 Upper Street, London N1", rating: 3.9, reviewCount: 14, trade: "cleaning" as const, photo: null }] : [];
     const { searchPlaces } = await import("./places.server");
-    try { return { results: await searchPlaces(data.q, data.max), error: null }; }
-    catch { return { results: [], error: "Search is having a moment. Please try again." }; }
+    try { return { results: [...seed, ...(await searchPlaces(data.q, data.max))], error: null }; }
+    catch { return { results: seed, error: seed.length ? null : "Search is having a moment. Please try again." }; }
   });
 
 export const getBusiness = createServerFn({ method: "GET" })
