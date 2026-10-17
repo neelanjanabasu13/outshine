@@ -35,8 +35,8 @@ export function TradeDeck({ selected, onPick }: { selected: Trade | null; onPick
             <button type="button" aria-pressed={on} onClick={() => onPick(t.trade)}
               className={`group relative block w-full overflow-hidden rounded-2xl border-2 border-pop-ink text-left transition duration-300 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pop-yellow ${t.bg} ${on ? "-translate-y-2 -rotate-1 shadow-block" : "shadow-block-sm hover:-translate-y-1 hover:rotate-1 hover:shadow-block"}`}>
               <img src={t.img} alt="" width={768} height={960} loading={i < 3 ? "eager" : "lazy"}
-                className={`aspect-[4/5] w-full object-cover transition duration-500 ${on ? "scale-110 rotate-3" : "group-hover:scale-105"}`} />
-              <span className={`absolute inset-x-0 bottom-0 p-4 ${t.fg}`}>
+                className={`aspect-square w-full border-b-2 border-pop-ink object-cover transition duration-500 ${on ? "scale-110 rotate-3" : "group-hover:scale-105"}`} />
+              <span className={`block p-4 ${t.fg}`}>
                 <span className="block font-display text-xl font-extrabold leading-tight">{t.name}</span>
                 <span className="block text-sm font-medium opacity-90">{t.pun}</span>
               </span>
