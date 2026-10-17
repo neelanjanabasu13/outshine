@@ -167,6 +167,7 @@ function Report() {
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
+        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "Fix it for me shown as if purchased, so you can watch our AI agent work through each fix."} This is a made-up business and no payment is taken.</p>}
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
