@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
-import { runAgent } from "@/lib/agent";
+import { AGENT_ACTION, runAgent } from "@/lib/agent";
 import { diyInstructions } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
