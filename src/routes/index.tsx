@@ -28,7 +28,7 @@ type Hit = { placeId: string; name: string; address: string; rating: number; rev
 
 function Home() {
   const [q, setQ] = useState("");
-  const [trade, setTrade] = useState<Trade | null>(null);
+  const [trade, setTrade] = useState<Trade | null>("cleaning");
   const [city, setCity] = useState("London");
   const [picked, setPicked] = useState<Hit | null>(null);
   const [hits, setHits] = useState<Hit[]>([]);
@@ -81,11 +81,25 @@ function Home() {
           {!picked ? (
             <div className="relative mt-8 max-w-xl">
               <div className="flex items-stretch rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
-                <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town"
+                <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Prolux Cleaning, Borehamwood"
                   className="min-w-0 flex-1 rounded-l-2xl bg-transparent px-5 py-4 text-lg outline-none" />
                 <span className="m-1.5 hidden items-center rounded-xl bg-fix px-5 font-semibold text-fix-foreground sm:flex">Scan free</span>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">Or pick your trade below to try a local business.</p>
+              <div className="mt-4 flex flex-wrap gap-2" aria-label="Pick a trade">
+                {(Object.keys(TRADES) as Trade[]).map((t) => (
+                  <button key={t} onClick={() => { setTrade(t); setQ(""); }} aria-pressed={trade === t}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${trade === t ? "border-ink bg-ink text-background" : "border-border bg-card hover:border-ink"}`}>{TRADES[t].label}</button>
+                ))}
+              </div>
+              {browsing && <div className="mt-3 flex min-h-9 flex-wrap items-center gap-2" aria-label="Example businesses" aria-busy={loading}>
+                <span className="text-xs text-muted-foreground">Try one in {city}:</span>
+                {hits.slice(0, 4).map((b) => (
+                  <button key={b.placeId} onClick={() => setPicked(b)} className="max-w-56 truncate rounded-full bg-secondary px-3 py-1.5 text-xs font-medium hover:bg-accent">
+                    {b.name}{b.rating > 0 && ` · ${b.rating.toFixed(1)} ★`}
+                  </button>
+                ))}
+                {loading && <span className="text-xs text-muted-foreground">Finding local businesses…</span>}
+              </div>}
               {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 {hits.map((b) => (
                   <li key={b.placeId}>
