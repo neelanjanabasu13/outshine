@@ -1,4 +1,5 @@
 import type { Trade } from "./audit";
+import type { Business } from "./sample";
 
 export const REFERENCE_CITIES = ["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"] as const;
 export type ReferenceCity = typeof REFERENCE_CITIES[number];
@@ -46,4 +47,11 @@ export function referenceCity(address: string, location?: { latitude: number; lo
   const [lat, lng] = centres[nearest];
   const km = 111 * Math.hypot(lat - location.latitude, (lng - location.longitude) * Math.cos(location.latitude * Math.PI / 180));
   return km <= 35 ? nearest : null;
+}
+
+/** Curation is not grade evidence and never triggers extra billable lookups. */
+export function getCuratedReference(address: string, trade: Trade, location?: { latitude: number; longitude: number }): { entry: ReferenceEntry; business: Business | null; checkedAt: string | null } | null {
+  const city = referenceCity(address, location);
+  const entry = REFERENCES.find((r) => r.city === city && r.trade === trade);
+  return entry ? { entry, business: null, checkedAt: null } : null;
 }
