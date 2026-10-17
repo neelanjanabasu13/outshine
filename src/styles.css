@@ -63,6 +63,8 @@
 
 @theme inline {
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-quietcrew: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-quietcrew: #6b4ef5;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
   --color-ink: var(--ink);
