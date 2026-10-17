@@ -7,10 +7,10 @@ import { getCuratedReference } from "./references";
 export const liveId = (trade: string, placeId: string) => `live.${trade}.${placeId}`;
 
 export const searchBusinesses = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ q: z.string().trim().min(2).max(120) }).parse(d))
+  .inputValidator((d) => z.object({ q: z.string().trim().min(2).max(120), max: z.number().int().min(1).max(20).optional() }).parse(d))
   .handler(async ({ data }) => {
     const { searchPlaces } = await import("./places.server");
-    try { return { results: await searchPlaces(data.q), error: null }; }
+    try { return { results: await searchPlaces(data.q, data.max), error: null }; }
     catch { return { results: [], error: "Search is having a moment. Please try again." }; }
   });
 
@@ -28,4 +28,17 @@ export const getBusiness = createServerFn({ method: "GET" })
       const reference = getCuratedReference(business.address, trade, business.location);
       return { ...business, reference };
     } catch { return null; }
+  });
+
+export const discoverBusinesses = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ trade: z.enum(["plumbing", "electrician", "cleaning", "landscaping", "salon"]), city: z.string().trim().min(2).max(40) }).parse(d))
+  .handler(async ({ data }) => {
+    const { discoverPlaces } = await import("./places.server");
+    const { discoveryQuery, pickDiscovery } = await import("./discovery");
+    const { evaluate, cappedGrade } = await import("./audit");
+    try {
+      const found = await discoverPlaces(data.trade, discoveryQuery(data.trade, data.city));
+      const graded = found.map(({ signals, ...r }) => ({ ...r, grade: cappedGrade(evaluate(data.trade, signals, r.name, true)) }));
+      return { results: pickDiscovery(graded).map(({ grade: _g, ...r }) => r), error: null };
+    } catch { return { results: [], error: "Search is having a moment. Please try again." }; }
   });

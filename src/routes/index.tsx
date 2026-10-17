@@ -4,9 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Brand";
 import { TRADES, type Trade } from "@/lib/audit";
 import { TRADE_PHOTOS } from "@/lib/sample";
-import { liveId, searchBusinesses } from "@/lib/places.functions";
+import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.functions";
 import { Button } from "@/components/ui/button";
-import { discoveryQuery, discoveryResults } from "@/lib/discovery";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
@@ -35,6 +34,7 @@ function Home() {
   const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
   const search = useServerFn(searchBusinesses);
+  const discover = useServerFn(discoverBusinesses);
 
   useEffect(() => {
     const s = q.trim();
@@ -46,13 +46,13 @@ function Home() {
     setErr(null);
     const to = setTimeout(async () => {
       try {
-        const r = await search({ data: { q: browsing && trade ? discoveryQuery(trade, city) : trade ? `${s} ${TRADES[trade].label}` : s } });
-        if (live) { setHits(browsing && trade ? discoveryResults(r.results, trade) : r.results); setErr(r.error); }
+        const r = await (browsing && trade ? discover({ data: { trade, city } }) : search({ data: { q: trade ? `${s} ${TRADES[trade].label}` : s } }));
+        if (live) { setHits(r.results); setErr(r.error); }
       } catch { if (live) setErr("Search is having a moment. Please try again."); }
       if (live) setLoading(false);
     }, browsing ? 0 : 400);
     return () => { live = false; clearTimeout(to); };
-  }, [q, trade, city, search]);
+  }, [q, trade, city, search, discover]);
 
   const pickedTrade = picked ? (picked.trade ?? trade) : null;
   const browsing = trade !== null && q.trim().length < 3;
@@ -83,9 +83,9 @@ function Home() {
             <div className="relative mt-4">
               <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town, e.g. ProLux Cleaning London"
                 className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
-              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Popular businesses" className="mt-4">
+              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="mt-4">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                <h2 className="min-w-0 text-sm font-semibold">Popular businesses</h2>
+                <h2 className="min-w-0 text-sm font-semibold">Local businesses to try</h2>
                 <div className="flex shrink-0 items-center gap-2">
                 <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-8 max-w-32 rounded-lg border border-border bg-card px-2 text-xs">
                   {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
