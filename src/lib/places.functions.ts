@@ -7,10 +7,10 @@ import { getCuratedReference } from "./references";
 export const liveId = (trade: string, placeId: string) => `live.${trade}.${placeId}`;
 
 export const searchBusinesses = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ q: z.string().trim().min(2).max(120) }).parse(d))
+  .inputValidator((d) => z.object({ q: z.string().trim().min(2).max(120), max: z.number().int().min(1).max(20).optional() }).parse(d))
   .handler(async ({ data }) => {
     const { searchPlaces } = await import("./places.server");
-    try { return { results: await searchPlaces(data.q), error: null }; }
+    try { return { results: await searchPlaces(data.q, data.max), error: null }; }
     catch { return { results: [], error: "Search is having a moment. Please try again." }; }
   });
 

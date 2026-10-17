@@ -6,6 +6,11 @@ describe("trade discovery", () => {
     expect(discoveryQuery("plumbing", "London")).toBe("plumbers and heating engineers in London UK");
     expect(discoveryQuery("cleaning", "Manchester")).toBe("cleaning services in Manchester UK");
   });
+  it("leads with businesses below the public targets and keeps one strong leader for contrast", () => {
+    const mk = (reviewCount: number, rating: number) => ({ trade: "plumbing" as const, reviewCount, rating });
+    const out = discoveryResults([mk(900, 4.9), mk(700, 5), mk(400, 4.5), mk(120, 4.9), mk(60, 4.2), mk(30, 4.6), mk(10, 3.9)], "plumbing");
+    expect(out.map((r) => r.reviewCount)).toEqual([400, 120, 60, 30, 900]);
+  });
   it("shows five matching businesses ordered by review count without changing the search results", () => {
     const results = [20, 80, 10, 50, 30, 60].map((reviewCount) => ({ trade: "cleaning" as const, reviewCount, rating: 4.5 }));
     const other = { trade: "plumbing" as const, reviewCount: 200, rating: 5 };

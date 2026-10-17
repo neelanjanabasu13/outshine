@@ -47,8 +47,8 @@ async function post(path: string, body: unknown, mask: string) {
   return res.json() as Promise<any>;
 }
 
-export async function searchPlaces(q: string) {
-  const json = await post("places:searchText", { textQuery: q, regionCode: "GB", maxResultCount: 8 },
+export async function searchPlaces(q: string, max = 8) {
+  const json = await post("places:searchText", { textQuery: q, regionCode: "GB", maxResultCount: max },
     "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types,places.photos");
   return ((json.places ?? []) as any[]).map((p) => ({
     placeId: p.id as string,
