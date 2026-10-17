@@ -7,6 +7,7 @@ import { TRADE_PHOTOS } from "@/lib/sample";
 import { liveId, searchBusinesses } from "@/lib/places.functions";
 import { Button } from "@/components/ui/button";
 import { discoveryQuery, discoveryResults } from "@/lib/discovery";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,6 +55,7 @@ function Home() {
   }, [q, trade, city, search]);
 
   const pickedTrade = picked ? (picked.trade ?? trade) : null;
+  const browsing = trade !== null && q.trim().length < 3;
 
   return (
     <div className="min-h-screen">
@@ -81,13 +83,36 @@ function Home() {
             <div className="relative mt-4">
               <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town, e.g. ProLux Cleaning London"
                 className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
-              {trade && q.trim().length < 3 && <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold">Popular {TRADES[trade].label.toLowerCase()} businesses</h2>
-                <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
+              {browsing && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Popular businesses" className="mt-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                <h2 className="min-w-0 text-sm font-semibold">Popular businesses</h2>
+                <div className="flex shrink-0 items-center gap-2">
+                <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-8 max-w-32 rounded-lg border border-border bg-card px-2 text-xs">
                   {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-              </div>}
-              {(q.trim().length >= 3 || trade) && <ul aria-label="Business results" aria-busy={loading} className="mt-2 overflow-hidden rounded-lg border border-border bg-card">
+                <CarouselPrevious className="static translate-y-0" title="Previous businesses" />
+                <CarouselNext className="static translate-y-0" title="Next businesses" />
+                </div>
+                </div>
+                <div aria-busy={loading} className="h-28">
+                  {hits.length > 0 ? <CarouselContent aria-label="Business results" className="-ml-2">
+                    {hits.map((b) => <CarouselItem key={b.placeId} className="basis-[85%] pl-2 sm:basis-[48%]">
+                      <Button variant="outline" onClick={() => setPicked(b)} className="flex h-28 w-full justify-start gap-3 rounded-lg px-3 text-left whitespace-normal">
+                        {b.photo ? <img src={b.photo} alt="" className="h-16 w-14 shrink-0 rounded-md object-cover" loading="lazy" width={56} height={64} /> : <span className="h-16 w-14 shrink-0 rounded-md bg-secondary" />}
+                        <span className="min-w-0 flex-1">
+                          <span className="line-clamp-2 text-sm font-semibold leading-5">{b.name}</span>
+                          <span className="mt-1 block truncate text-xs text-muted-foreground">{b.address}</span>
+                          <span className="mt-1 block text-xs text-muted-foreground">{b.rating > 0 && `${b.rating.toFixed(1)} ★ · `}{b.reviewCount.toLocaleString("en-GB")} reviews</span>
+                        </span>
+                      </Button>
+                    </CarouselItem>)}
+                  </CarouselContent> : <div className="flex h-full items-center rounded-lg border border-border bg-card px-4 text-sm text-muted-foreground" role="status">
+                    {loading ? "Searching Google…" : err ?? "No businesses found. Try another city."}
+                  </div>}
+                </div>
+                <p className="mt-2 text-xs leading-4 text-muted-foreground">Google results by review count, not an official ranking.</p>
+              </Carousel>}
+              {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="mt-2 overflow-hidden rounded-lg border border-border bg-card">
                 {hits.map((b) => (
                   <li key={b.placeId}>
                     <Button variant="ghost" onClick={() => setPicked(b)} className="flex h-auto w-full justify-start gap-4 rounded-none px-5 py-3 text-left whitespace-normal">
@@ -100,7 +125,6 @@ function Home() {
                 {loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">Searching Google…</li>}
                 {!loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">{err ?? "No match on Google. Try adding your town or postcode."}</li>}
               </ul>}
-              {trade && q.trim().length < 3 && hits.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Live Google results for {city}, ordered by review count. These are not an official top-five ranking.</p>}
             </div>
           ) : (
             <div className="animate-rise mt-4 flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 sm:flex-row sm:items-center">
