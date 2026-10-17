@@ -146,13 +146,25 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
 /** Trade browsing: one search with full fields, graded on the same public evidence rules as a scan. */
 export async function discoverPlaces(trade: Trade, queries: string[], keep: (r: { rating: number }) => boolean = () => true) {
   const mask = "places." + FIELDS.split(",").join(",places.");
-  const pages = await Promise.all(queries.map((q) => post("places:searchText", { textQuery: q, regionCode: "GB", maxResultCount: 20 }, mask).catch(() => ({ places: [] }))));
+  // Google returns at most 20 places per page (60 per query), ranked by prominence, so we follow every page.
+  const all = async (q: string) => {
+    const out: any[] = [];
+    let pageToken: string | undefined;
+    for (let i = 0; i < 3; i++) {
+      const j: any = await post("places:searchText", { textQuery: q, regionCode: "GB", pageSize: 20, ...(pageToken ? { pageToken } : {}) }, mask + ",nextPageToken").catch(() => ({}));
+      out.push(...(j.places ?? []));
+      pageToken = j.nextPageToken;
+      if (!pageToken) break;
+    }
+    return { places: out };
+  };
+  const pages = await Promise.all(queries.map(all));
   const seen = new Set<string>();
   const places = pages.flatMap((j: any) => (j.places ?? []) as any[])
     .filter((p) => { if (seen.has(p.id)) return false; seen.add(p.id); const g = guessTrade(p.types, p.displayName?.text); return g === null || g === trade; })
     .filter((p) => keep({ rating: p.rating ?? 0 }))
     .sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0))
-    .slice(0, 10);
+    .slice(0, 12);
   const creds = await Promise.all(places.map((p) => websiteCredential(p.websiteUri, trade)));
   return places.map((p, i) => ({
     placeId: p.id as string, name: p.displayName?.text ?? "", address: p.formattedAddress ?? "",
