@@ -272,7 +272,7 @@ function PayButton({ b, item, label, children, onSession, variant = "default" }:
       tries += 1;
       // If a call stalls (for example during an app update), retry instead of spinning forever.
       const stall = setTimeout(() => { if (!cancelled && tries < 3) attempt(); else if (!cancelled) setErr("We could not prepare the payment page. Please refresh and try again."); }, 10000);
-      go({ data: { businessId: b.id, businessName: b.name, item, label } })
+      go({ data: { businessId: b.id, businessName: b.name, item, label, origin: window.location.origin } })
         .then((r) => {
           clearTimeout(stall);
           if (cancelled) return;
