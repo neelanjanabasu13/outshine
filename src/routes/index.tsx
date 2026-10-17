@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Brand";
+import { Shine } from "@/components/Shine";
 import { TRADES, type Trade } from "@/lib/audit";
 import { TRADE_PHOTOS } from "@/lib/sample";
 import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.functions";
