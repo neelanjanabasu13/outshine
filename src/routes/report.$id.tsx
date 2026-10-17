@@ -131,7 +131,7 @@ function Report() {
               {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Every point comes from Google or your own website. Owner replies to reviews are not graded because Google does not publish them. We only show areas we can actually grade from this evidence.</p>}
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {areaList.filter((area) => areas[area] !== undefined).map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
           </div>
         </section>
