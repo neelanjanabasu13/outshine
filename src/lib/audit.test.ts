@@ -54,7 +54,7 @@ describe("grading", () => {
     for (const trade of Object.keys(TRADES) as Trade[]) {
       const findings = benchmarkFindings(trade);
       expect(gradeOf(scoreOf(findings))).toBe("A");
-      for (const score of Object.values(areaScores(findings))) expect(gradeOf(score)).toBe("A");
+      for (const score of Object.values(assessedAreaScores(findings))) expect(gradeOf(score)).toBe("A");
     }
   });
 
