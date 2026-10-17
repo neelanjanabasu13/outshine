@@ -10,7 +10,7 @@ type Tile = { trade: Trade; name: string; pun: string; img: string; bg: string; 
 export const TILES: Tile[] = [
   { trade: "plumbing", name: "Plumbers", pun: "Keep the jobs flowing.", img: plumbing, bg: "bg-pop-blue", fg: "text-pop-cream" },
   { trade: "salon", name: "Hair & Beauty", pun: "A cut above the rest.", img: salon, bg: "bg-pop-lilac", fg: "text-pop-ink" },
-  { trade: "cleaning", name: "Cleaners", pun: "Make a spotless first impression.", img: cleaning, bg: "bg-pop-yellow", fg: "text-pop-ink" },
+  { trade: "cleaning", name: "Cleaners", pun: "Spotless first impressions.", img: cleaning, bg: "bg-pop-yellow", fg: "text-pop-ink" },
   { trade: "electrician", name: "Electricians", pun: "Switch on more bookings.", img: electrician, bg: "bg-pop-red", fg: "text-pop-cream" },
   { trade: "landscaping", name: "Gardeners", pun: "Grow your customer base.", img: landscaping, bg: "bg-pop-mint", fg: "text-pop-ink" },
 ];
