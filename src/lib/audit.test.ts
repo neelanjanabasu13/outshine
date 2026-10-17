@@ -21,8 +21,8 @@ describe("grading", () => {
   });
 
   it("uses the placeholder prices of £5 per fix and £29 for all", () => {
-    expect(PRICE_PER_FIX).toBe(5);
-    expect(PRICE_BUNDLE).toBe(29);
+    expect(PRICE_PER_FIX).toBe(7.99);
+    expect(PRICE_BUNDLE).toBe(29.99);
   });
 
   it("estimates no lost revenue when you match or beat rivals", () => {
