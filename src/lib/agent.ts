@@ -63,7 +63,7 @@ export function runAgent(kind: FixKind, b: Business): AgentRun {
 /** Google's own "write a review" page for a live Places id; null for demo businesses. */
 export function reviewLink(b: Pick<Business, "id">): string | null {
   const m = /^live\.[^.]+\.(.+)$/.exec(b.id);
-  return m ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(m[1])}` : null;
+  return m ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(m[1] ?? "")}` : null;
 }
 
 /** Where Google manages the owner's listing; owners must be signed in, so we cannot act there for them. */
