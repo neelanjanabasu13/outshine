@@ -42,10 +42,10 @@ export function pickDiscovery<T extends { grade: string; reviewCount: number }>(
   return [...picked, ...byNeed.filter((r) => !picked.includes(r))].slice(0, 5);
 }
 
-/** Example pills: businesses rated 3.4 to 4.0 stars, which almost always have something to improve. */
-export const inExampleRange = (r: { rating: number }) => r.rating >= 3.4 && r.rating <= 4.0;
+/** Example pills: businesses rated 3.5 to 4.0 stars, which almost always have something to improve. */
+export const inExampleRange = (r: { rating: number }) => r.rating >= 3.5 && r.rating <= 4.0;
 
 export function pickExamples<T extends { grade: string; reviewCount: number; rating: number }>(results: T[]): T[] {
   const inRange = results.filter(inExampleRange).sort((a, b) => b.reviewCount - a.reviewCount);
-  return [...inRange, ...pickDiscovery(results.filter((r) => !inRange.includes(r)))].slice(0, 5);
+  return inRange.slice(0, 8);
 }
