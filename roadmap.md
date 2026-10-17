@@ -9,4 +9,6 @@
 - [x] Replace per-fix purchases with fixed whole-report DIY and done-for-you tiers and verify test checkout
 - [ ] Accept real payments (blocked: live Stripe configuration)
 - [ ] Save reports, email capture, 30-day re-check emails (future work)
+- [x] All-clear reports give tips and a reference example; free report downloadable
+- [ ] Fix Stripe checkout blank pages (next, awaiting user)
 - [ ] Final name (blocked: user)

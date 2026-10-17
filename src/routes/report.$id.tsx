@@ -100,11 +100,24 @@ function Report() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  const downloadReport = () => {
+    const lines = [`${b.name}`, `${b.address}`, `FixFirst free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
+      ...(["Reputation", "Response", "Visuals", "Profile", "Credentials"] as Area[]).map((a) => `${a}: ${areas[a] === undefined ? "Not assessed" : gradeOf(areas[a]!)}`),
+      "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${cappedGrade(c.score, !!b.live)}`),
+      "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
+      ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
+      "", "FixFirst by Quiet Crew · https://quietcrew.ai/"];
+    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a"); a.href = url; a.download = "fixfirst-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
+        <Button variant="outline" size="sm" className="ml-4" onClick={downloadReport}><Download />Download free report</Button>
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
@@ -123,7 +136,9 @@ function Report() {
           </div>
         </section>
 
-        {allClear ? <section className="mt-12 border-y border-border py-8"><p className="flex items-center gap-2 text-grade-a"><Check className="h-5 w-5" />All clear</p><h2 className="mt-2 text-2xl font-semibold">Every public signal we can check already meets the standard</h2><p className="mt-2 max-w-2xl text-muted-foreground">There is nothing for a DIY pack or the agent to fix, so we will not ask you to pay for anything. Your scan is free and complete.</p></section> : <section className="mt-12 border-y border-border py-8" id="pricing">
+        {allClear ? <section className="mt-12 border-y border-border py-8"><p className="flex items-center gap-2 text-grade-a"><Check className="h-5 w-5" />All clear</p><h2 className="mt-2 text-2xl font-semibold">Every public signal we can check already meets the standard</h2><p className="mt-2 max-w-2xl text-muted-foreground">There is nothing for a DIY pack or the agent to fix, so we will not ask you to pay for anything. There is always room to grow, though, and these habits are what keep the strongest {TRADES[b.trade].label.toLowerCase()} businesses ahead in areas Google does not show us.</p>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2">{extraTips(b.trade).map((t) => <li key={t.title} className="border-l-2 border-fix pl-4"><p className="font-medium">{t.title}</p><p className="mt-1 text-sm text-muted-foreground">{t.body}</p></li>)}</ul>
+          {reference?.entry && <div className="mt-6 rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">A strong {reference.entry.city} profile we keep for comparison</p><p className="mt-1 text-lg font-semibold">{reference.entry.name}</p><p className="mt-1 text-sm text-muted-foreground">A real local business we picked as a reference. It is worth looking at how they present their services, photos and replies to reviews.</p><Button asChild variant="link" className="h-auto px-0"><a href={reference.entry.website} target="_blank" rel="noopener noreferrer">See their profile<ArrowUpRight /></a></Button></div>}</section> : <section className="mt-12 border-y border-border py-8" id="pricing">
           <h2 className="text-2xl font-semibold">Choose how you want to fix it</h2>
           <p className="mt-2 text-muted-foreground">Your scan stays free. Each paid option covers your whole report at a fixed price, however many fixes you need, with no subscription.</p>
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
@@ -283,4 +298,14 @@ function Radar({ you, them }: { you: Partial<Record<Area, number>>; them: Partia
   const pt = (i: number, v: number) => { const a = (Math.PI * 2 * i) / keys.length - Math.PI / 2; return [150 + Math.cos(a) * v * 1.1, 150 + Math.sin(a) * v * 1.1]; };
   const poly = (d: Partial<Record<Area, number>>) => keys.map((k, i) => pt(i, d[k] ?? 0).join(",")).join(" ");
   return <div><svg viewBox="-50 -10 400 320" role="img" aria-label="Your profile compared with a real reference business" className="mx-auto w-full max-w-sm">{[25, 50, 75, 100].map((r) => <polygon key={r} points={keys.map((_, i) => pt(i, r).join(",")).join(" ")} fill="none" stroke="var(--border)" />)}<polygon points={poly(them)} fill="var(--grade-a)" fillOpacity="0.12" stroke="var(--grade-a)" strokeDasharray="4 4" /><polygon points={poly(you)} fill="var(--fix)" fillOpacity="0.25" stroke="var(--fix)" strokeWidth="2" />{keys.map((k, i) => { const [x, y] = pt(i, 125); return <text key={k} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="var(--foreground)">{k}</text>; })}</svg><p className="text-center text-xs"><span className="text-fix">Your profile / projection</span> · <span className="text-grade-a">Real reference profile</span></p></div>;
+}
+
+function extraTips(trade: keyof typeof TRADES) {
+  const t = TRADES[trade];
+  return [
+    { title: "Reply to every review", body: "A short, personal owner reply within a day shows new customers you care, and praise answered is free marketing." },
+    { title: "Show your credentials", body: `Mention ${t.credential} on your profile and website if you hold it. ${t.credentialPlain}` },
+    { title: "Keep photos current", body: `Add fresh photos of ${t.expectedPhotos} every month or so, so the profile looks active.` },
+    { title: "Post regular updates", body: "A weekly Google update about a recent job or an open slot signals you are busy and available." },
+  ];
 }
