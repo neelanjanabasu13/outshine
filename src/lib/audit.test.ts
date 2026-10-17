@@ -4,12 +4,12 @@ import { BUSINESSES } from "./sample";
 
 describe("grading", () => {
   it("does not penalise live businesses for unexposed fields", () => {
-    const s = { ...BUSINESSES[0]?.signals, rating: 4.9, reviewCount: 250, photoCount: 10, hasWebsite: true, hasHours: true, reviewsLast90: 0, replyRate: 0, newestPhotoDays: 0, descriptionLength: 0, postsLast30: 0, credentialMentioned: false, servicesListed: 0 };
+    const s = { ...BUSINESSES[0]?.signals, rating: 4.9, reviewCount: 250, photoCount: 10, hasWebsite: true, hasHours: true, reviewsLast90: 0, replyRate: 0, newestPhotoDays: 0, descriptionLength: 0, postsLast30: 0, credentialMentioned: false, servicesListed: 0, ownerPhotos: 3 };
     for (const trade of Object.keys(TRADES) as Trade[]) {
       const f = evaluate(trade, s, "Real profile", true);
       expect(gradeOf(scoreOf(f))).toBe("A");
-      expect(Object.keys(assessedAreaScores(f)).sort()).toEqual(["Profile", "Reputation", "Visuals"]);
-      expect(f.map((x) => x.id)).toEqual(["rating", "velocity", "photos", "website", "hours"]);
+      expect(Object.keys(assessedAreaScores(f)).sort()).toEqual(["Activity", "Profile", "Reputation", "Visuals"]);
+      expect(f.map((x) => x.id)).toEqual(["rating", "velocity", "photos", "website", "hours", "ownerPhotos"]);
       expect(scoreOf(evaluate(trade, { ...s, replyRate: 1, postsLast30: 4, credentialMentioned: true, descriptionLength: 750, reviewsLast90: 100 }, "Same profile", true))).toBe(scoreOf(f));
     }
   });
