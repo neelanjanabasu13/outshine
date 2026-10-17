@@ -8,6 +8,7 @@ import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.funct
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { TradeDeck } from "@/components/TradeDeck";
+import { ReportStack } from "@/components/ReportStack";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,32 +60,33 @@ function Home() {
   const browsing = trade !== null && q.trim().length < 3;
 
   return (
-    <div className="min-h-screen bg-pop-cream text-pop-ink">
+    <div className="min-h-screen">
       <Header />
-      <main className="mx-auto max-w-7xl px-5 pb-24 pt-8 md:pt-14">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="animate-rise inline-block rounded-full border-2 border-pop-ink bg-pop-ink px-4 py-1 text-xs font-bold uppercase tracking-[0.15em] text-pop-cream">One-off payments. No subscription.</p>
-          <h1 className="animate-rise mt-6 font-display text-5xl font-extrabold leading-[0.92] md:text-7xl">
+      <main className="mx-auto max-w-6xl px-5 pb-24 pt-8 md:pt-14">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
+        <div>
+          <p className="animate-rise inline-block text-sm font-medium uppercase tracking-[0.2em] text-fix">One-off payments. No subscription.</p>
+          <h1 className="animate-rise mt-6 font-display text-5xl font-extrabold leading-[0.95] md:text-6xl">
             Fix what's{" "}
             <span className="relative inline-block">
-              <span aria-hidden className="animate-marker absolute inset-x-[-0.08em] bottom-[0.08em] -z-0 h-[0.38em] rounded-sm bg-pop-yellow" />
+              <span aria-hidden className="animate-marker absolute inset-x-[-0.08em] bottom-[0.08em] -z-0 h-[0.38em] rounded-sm bg-grade-c/60" />
               <span className="relative">holding</span>
             </span>{" "}
             your business back.
           </h1>
-          <p className="animate-rise mx-auto mt-6 max-w-2xl text-lg text-pop-ink/75">
-            A free scan of your Google profile against nearby rivals. In under a minute you get a letter grade, the exact problems costing you calls, and <span className="rounded-md bg-pop-mint px-1.5 py-0.5 font-bold text-pop-ink">our AI agent fixes them for you.</span>
+          <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
+            A free scan of your Google profile against nearby rivals. In under a minute you get a letter grade, the exact problems costing you calls, and <span className="font-semibold text-brand-gradient">our AI agent fixes them for you.</span>
           </p>
 
           {!picked ? (
-            <div className="relative mx-auto mt-8 max-w-2xl text-left">
-              <div className="flex items-stretch rounded-2xl border-2 border-pop-ink bg-card shadow-block">
+            <div className="relative mt-8 max-w-xl">
+              <div className="flex items-stretch rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town"
                   className="min-w-0 flex-1 rounded-l-2xl bg-transparent px-5 py-4 text-lg outline-none" />
-                <span className="m-1.5 hidden items-center rounded-xl bg-pop-red px-5 font-bold text-pop-cream sm:flex">Scan free</span>
+                <span className="m-1.5 hidden items-center rounded-xl bg-fix px-5 font-semibold text-fix-foreground sm:flex">Scan free</span>
               </div>
-              <p className="mt-3 text-center text-sm text-pop-ink/60">Or pick your trade below to try a local business.</p>
-              {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border-2 border-pop-ink bg-card shadow-block">
+              <p className="mt-3 text-sm text-muted-foreground">Or pick your trade below to try a local business.</p>
+              {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 {hits.map((b) => (
                   <li key={b.placeId}>
                     <Button variant="ghost" onClick={() => setPicked(b)} className="flex h-auto w-full justify-start gap-4 rounded-none px-5 py-3 text-left whitespace-normal">
@@ -99,42 +101,44 @@ function Home() {
               </ul>}
             </div>
           ) : (
-            <div className="animate-pop mx-auto mt-8 flex max-w-2xl flex-col gap-5 rounded-2xl border-2 border-pop-ink bg-card p-4 text-left shadow-block sm:flex-row sm:items-center">
-              <img src={picked.photo ?? TRADE_PHOTOS[pickedTrade ?? "cleaning"]} alt={picked.name} className="h-32 w-full rounded-xl border-2 border-pop-ink object-cover sm:w-40" width={160} height={128} />
+            <div className="animate-pop mt-8 flex max-w-xl flex-col gap-5 rounded-2xl border border-border bg-card p-4 shadow-lg sm:flex-row sm:items-center">
+              <img src={picked.photo ?? TRADE_PHOTOS[pickedTrade ?? "cleaning"]} alt={picked.name} className="h-32 w-full rounded-xl object-cover sm:w-40" width={160} height={128} />
               <div className="flex-1">
                 <p className="font-display text-2xl font-extrabold">{picked.name}</p>
                 <p className="text-sm text-muted-foreground">{picked.address}</p>
                 <p className="mt-1 text-sm">{picked.rating.toFixed(1)} ★ · {picked.reviewCount} reviews</p>
-                {!pickedTrade && <p className="mt-2 text-sm font-semibold text-pop-red">Pick your trade below so we compare you with the right rivals.</p>}
+                {!pickedTrade && <p className="mt-2 text-sm font-semibold text-fix">Pick your trade below so we compare you with the right rivals.</p>}
                 <div className="mt-4 flex items-center gap-4">
                   <button disabled={!pickedTrade} onClick={() => pickedTrade && navigate({ to: "/scan/$id", params: { id: liveId(pickedTrade, picked.placeId) } })}
-                    className="rounded-xl border-2 border-pop-ink bg-pop-red px-6 py-3 font-bold text-pop-cream shadow-block-sm transition hover:-translate-y-0.5 disabled:opacity-40">Grade my business →</button>
+                    className="rounded-full bg-fix px-6 py-3 font-semibold text-fix-foreground transition hover:-translate-y-0.5 disabled:opacity-40">Grade my business →</button>
                   <button onClick={() => setPicked(null)} className="text-sm text-muted-foreground underline-offset-4 hover:underline">Not this one</button>
                 </div>
               </div>
             </div>
           )}
         </div>
+        <div className="pt-8"><ReportStack /></div>
+        </div>
 
-        <div className="mt-12">
+        <div className="mt-16">
           <TradeDeck selected={picked ? pickedTrade : trade} onPick={(t) => { setTrade(t); if (!picked || picked.trade) { setPicked(null); setQ(""); } }} />
         </div>
 
-        {browsing && !picked && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mx-auto mt-8 max-w-4xl">
+        {browsing && !picked && <Carousel key={`${trade}-${city}`} opts={{ align: "start", slidesToScroll: 1 }} aria-label="Local businesses to try" className="animate-rise mt-6">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="min-w-0 font-display text-lg font-extrabold">Local {trade ? TRADES[trade].label.toLowerCase() : ""} businesses to try</h2>
             <div className="flex shrink-0 items-center gap-2">
-              <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-9 max-w-32 rounded-lg border-2 border-pop-ink bg-card px-2 text-sm">
+              <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="h-9 max-w-32 rounded-lg border border-border bg-card px-2 text-sm">
                 {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
-              <CarouselPrevious className="static translate-y-0 border-2 border-pop-ink" title="Previous businesses" />
-              <CarouselNext className="static translate-y-0 border-2 border-pop-ink" title="Next businesses" />
+              <CarouselPrevious className="static translate-y-0 " title="Previous businesses" />
+              <CarouselNext className="static translate-y-0 " title="Next businesses" />
             </div>
           </div>
           <div aria-busy={loading} className="h-28">
             {hits.length > 0 ? <CarouselContent aria-label="Business results" className="-ml-3">
               {hits.map((b) => <CarouselItem key={b.placeId} className="basis-[85%] pl-3 sm:basis-[48%] md:basis-1/3">
-                <Button variant="outline" onClick={() => setPicked(b)} className="flex h-28 w-full justify-start gap-3 rounded-xl border-2 border-pop-ink bg-card px-3 text-left whitespace-normal shadow-block-sm hover:-translate-y-0.5">
+                <Button variant="outline" onClick={() => setPicked(b)} className="flex h-28 w-full justify-start gap-3 rounded-xl bg-card px-3 text-left whitespace-normal hover:-translate-y-0.5">
                   {b.photo ? <img src={b.photo} alt="" className="h-16 w-14 shrink-0 rounded-md object-cover" loading="lazy" width={56} height={64} /> : <span className="h-16 w-14 shrink-0 rounded-md bg-secondary" />}
                   <span className="min-w-0 flex-1">
                     <span className="line-clamp-2 text-sm font-semibold leading-5">{b.name}</span>
@@ -143,31 +147,31 @@ function Home() {
                   </span>
                 </Button>
               </CarouselItem>)}
-            </CarouselContent> : <div className="flex h-full items-center rounded-xl border-2 border-pop-ink bg-card px-4 text-sm text-muted-foreground" role="status">
+            </CarouselContent> : <div className="flex h-full items-center rounded-xl border border-border bg-card px-4 text-sm text-muted-foreground" role="status">
               {loading ? "Searching Google…" : err ?? "No businesses found. Try another city."}
             </div>}
           </div>
-          <p className="mt-2 text-xs text-pop-ink/60">Google results by review count, not an official ranking.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Google results by review count, not an official ranking.</p>
         </Carousel>}
 
-        <ul className="mx-auto mt-16 grid max-w-6xl gap-4 md:grid-cols-3">
+        <ul className="mt-20 grid gap-4 md:grid-cols-3">
           {[
             { k: "Spot the leaks", d: "Missing website, thin photos, unanswered reviews and gaps your rivals have already filled, found in under a minute.", bg: "bg-pop-yellow" },
             { k: "See who's winning nearby", d: "Your grade next to the three closest businesses in your trade, so you know exactly who is taking your calls.", bg: "bg-pop-mint" },
             { k: "Get it fixed, not flagged", d: "Our AI agent writes your review replies, your description and a one-page website for you.*", bg: "bg-pop-lilac" },
           ].map((c) => (
-            <li key={c.k} className={`rounded-2xl border-2 border-pop-ink p-6 shadow-block-sm ${c.bg}`}>
+            <li key={c.k} className={`rounded-2xl border border-border bg-card p-6`}>
               <p className="font-display text-2xl font-extrabold">{c.k}</p>
-              <p className="mt-2 text-pop-ink/80">{c.d}</p>
+              <p className="mt-2 text-muted-foreground">{c.d}</p>
             </li>
           ))}
         </ul>
 
-        <section className="mx-auto mt-14 grid max-w-6xl gap-8 rounded-2xl border-2 border-pop-ink bg-card p-8 shadow-block md:grid-cols-[1.3fr_1fr] md:p-12">
+        <section className="mt-14 grid gap-8 rounded-[2rem] border border-border bg-card p-8 md:grid-cols-[1.3fr_1fr] md:p-12">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-pop-red">No strings attached</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-fix">No strings attached</p>
             <h2 className="mt-3 font-display text-3xl font-extrabold md:text-4xl">No subscription, and no free trial that quietly bills you.</h2>
-            <p className="mt-4 max-w-md text-pop-ink/75">
+            <p className="mt-4 max-w-md text-muted-foreground">
               Your scan is free. Choose a DIY guide for £7.99 (launch price, usually £14.99), or let our AI agent prepare every fix for £29.99 (usually £49.99). Both cover your whole report with one payment.
             </p>
           </div>
@@ -177,11 +181,11 @@ function Home() {
               <>DIY pack £7.99 <s className="opacity-60">£14.99</s></>,
               <>Fix it for me £29.99 <s className="opacity-60">£49.99</s></>,
             ].map((t, i) => (
-              <li key={i} className={`rounded-xl border-2 border-pop-ink px-5 py-4 font-bold ${["bg-pop-mint", "bg-pop-yellow", "bg-pop-blue text-pop-cream"][i]}`}>{t}</li>
+              <li key={i} className={`rounded-2xl bg-accent px-5 py-4 font-medium text-accent-foreground`}>{t}</li>
             ))}
           </ul>
         </section>
-        <p className="mx-auto mt-4 max-w-6xl text-xs text-pop-ink/60">*Where Google needs you to sign in, our AI agent hands you the finished work with a one-click copy and open, so you only paste and save.</p>
+        <p className="mt-4 text-xs text-muted-foreground">*Where Google needs you to sign in, our AI agent hands you the finished work with a one-click copy and open, so you only paste and save.</p>
       </main>
     </div>
   );
