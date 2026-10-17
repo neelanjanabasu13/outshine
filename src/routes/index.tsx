@@ -15,9 +15,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Outshine · Free online presence audit for UK trades" },
-      { name: "description", content: "Get a free A to F grade for your plumbing, electrical, cleaning, landscaping or salon business in under a minute, then let our agent fix it." },
+      { name: "description", content: "Get a free A to F grade for your plumbing, electrical, cleaning, landscaping or salon business in under a minute, then stand out with a DIY pack or our AI agent." },
       { property: "og:title", content: "Outshine · Free online presence audit for UK trades" },
-      { property: "og:description", content: "A to F grade, the five things costing you calls, and an agent that fixes them for you." },
+      { property: "og:description", content: "See your grade against local rivals, then outshine them yourself or let our AI agent do it for you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

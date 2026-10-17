@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://grade-your-trade.lovable.app/sitemap.xml
