@@ -1,11 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-import { REFERENCES, REFERENCE_CITIES } from "./references";
+import { REFERENCES, type ReferenceCity } from "./references";
+import type { Trade } from "./audit";
 
-export const getReference = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ city: z.enum(REFERENCE_CITIES), trade: z.enum(["plumbing", "electrician", "cleaning", "landscaping", "salon"]) }).parse(d))
-  .handler(async ({ data }) => {
-    const entry = REFERENCES.find((r) => r.city === data.city && r.trade === data.trade);
+export async function getReference(city: ReferenceCity, trade: Trade) {
+    const entry = REFERENCES.find((r) => r.city === city && r.trade === trade);
     if (!entry) return { entry: null, business: null, checkedAt: null };
     try {
       const { searchPlaces, getLiveBusiness } = await import("./places.server");
@@ -15,4 +12,4 @@ export const getReference = createServerFn({ method: "GET" })
       const business = await getLiveBusiness(`live.${entry.trade}.${match.placeId}`, entry.trade, match.placeId, false);
       return { entry, business, checkedAt: new Date().toISOString() };
     } catch { return { entry, business: null, checkedAt: null }; }
-  });
+}
