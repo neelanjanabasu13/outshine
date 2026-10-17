@@ -48,12 +48,38 @@ export function publicOrigin(req: Request): string {
   return new URL(req.url).origin;
 }
 
+/** Public address used when nothing better is known, so Stripe never sends a customer to an internal server. */
+export const FALLBACK_ORIGIN = "https://id-preview--b9204ba5-a192-429c-bf6c-627e52123178.lovable.app";
+
+const TRUSTED_HOST = /(^|\.)(lovable\.app|lovableproject\.com|lovable\.dev)$/;
+
+/**
+ * Where Stripe returns the customer. The browser's own address wins when it is one of our hosts;
+ * otherwise the request headers are used, and an internal localhost address is never used unless the
+ * browser itself is on localhost (local testing).
+ */
+export function returnOrigin(clientOrigin: string | undefined, req: Request): string {
+  if (clientOrigin) {
+    try {
+      const u = new URL(clientOrigin);
+      if (u.protocol === "https:" && TRUSTED_HOST.test(u.hostname)) return u.origin;
+      if (u.hostname === "localhost") return u.origin;
+    } catch { /* ignore malformed */ }
+  }
+  const fromHeaders = publicOrigin(req);
+  try {
+    const host = new URL(fromHeaders).hostname;
+    if (host === "localhost" || host === "127.0.0.1") return FALLBACK_ORIGIN;
+  } catch { return FALLBACK_ORIGIN; }
+  return fromHeaders;
+}
+
 export const createCheckout = createServerFn({ method: "POST" })
   .inputValidator((d) =>
-    z.object({ businessId: z.string().min(1).max(100), businessName: z.string().max(200), item: z.enum(["diy", "all"]), label: z.string().max(200) }).parse(d),
+    z.object({ businessId: z.string().min(1).max(100), businessName: z.string().max(200), item: z.enum(["diy", "all"]), label: z.string().max(200), origin: z.string().max(200).optional() }).parse(d),
   )
   .handler(async ({ data }) => {
-    const origin = publicOrigin(getRequest());
+    const origin = returnOrigin(data.origin, getRequest());
     const pence = Math.round(checkoutPrice(data.item) * 100);
     const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : `FixFirst done-for-you for ${data.businessName}`;
     const back = `${origin}/report/${encodeURIComponent(data.businessId)}`;
