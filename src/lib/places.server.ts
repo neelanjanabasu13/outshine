@@ -72,21 +72,21 @@ function toSignals(p: any, trade: Trade): Signals {
   return {
     rating: p.rating ?? 0,
     reviewCount: p.userRatingCount ?? 0,
-    // Google only shares five reviews, so we scale the share that are recent.
-    reviewsLast90: reviews.length ? Math.round((reviews.filter((r) => now - Date.parse(r.publishTime) < 90 * 864e5).length / reviews.length) * Math.min(p.userRatingCount ?? 0, 20)) : 0,
-    replyRate: 0.5, // Google does not share owner replies publicly; neutral until the owner connects their profile.
-    photoCount: (p.photos?.length ?? 0) * 3,
-    newestPhotoDays: 60,
-    descriptionLength: p.editorialSummary?.text?.length ?? 0,
+    // Unavailable fields are placeholders for the shared shape and excluded by public-only grading.
+    reviewsLast90: 0,
+    replyRate: 0,
+    photoCount: p.photos?.length ?? 0,
+    newestPhotoDays: 0,
+    descriptionLength: 0,
     hasWebsite: !!p.websiteUri,
     hasHours: !!p.regularOpeningHours,
     postsLast30: 0,
-    credentialMentioned: CREDENTIAL_WORDS[trade].test(text),
-    servicesListed: Math.min((p.types?.length ?? 1), 9),
+    credentialMentioned: false,
+    servicesListed: 0,
   };
 }
 
-export async function getLiveBusiness(id: string, trade: Trade, placeId: string): Promise<Business> {
+export async function getLiveBusiness(id: string, trade: Trade, placeId: string, includeCompetitors = true): Promise<Business> {
   const res = await fetch(`${API}/places/${encodeURIComponent(placeId)}?languageCode=en-GB&regionCode=GB`, {
     headers: { "X-Goog-Api-Key": key(), "X-Goog-FieldMask": FIELDS },
   });
@@ -95,7 +95,7 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string)
   const town = (p.addressComponents ?? []).find((c: any) => c.types?.includes("postal_town") || c.types?.includes("locality"))?.longText;
 
   let competitors: Business["competitors"] = [];
-  if (p.location) {
+  if (p.location && includeCompetitors) {
     const near = await post("places:searchText", {
       textQuery: TRADE_QUERY[trade], regionCode: "GB", maxResultCount: 8,
       locationBias: { circle: { center: p.location, radius: 3000 } },

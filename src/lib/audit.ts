@@ -87,7 +87,8 @@ export interface Finding {
 
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 
-export function evaluate(trade: Trade, s: Signals, businessName: string): Finding[] {
+export function evaluate(trade: Trade, s: Signals, businessName: string, publicOnly = false): Finding[] {
+  if (publicOnly) return evaluatePublic(trade, s);
   const t = TRADES[trade];
   const w = t.weights;
   return [
@@ -162,7 +163,30 @@ export function evaluate(trade: Trade, s: Signals, businessName: string): Findin
 export function scoreOf(findings: Finding[]): number {
   const total = findings.reduce((a, f) => a + f.weight, 0);
   const got = findings.reduce((a, f) => a + f.weight * f.score, 0);
-  return Math.round((got / total) * 100);
+  return total ? Math.round((got / total) * 100) : 0;
+}
+
+/** Public profile grade only: unexposed fields never contribute a penalty or guessed score. */
+function evaluatePublic(trade: Trade, s: Signals): Finding[] {
+  const t = TRADES[trade];
+  const photosTarget = Math.min(t.minPhotos, 10); // Places returns at most ten photos, not the full gallery.
+  return [
+    { id: "rating", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: s.reviewCount > 0 ? clamp((s.rating - 3.5) / 1.3) : 0,
+      title: s.rating >= 4.8 ? "Strong customer rating" : "Your customer rating could be stronger", evidence: `${s.rating.toFixed(1)} stars from ${s.reviewCount} Google reviews. The public-profile target is 4.8 stars, not a measured local average.`, impact: "Your rating helps customers decide whether to contact you.", before: `${s.rating.toFixed(1)} ★ on Google`, after: "Invite honest feedback from satisfied customers" },
+    { id: "velocity", area: "Reputation", fix: "review-request", weight: t.weights.Reputation / 2, score: clamp(s.reviewCount / 50),
+      title: "Build a broader base of customer reviews", evidence: `${s.reviewCount} Google reviews in total; the public-profile target is 50. Review recency and velocity cannot be verified from Google's limited sample.`, impact: "More genuine reviews give customers a broader base of evidence.", before: `${s.reviewCount} published reviews`, after: "A consistent process for requesting honest reviews after jobs" },
+    { id: "photos", area: "Visuals", fix: "photos", weight: t.weights.Visuals, score: clamp(s.photoCount / photosTarget),
+      title: "Make your work easier to see", evidence: `${s.photoCount} photos returned by Google, which exposes up to ten, not the full gallery. This check targets ${photosTarget} visible photos; their dates and quality are not graded.`, impact: `Useful photos of ${t.expectedPhotos} help customers inspect your work.`, before: `${s.photoCount} photos available in the public feed`, after: `Add useful photos of ${t.expectedPhotos}` },
+    { id: "website", area: "Profile", fix: "website", weight: t.weights.Profile / 2, score: s.hasWebsite ? 1 : 0,
+      title: s.hasWebsite ? "Your website is linked" : "No website linked to your profile", evidence: s.hasWebsite ? "Google returns a website link." : "Google returns no website link.", impact: "A website gives customers somewhere to learn more before contacting you.", before: s.hasWebsite ? "Website linked" : "No website link returned", after: "A website linked from your Google profile" },
+    { id: "hours", area: "Profile", fix: "description", weight: t.weights.Profile / 2, score: s.hasHours ? 1 : 0,
+      title: s.hasHours ? "Your opening hours are available" : "Your opening hours are not available", evidence: s.hasHours ? "Google returns regular opening hours." : "Google returns no regular opening hours; confirm whether hours apply to your business.", impact: "Clear availability helps customers decide when to contact you.", before: s.hasHours ? "Opening hours available" : "No regular opening hours returned", after: "Accurate opening hours for your business" },
+  ];
+}
+
+export function assessedAreaScores(findings: Finding[]): Partial<Record<Area, number>> {
+  const scores = areaScores(findings);
+  return Object.fromEntries(Object.entries(scores).filter(([area]) => findings.some((f) => f.area === area && f.weight > 0)));
 }
 
 export function gradeOf(score: number): Grade {
