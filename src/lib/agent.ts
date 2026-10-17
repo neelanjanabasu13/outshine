@@ -24,7 +24,7 @@ export function runAgent(kind: FixKind, b: Business): AgentRun {
         steps: [`Reading ${unreplied.length} unanswered reviews`, "Checking tone against your best replies", "Drafting personal replies", "Softening the reply to the negative review"],
         output: unreplied.map((r) => `${r.author} (${r.stars}★): “${r.text}”\n→ ${r.stars >= 4
           ? `Thank you so much, ${r.author.split(" ")[0]}. It was a pleasure, and we really appreciate you taking the time to say so. ${b.name}`
-          : `Hi ${r.author.split(" ")[0]}, thank you for the honest feedback, and I'm sorry we let you down on that. It's not the standard we hold ourselves to, and I'd like to put it right, so please call me directly on ${b.phone}. ${first}, ${b.name}`}`).join("\n\n"),
+          : `Hi ${r.author.split(" ")[0]}, thank you for the honest feedback, and I'm sorry we let you down on that. It's not the standard we hold ourselves to, and I'd like to put it right, so please call me directly on ${b.phone}. The team at ${b.name}`}`).join("\n\n"),
       };
     }
     case "description":

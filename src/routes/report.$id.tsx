@@ -203,16 +203,16 @@ function Report() {
             </div>
             <div className="flex flex-col gap-3">
               <p className="font-medium">DIY pack</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_DIY.toFixed(2)}</span>£{PRICE_DIY.toFixed(2)}</p>
-              <p className="flex-1 text-sm text-muted-foreground">A downloadable, step-by-step guide to every finding in your report. You make the changes.</p>
+              <p className="flex-1 text-sm text-muted-foreground">Ready-to-use fixes for every finding: the finished wording with one-click copy and open, your QR review card and website, plus a step-by-step guide and PDF. You paste and save.</p>
               {diy ? <Button onClick={downloadDIY} disabled={pdfBusy} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
             </div>
             <div className="flex flex-col gap-3">
-              <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</p>
-              <p className="flex-1 text-sm text-muted-foreground">The agent prepares all the fixes in your report for one fixed price.</p>
-              {all ? <p className="text-grade-a">Your agent drafts are unlocked below.</p> : <PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton>}
+              <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold">{showcase ? <><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</> : "Coming soon"}</p>
+              <p className="flex-1 text-sm text-muted-foreground">Our fully automated AI agent makes every change on your Google listing and website for you. Nothing to copy, nothing to paste.</p>
+              {showcase ? <p className="text-grade-a">Our AI agent is fixing everything below.</p> : <Button disabled variant="outline" className="h-auto min-h-10 w-full whitespace-normal py-3">Coming soon</Button>}
             </div>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">Secure one-off payment through Stripe. Agent output is currently a draft preview, not automatic changes to your Google profile.</p>
+          <p className="mt-5 text-xs text-muted-foreground">Secure one-off payment through Stripe. No subscription.</p>
           {pendingSession && <p role="status" className="mt-3 text-sm">Complete the secure payment in the new tab, then return here.</p>}
           {paymentMessage && <p role="status" className="mt-3 text-sm">{paymentMessage}</p>}
         </section>}
@@ -282,7 +282,7 @@ function Report() {
               <p className="text-sm"><span className="font-semibold">{all ? "Your playbook is included." : "Your DIY pack is unlocked."}</span> <span className="text-muted-foreground">Download the full report and every guide as one searchable PDF with clickable contents.</span></p>
               <Button onClick={downloadDIY} disabled={pdfBusy}><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button>
             </div>
-            <div className="mt-8 space-y-6">{problems.map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}</div>
+            <div className="mt-8 space-y-10">{problems.map((f, i) => <div key={f.id} className="space-y-4">{!showcase && <DiyActions f={f} b={b} />}<SopCard f={f} n={i + 1} b={b} /></div>)}</div>
             </>
           ) : (
             <div className="relative mt-8">
@@ -302,7 +302,7 @@ function Report() {
           )}
         </section>}
       </main>
-      {!all && !allClear && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY <s>£{WAS_DIY.toFixed(2)}</s> £{PRICE_DIY.toFixed(2)} · Agent <s>£{WAS_BUNDLE.toFixed(2)}</s> £{PRICE_BUNDLE.toFixed(2)} launch prices</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
+      {!diy && !allClear && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY pack <s>£{WAS_DIY.toFixed(2)}</s> £{PRICE_DIY.toFixed(2)} launch price · Fully automated agent coming soon</p><PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton></div></div>}
     </div>
   );
 }
@@ -392,37 +392,42 @@ function ProblemCard({ f, n, b, autoRun, showcase = false }: { f: Finding; n: nu
       <h3 className="mt-3 text-2xl font-semibold">{f.title}</h3>
       <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
       <p className="mt-2 text-muted-foreground">{f.impact}</p>
-      <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by our AI agent*</p>
-        <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
-        <p className="mt-2 text-sm text-muted-foreground">Choose <span className="font-semibold text-foreground">Fix it for me</span> and our AI agent creates it for you, or choose the <span className="font-semibold text-foreground">DIY pack</span> to do it yourself for less.</p>
-      </div>
-      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-        <div className="rounded-lg border border-border p-3"><dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fix">Our AI agent creates</dt><dd className="mt-1">{handoff.created}</dd></div>
-        <div className="rounded-lg border border-dashed border-border p-3"><dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Your one quick step*</dt><dd className="mt-1">{handoff.you}</dd><dd className="mt-1 text-xs text-muted-foreground">Why: {handoff.why}</dd></div>
-      </dl>
-      <p className="mt-2 text-xs text-muted-foreground">* {HANDOFF_NOTE}</p>
-      {state !== "idle" && <ul className="mt-6 space-y-1.5 text-xs">{run.steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : "text-muted-foreground"}>{i < step ? "✓" : "○"} {s}</li>)}</ul>}
+      <p className="mt-5 text-sm"><a href="#diy" className="font-semibold text-fix underline underline-offset-4">Fix it yourself with the DIY pack</a><span className="text-muted-foreground">: the finished wording, one-click buttons and a step-by-step guide.</span></p>
     </div>
     <div className="flex flex-col">
       <div className="inline-flex self-start gap-1 text-xs">{(["Before", "After"] as const).map((l) => <Button key={l} size="sm" variant={showAfter === (l === "After") ? "secondary" : "ghost"} onClick={() => setShowAfter(l === "After")}>{l}</Button>)}</div>
       <div className={`mt-3 flex-1 rounded-lg p-5 text-sm ${showAfter ? "bg-accent text-accent-foreground" : "bg-secondary"}`}>
-        {!showAfter && <p>{f.before}</p>}
-        {showAfter && state !== "done" && <p>{f.after}</p>}
-        {showAfter && state === "done" && (f.fix === "website"
-          ? <div><p className="font-medium">Our AI agent has published your website.</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button asChild><Link to="/site/$id" params={{ id: b.id }} target="_blank">Open your website<ArrowUpRight /></Link></Button>
-                <Button variant="outline" onClick={() => copyAndOpen(`${window.location.origin}/site/${b.id}`)}>{copied ? "Link copied ✓" : "Copy link and open Google"}<ArrowUpRight /></Button>
-              </div></div>
-          : <div><pre className="max-h-72 overflow-auto whitespace-pre-wrap font-sans">{run.output}</pre>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button onClick={() => copyAndOpen(run.output)}>{copied ? "Copied ✓ Paste it on Google" : "Copy and open Google"}<ArrowUpRight /></Button>
-                {f.fix === "review-request" && link && <Button variant="outline" onClick={() => downloadReviewFlyer({ name: b.name, phone: b.phone, link })}><Download />Download QR review card</Button>}
-              </div></div>)}
+        <p>{showAfter ? f.after : f.before}</p>
       </div>
     </div>
   </article>;
+}
+
+/** DIY pack: the finished, ready-to-use fix with one-click actions, shown above the step-by-step guide. */
+function DiyActions({ f, b }: { f: Finding; b: Business }) {
+  const [copied, setCopied] = useState(false);
+  const run = runAgent(f.fix, b);
+  const link = reviewLink(b);
+  const copyAndOpen = async (text: string) => {
+    const tab = window.open(GOOGLE_PROFILE_URL, "_blank"); if (tab) tab.opener = null;
+    try { await navigator.clipboard.writeText(text); setCopied(true); } catch { setCopied(false); }
+    if (!tab) window.location.assign(GOOGLE_PROFILE_URL);
+  };
+  return <div className="rounded-lg border border-fix bg-accent/50 p-6 text-accent-foreground md:p-8">
+    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Ready to use · {f.title}</p>
+    {f.fix === "website"
+      ? <div className="mt-3"><p className="font-medium">Your one-page website is ready, built from your business details.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild><Link to="/site/$id" params={{ id: b.id }} target="_blank">Open your website<ArrowUpRight /></Link></Button>
+            <Button variant="outline" onClick={() => copyAndOpen(`${window.location.origin}/site/${b.id}`)}>{copied ? "Link copied ✓ Paste it on Google" : "Copy link and open Google"}<ArrowUpRight /></Button>
+          </div></div>
+      : <div className="mt-3"><pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md bg-card p-4 font-sans text-sm text-card-foreground">{run.output}</pre>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button onClick={() => copyAndOpen(run.output)}>{copied ? "Copied ✓ Paste it on Google" : "Copy and open Google"}<ArrowUpRight /></Button>
+            {f.fix === "review-request" && link && <Button variant="outline" onClick={() => downloadReviewFlyer({ name: b.name, phone: b.phone, link })}><Download />Download QR review card</Button>}
+          </div></div>}
+    <p className="mt-3 text-xs text-muted-foreground">Copy, paste on Google, save. The full guide below explains each click if you need it.</p>
+  </div>;
 }
 
 function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
