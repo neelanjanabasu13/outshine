@@ -138,6 +138,7 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
     })),
     competitors,
     photo: p.photos?.[0]?.name ? photoUrl(p.photos[0].name) : undefined,
+    gallery: ((p.photos ?? []) as any[]).slice(0, 6).filter((ph) => ph.name).map((ph) => photoUrl(ph.name)),
     live: true,
   };
 }
