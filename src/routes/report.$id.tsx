@@ -7,7 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
-import { AGENT_ACTION, runAgent } from "@/lib/agent";
+import { AGENT_ACTION, AGENT_HANDOFF, GOOGLE_PROFILE_URL, HANDOFF_NOTE, reviewLink, runAgent } from "@/lib/agent";
+import { downloadReviewFlyer } from "@/lib/review-flyer";
 import { sopFor } from "@/lib/diy";
 import { SCREEN_NOTE, TOOLS_DISCLAIMER, type UiScreen } from "@/lib/sop-visuals";
 
@@ -339,6 +340,13 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
   const [showAfter, setShowAfter] = useState(false);
   const [copied, setCopied] = useState(false);
   const run = runAgent(f.fix, b);
+  const handoff = AGENT_HANDOFF[f.fix];
+  const link = reviewLink(b);
+  const copyAndOpen = async (text: string) => {
+    const tab = window.open(GOOGLE_PROFILE_URL, "_blank"); if (tab) tab.opener = null;
+    try { await navigator.clipboard.writeText(text); setCopied(true); } catch { setCopied(false); }
+    if (!tab) window.location.assign(GOOGLE_PROFILE_URL);
+  };
   useEffect(() => { if (autoRun && state === "idle") setState("running"); }, [autoRun, state]);
   useEffect(() => {
     if (state !== "running") return;
@@ -353,10 +361,15 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
       <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
       <p className="mt-2 text-muted-foreground">{f.impact}</p>
       <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by our AI agent</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by our AI agent*</p>
         <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
         <p className="mt-2 text-sm text-muted-foreground">Choose <span className="font-semibold text-foreground">Fix it for me</span> and our AI agent creates it for you, or choose the <span className="font-semibold text-foreground">DIY pack</span> to do it yourself for less.</p>
       </div>
+      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div className="rounded-lg border border-border p-3"><dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fix">Our AI agent creates</dt><dd className="mt-1">{handoff.created}</dd></div>
+        <div className="rounded-lg border border-dashed border-border p-3"><dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Your one quick step*</dt><dd className="mt-1">{handoff.you}</dd><dd className="mt-1 text-xs text-muted-foreground">Why: {handoff.why}</dd></div>
+      </dl>
+      <p className="mt-2 text-xs text-muted-foreground">* {HANDOFF_NOTE}</p>
       {state !== "idle" && <ul className="mt-6 space-y-1.5 text-xs">{run.steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : "text-muted-foreground"}>{i < step ? "✓" : "○"} {s}</li>)}</ul>}
     </div>
     <div className="flex flex-col">
@@ -364,7 +377,17 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
       <div className={`mt-3 flex-1 rounded-lg p-5 text-sm ${showAfter ? "bg-accent text-accent-foreground" : "bg-secondary"}`}>
         {!showAfter && <p>{f.before}</p>}
         {showAfter && state !== "done" && <p>{f.after}</p>}
-        {showAfter && state === "done" && (f.fix === "website" ? <div><p className="font-medium">Your draft website is ready to preview.</p><Button asChild className="mt-3"><Link to="/site/$id" params={{ id: b.id }} target="_blank">Preview website<ArrowUpRight /></Link></Button></div> : <div><pre className="max-h-72 overflow-auto whitespace-pre-wrap font-sans">{run.output}</pre><Button className="mt-4" onClick={async () => { try { await navigator.clipboard.writeText(run.output); setCopied(true); } catch { setCopied(false); } }}>{copied ? "Copied ✓" : "Copy draft"}</Button></div>)}
+        {showAfter && state === "done" && (f.fix === "website"
+          ? <div><p className="font-medium">Our AI agent has published your website.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button asChild><Link to="/site/$id" params={{ id: b.id }} target="_blank">Open your website<ArrowUpRight /></Link></Button>
+                <Button variant="outline" onClick={() => copyAndOpen(`${window.location.origin}/site/${b.id}`)}>{copied ? "Link copied ✓" : "Copy link and open Google"}<ArrowUpRight /></Button>
+              </div></div>
+          : <div><pre className="max-h-72 overflow-auto whitespace-pre-wrap font-sans">{run.output}</pre>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button onClick={() => copyAndOpen(run.output)}>{copied ? "Copied ✓ Paste it on Google" : "Copy and open Google"}<ArrowUpRight /></Button>
+                {f.fix === "review-request" && link && <Button variant="outline" onClick={() => downloadReviewFlyer({ name: b.name, phone: b.phone, link })}><Download />Download QR review card</Button>}
+              </div></div>)}
       </div>
     </div>
   </article>;
