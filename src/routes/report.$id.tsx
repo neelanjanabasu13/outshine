@@ -11,7 +11,8 @@ import { AGENT_ACTION, AGENT_HANDOFF, GOOGLE_PROFILE_URL, HANDOFF_NOTE, reviewLi
 import { downloadReviewFlyer } from "@/lib/review-flyer";
 import { sopFor } from "@/lib/diy";
 import { SCREEN_NOTE, TOOLS_DISCLAIMER, type UiScreen } from "@/lib/sop-visuals";
-import { ConnectGate, SHOWCASE_LOG, ShowcaseResult } from "@/components/AgentShowcase";
+import { SHOWCASE_LOG, ShowcaseResult } from "@/components/AgentShowcase";
+import { ConnectGate } from "@/components/ConnectGate";
 
 function ScreenDiagram({ s }: { s: UiScreen }) {
   return <figure className="overflow-hidden rounded-lg border border-border bg-background">
