@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { areaScores, estimateLostRevenue, evaluate, gradeOf, PRICE_BUNDLE, PRICE_PER_FIX, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
@@ -38,6 +40,17 @@ function Report() {
   const problems = topProblems(findings);
   const lost = estimateLostRevenue(b.trade, score, avgTop);
   const [all, setAll] = useState(false);
+  const [paidItem, setPaidItem] = useState<string | null>(null);
+  const verify = useServerFn(verifyCheckout);
+  useEffect(() => {
+    const sid = new URLSearchParams(window.location.search).get("session_id");
+    if (!sid) return;
+    verify({ data: { sessionId: sid } }).then((r) => {
+      if (!r.paid || r.businessId !== b.id) return;
+      if (r.item === "all") setAll(true); else setPaidItem(r.item);
+      window.history.replaceState(null, "", window.location.pathname);
+    }).catch(() => {});
+  }, [b.id, verify]);
 
   return (
     <div className="min-h-screen">
@@ -120,15 +133,34 @@ function Report() {
         <section className="mt-16 rounded-[2rem] bg-ink p-8 text-paper md:p-12">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="font-display text-3xl font-semibold md:text-4xl">Fix all of it for £{PRICE_BUNDLE}.</p>
+              <p className="font-display text-3xl font-semibold md:text-4xl">Fix all of it for £{PRICE_BUNDLE.toFixed(2)}.</p>
               <p className="mt-2 max-w-md opacity-70">Every fix above, done by the agent, plus a free re-check in 30 days so you can see your new grade.</p>
             </div>
-            <button onClick={() => { setAll(true); window.scrollTo({ top: document.body.scrollHeight / 3, behavior: "smooth" }); }}
-              className="rounded-full bg-fix px-8 py-4 font-medium text-fix-foreground hover:opacity-90">Fix everything →</button>
+            <PayButton b={b} item="all" label="Every fix" className="rounded-full bg-fix px-8 py-4 font-medium text-fix-foreground hover:opacity-90 disabled:opacity-50">Fix everything →</PayButton>
           </div>
-          <p className="mt-6 text-xs opacity-50">Preview: payment isn't switched on yet, so fixes run free for now.</p>
+          <p className="mt-6 text-xs opacity-50">One payment, never a monthly bill. Test mode: use card 4242 4242 4242 4242.</p>
         </section>
       </main>
+    </div>
+  );
+}
+
+function PayButton({ b, item, label, className, children }: { b: Business; item: string; label: string; className: string; children: React.ReactNode }) {
+  const go = useServerFn(createCheckout);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  return (
+    <div>
+      <button disabled={busy} className={className} onClick={async () => {
+        setBusy(true); setErr(null);
+        try {
+          const r = await go({ data: { businessId: b.id, businessName: b.name, item, label } });
+          if (r.url) { window.location.href = r.url; return; }
+          setErr(r.error);
+        } catch { setErr("We could not open the payment page. Please try again."); }
+        setBusy(false);
+      }}>{busy ? "Opening secure payment…" : children}</button>
+      {err && <p className="mt-2 text-sm text-destructive">{err}</p>}
     </div>
   );
 }
@@ -160,9 +192,9 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
         <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
         <p className="mt-2 text-muted-foreground">{f.impact}</p>
         {state === "idle" && (
-          <button onClick={() => setState("running")} className="mt-6 rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:opacity-90">
-            Fix it for me · £{PRICE_PER_FIX}
-          </button>
+          <PayButton b={b} item={f.id} label={f.title} className="mt-6 rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:opacity-90 disabled:opacity-50">
+            Fix it for me · £{PRICE_PER_FIX.toFixed(2)}
+          </PayButton>
         )}
         {state !== "idle" && (
           <ul className="mt-6 space-y-1.5 font-mono text-xs">

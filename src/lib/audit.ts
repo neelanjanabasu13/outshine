@@ -191,8 +191,8 @@ export function topProblems(findings: Finding[], n = 5): Finding[] {
     .slice(0, n);
 }
 
-export const PRICE_PER_FIX = 5; // placeholder, final pricing tbc
-export const PRICE_BUNDLE = 29; // placeholder, final pricing tbc
+export const PRICE_PER_FIX = 7.99; // placeholder, final pricing tbc
+export const PRICE_BUNDLE = 29.99; // placeholder, final pricing tbc
 
 /** Rough monthly revenue going to better-looking rivals. Placeholder model until real call data exists:
  * each point behind the local leaders costs about 0.4 enquiries a month, a third of which become paid jobs. */
