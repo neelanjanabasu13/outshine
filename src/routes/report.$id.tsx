@@ -37,7 +37,7 @@ function Report() {
   const score = scoreOf(findings);
   const grade = cappedGrade(findings);
   const areas = assessedAreaScores(findings);
-  const areaList: Area[] = b.live ? ["Reputation", "Activity", "Visuals", "Profile", "Credentials"] : ["Reputation", "Response", "Visuals", "Profile", "Credentials"];
+  const areaList: Area[] = b.live ? ["Reputation", "Visuals", "Profile", "Credentials"] : ["Reputation", "Response", "Visuals", "Profile", "Credentials"];
   const reference = b.reference;
   const referenceBusiness = reference?.business;
   const referenceFindings = referenceBusiness ? evaluate(b.trade, referenceBusiness.signals, referenceBusiness.name, true) : [];
