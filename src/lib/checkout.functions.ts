@@ -13,13 +13,12 @@ function key() {
 
 export const createCheckout = createServerFn({ method: "POST" })
   .inputValidator((d) =>
-    z.object({ businessId: z.string().min(1).max(100), businessName: z.string().max(200), item: z.string().min(1).max(60), label: z.string().max(200) }).parse(d),
+    z.object({ businessId: z.string().min(1).max(100), businessName: z.string().max(200), item: z.enum(["diy", "all"]), label: z.string().max(200) }).parse(d),
   )
   .handler(async ({ data }) => {
     const origin = new URL(getRequest().url).origin;
-    const bundle = data.item === "all";
     const pence = Math.round(checkoutPrice(data.item) * 100);
-    const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : bundle ? `FixFirst: every fix for ${data.businessName}` : `FixFirst fix: ${data.label}`;
+    const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : `FixFirst done-for-you for ${data.businessName}`;
     const back = `${origin}/report/${encodeURIComponent(data.businessId)}`;
     const body = new URLSearchParams({
       mode: "payment",
