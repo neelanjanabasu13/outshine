@@ -190,3 +190,8 @@
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
+
+@keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.14) translate(-1.5%, -1%); } }
+@utility animate-kenburns { animation: kenburns 3.2s ease-out both; }
+@keyframes pop { 0% { opacity: 0; transform: scale(.8) translateY(6px); } 70% { transform: scale(1.04); } 100% { opacity: 1; transform: none; } }
+@utility animate-pop { animation: pop .5s cubic-bezier(.2,.7,.2,1) both; }

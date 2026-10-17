@@ -20,6 +20,7 @@ export interface Business {
   reviews: { author: string; stars: number; text: string; replied: boolean }[];
   competitors: { name: string; signals: Signals; photo?: string | undefined }[];
   photo?: string | undefined;
+  gallery?: string[] | undefined;
   live?: boolean;
   location?: { latitude: number; longitude: number };
 }
