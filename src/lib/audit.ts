@@ -265,10 +265,11 @@ export function estimateLostRevenue(trade: Trade, yourScore: number, rivalsScore
   return { jobs, pounds: jobs * TRADES[trade].avgJob };
 }
 
-/** An A needs evidence in every area; if any area could not be checked, the best grade is B. */
+/** An A needs evidence in every area and no weak area; otherwise the best grade is B. */
 export function cappedGrade(findings: Finding[]): Grade {
   const g = gradeOf(scoreOf(findings));
   const areas = new Set(findings.filter((f) => f.weight > 0).map((f) => f.area));
   const complete = areas.has("Credentials") && (areas.has("Response") || areas.has("Activity"));
-  return g === "A" && !complete ? "B" : g;
+  const weak = Object.values(assessedAreaScores(findings)).some((v) => gradeOf(v) === "D" || gradeOf(v) === "F");
+  return g === "A" && (!complete || weak) ? "B" : g;
 }

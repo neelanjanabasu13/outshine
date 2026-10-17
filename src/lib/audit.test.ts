@@ -94,6 +94,7 @@ describe("cappedGrade", () => {
   const base = { ...BUSINESSES[0]!.signals, rating: 5, reviewCount: 1000, photoCount: 10, hasWebsite: true, hasHours: true, newestReviewDays: 10, ownerPhotos: 5 };
   it("caps an A at B when credentials could not be checked", () => { expect(_cappedGrade(evaluate("cleaning", { ...base, websiteCredential: null }, "x", true))).toBe("B"); });
   it("allows an A when every area has evidence", () => { expect(_cappedGrade(evaluate("cleaning", { ...base, websiteCredential: true }, "x", true))).toBe("A"); });
+  it("never gives an A when an area is graded F", () => { expect(_cappedGrade(evaluate("salon", { ...base, websiteCredential: false }, "x", true))).toBe("B"); });
   it("lowers the grade when the website shows no credentials", () => { expect(_cappedGrade(evaluate("plumbing", { ...base, websiteCredential: false }, "x", true))).not.toBe("A"); });
   it("lowers the grade when the newest review is over 180 days old", () => {
     const fresh = scoreOf(evaluate("salon", { ...base, websiteCredential: true }, "x", true));
