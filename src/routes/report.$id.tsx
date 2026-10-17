@@ -225,6 +225,34 @@ function Report() {
           <h2 className="text-3xl font-semibold md:text-4xl">The {problems.length} things costing you the most</h2>
           <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} />)}</div>
         </section>}
+
+        {!allClear && <section className="mt-16 border-t border-border pt-12" id="diy">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-semibold md:text-4xl">How to fix it yourself, step by step</h2>
+              <p className="mt-3 max-w-2xl text-muted-foreground">A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before.</p>
+            </div>
+            {diy && <Button onClick={downloadDIY}><Download />Download DIY pack</Button>}
+          </div>
+          {diy ? (
+            <div className="mt-8 space-y-6">{problems.map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}</div>
+          ) : (
+            <div className="relative mt-8">
+              <div className="pointer-events-none select-none space-y-6 blur-md" aria-hidden="true">
+                {problems.slice(0, 2).map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}
+              </div>
+              <div className="absolute inset-0 grid place-items-center rounded-lg bg-background/40">
+                <div className="mx-4 max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-lg">
+                  <Lock className="mx-auto h-8 w-8 text-fix" />
+                  <p className="mt-4 text-xl font-semibold">Unlock the full DIY pack</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{problems.length} detailed SOP{problems.length === 1 ? "" : "s"} for your report, with exact clicks, scripts and links. One-off payment, no subscription.</p>
+                  <div className="mt-5"><PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Unlock DIY pack · £{PRICE_DIY.toFixed(2)} <s className="ml-1 text-xs opacity-70">£{WAS_DIY.toFixed(2)}</s></PayButton></div>
+                  <p className="mt-3 text-xs text-muted-foreground">Prefer not to do it yourself? Choose Fix it for me above and our AI agent does the work.</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>}
       </main>
       {!all && !allClear && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY <s>£{WAS_DIY.toFixed(2)}</s> £{PRICE_DIY.toFixed(2)} · Agent <s>£{WAS_BUNDLE.toFixed(2)}</s> £{PRICE_BUNDLE.toFixed(2)} launch prices</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
     </div>
