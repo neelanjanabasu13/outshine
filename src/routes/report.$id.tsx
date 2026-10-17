@@ -159,7 +159,7 @@ function Report() {
               {all ? <p className="text-grade-a">Your agent drafts are unlocked below.</p> : <PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton>}
             </div>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">Test payments only. Agent output is currently a draft preview, not automatic changes to your Google profile. No real money is charged.</p>
+          <p className="mt-5 text-xs text-muted-foreground">Secure one-off payment through Stripe. Agent output is currently a draft preview, not automatic changes to your Google profile.</p>
           {pendingSession && <p role="status" className="mt-3 text-sm">Complete the secure payment in the new tab, then return here.</p>}
           {paymentMessage && <p role="status" className="mt-3 text-sm">{paymentMessage}</p>}
         </section>}
