@@ -46,8 +46,8 @@ function Home() {
     setErr(null);
     const to = setTimeout(async () => {
       try {
-        const r = await search({ data: browsing && trade ? { q: discoveryQuery(trade, city), max: 20 } : { q: trade ? `${s} ${TRADES[trade].label}` : s } });
-        if (live) { setHits(browsing && trade ? discoveryResults(r.results, trade) : r.results); setErr(r.error); }
+        const r = await (browsing && trade ? discover({ data: { trade, city } }) : search({ data: { q: trade ? `${s} ${TRADES[trade].label}` : s } }));
+        if (live) { setHits(r.results); setErr(r.error); }
       } catch { if (live) setErr("Search is having a moment. Please try again."); }
       if (live) setLoading(false);
     }, browsing ? 0 : 400);

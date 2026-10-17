@@ -27,3 +27,17 @@ export function discoveryResults<T extends { trade: Trade | null; reviewCount: n
   const picked = leader ? [...improvers, leader] : improvers;
   return [...picked, ...pool.filter((r) => !picked.includes(r))].slice(0, 5);
 }
+
+const RANK: Record<string, number> = { F: 0, E: 1, D: 2, C: 3, B: 4, A: 5 };
+
+/**
+ * Picks five graded businesses: four with the most to fix (weakest grade first, then most reviewed so
+ * they are recognisable names), then one A-grade leader for contrast when the area has one.
+ */
+export function pickDiscovery<T extends { grade: string; reviewCount: number }>(results: T[]): T[] {
+  const byNeed = [...results].sort((a, b) => (RANK[a.grade] ?? 9) - (RANK[b.grade] ?? 9) || b.reviewCount - a.reviewCount);
+  const improvers = byNeed.filter((r) => r.grade !== "A").slice(0, 4);
+  const leader = byNeed.filter((r) => r.grade === "A").sort((a, b) => b.reviewCount - a.reviewCount)[0];
+  const picked = leader ? [...improvers, leader] : improvers;
+  return [...picked, ...byNeed.filter((r) => !picked.includes(r))].slice(0, 5);
+}

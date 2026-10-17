@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { discoveryQuery, discoveryResults } from "./discovery";
+import { discoveryQuery, discoveryResults, pickDiscovery } from "./discovery";
 
 describe("trade discovery", () => {
   it("searches London businesses without needing a typed business name", () => {
@@ -16,5 +16,10 @@ describe("trade discovery", () => {
     const other = { trade: "plumbing" as const, reviewCount: 200, rating: 5 };
     expect(discoveryResults([...results, other], "cleaning").map((r) => r.reviewCount)).toEqual([80, 60, 50, 30, 20]);
     expect(results.map((r) => r.reviewCount)).toEqual([20, 80, 10, 50, 30, 60]);
+  });
+  it("browsing shows four businesses with real problems before one A-grade leader", () => {
+    const mk = (grade: string, reviewCount: number) => ({ grade, reviewCount });
+    const out = pickDiscovery([mk("A", 900), mk("A", 300), mk("B", 500), mk("C", 200), mk("D", 50), mk("C", 400), mk("B", 80)]);
+    expect(out.map((r) => `${r.grade}${r.reviewCount}`)).toEqual(["D50", "C400", "C200", "B500", "A900"]);
   });
 });

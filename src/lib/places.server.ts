@@ -143,4 +143,17 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
   };
 }
 
+/** Trade browsing: one search with full fields, graded on the same public evidence rules as a scan. */
+export async function discoverPlaces(trade: Trade, query: string) {
+  const json = await post("places:searchText", { textQuery: query, regionCode: "GB", maxResultCount: 20 }, "places." + FIELDS.split(",").join(",places."));
+  const places = ((json.places ?? []) as any[]).filter((p) => { const g = guessTrade(p.types, p.displayName?.text); return g === null || g === trade; });
+  const creds = await Promise.all(places.map((p) => websiteCredential(p.websiteUri, trade)));
+  return places.map((p, i) => ({
+    placeId: p.id as string, name: p.displayName?.text ?? "", address: p.formattedAddress ?? "",
+    rating: p.rating ?? 0, reviewCount: p.userRatingCount ?? 0, trade: trade as Trade | null,
+    photo: p.photos?.[0]?.name ? photoUrl(p.photos[0].name) : null,
+    signals: toSignals(p, trade, creds[i] ?? null),
+  }));
+}
+
 export const isTrade = (t: string): t is Trade => t in TRADES;
