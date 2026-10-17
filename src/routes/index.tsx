@@ -81,7 +81,7 @@ function Home() {
           {!picked ? (
             <div className="relative mt-8 max-w-xl">
               <div className="flex items-stretch rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
-                <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Prolux Cleaning, Borehamwood"
+                <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Mop Stars Cleaning, Leeds"
                   className="min-w-0 flex-1 rounded-l-2xl bg-transparent px-5 py-4 text-lg outline-none" />
                 <span className="m-1.5 hidden items-center rounded-xl bg-fix px-5 font-semibold text-fix-foreground sm:flex">Scan free</span>
               </div>
