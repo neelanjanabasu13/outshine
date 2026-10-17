@@ -229,13 +229,21 @@ function PayButton({ b, item, label, children, onSession, variant = "default" }:
   // click on a link opens Stripe in a new tab reliably, including inside the preview.
   useEffect(() => {
     let cancelled = false;
-    go({ data: { businessId: b.id, businessName: b.name, item, label } })
-      .then((r) => {
-        if (cancelled) return;
-        if (r.url) setSession({ url: r.url, id: r.sessionId ?? undefined });
-        else setErr(r.error ?? "We could not prepare the payment page. Please refresh and try again.");
-      })
-      .catch(() => { if (!cancelled) setErr("We could not prepare the payment page. Please refresh and try again."); });
+    let tries = 0;
+    const attempt = () => {
+      tries += 1;
+      // If a call stalls (for example during an app update), retry instead of spinning forever.
+      const stall = setTimeout(() => { if (!cancelled && tries < 3) attempt(); else if (!cancelled) setErr("We could not prepare the payment page. Please refresh and try again."); }, 10000);
+      go({ data: { businessId: b.id, businessName: b.name, item, label } })
+        .then((r) => {
+          clearTimeout(stall);
+          if (cancelled) return;
+          if (r.url) { setErr(null); setSession({ url: r.url, id: r.sessionId ?? undefined }); }
+          else setErr(r.error ?? "We could not prepare the payment page. Please refresh and try again.");
+        })
+        .catch(() => { clearTimeout(stall); if (!cancelled) { if (tries < 3) setTimeout(attempt, 1500); else setErr("We could not prepare the payment page. Please refresh and try again."); } });
+    };
+    attempt();
     return () => { cancelled = true; };
   }, [b.id, item]); // eslint-disable-line react-hooks/exhaustive-deps
   const cls = "h-auto min-h-10 w-full whitespace-normal py-3";
