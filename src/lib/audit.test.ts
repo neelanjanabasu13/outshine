@@ -4,7 +4,7 @@ import { BUSINESSES } from "./sample";
 
 describe("grading", () => {
   it("does not penalise live businesses for unexposed fields", () => {
-    const s = { ...BUSINESSES[0]?.signals, rating: 4.8, reviewCount: 50, photoCount: 10, hasWebsite: true, hasHours: true, reviewsLast90: 0, replyRate: 0, newestPhotoDays: 0, descriptionLength: 0, postsLast30: 0, credentialMentioned: false, servicesListed: 0 };
+    const s = { ...BUSINESSES[0]?.signals, rating: 4.9, reviewCount: 250, photoCount: 10, hasWebsite: true, hasHours: true, reviewsLast90: 0, replyRate: 0, newestPhotoDays: 0, descriptionLength: 0, postsLast30: 0, credentialMentioned: false, servicesListed: 0 };
     for (const trade of Object.keys(TRADES) as Trade[]) {
       const f = evaluate(trade, s, "Real profile", true);
       expect(gradeOf(scoreOf(f))).toBe("A");
@@ -94,4 +94,14 @@ describe("cappedGrade", () => {
   it("caps public-only A grades at B", () => { expect(_cappedGrade(100, true)).toBe("B"); });
   it("keeps A when full evidence exists", () => { expect(_cappedGrade(100, false)).toBe("A"); });
   it("leaves lower public grades unchanged", () => { expect(_cappedGrade(0, true)).toBe(_cappedGrade(0, false)); });
+});
+
+describe("public grades spread", () => {
+  const base = { ...BUSINESSES[0]!.signals, photoCount: 10, hasWebsite: true, hasHours: true };
+  const g = (rating: number, reviewCount: number) => _cappedGrade(scoreOf(evaluate("cleaning", { ...base, rating, reviewCount }, "x", true)), true);
+  it("gives a typical 4.6 star, 40 review profile a lower grade than a 5.0 star, 1,100 review one", () => {
+    expect(g(4.6, 40)).not.toBe(g(5.0, 1100));
+  });
+  it("grades 5.0 stars and 1,100 reviews as B", () => { expect(g(5.0, 1100)).toBe("B"); });
+  it("grades 4.2 stars and 15 reviews below C", () => { expect(["D", "F"]).toContain(g(4.2, 15)); });
 });
