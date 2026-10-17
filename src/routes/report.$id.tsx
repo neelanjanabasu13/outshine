@@ -103,12 +103,23 @@ function Report() {
     return () => { active = false; clearInterval(interval); };
   }, [pendingSession, b.id, verify]);
 
-  const downloadDIY = () => {
-    const text = `${b.name}\nFixFirst DIY pack\n\n` + problems.map((f) => `${f.title}\n${f.evidence}\n\n${diyInstructions(f, b.trade).map((s, i) => `${i + 1}. ${s}`).join("\n")}\n`).join("\n");
-    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = url; a.download = "fixfirst-diy-pack.txt"; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const downloadDIY = async () => {
+    setPdfBusy(true);
+    try {
+      const { buildReportPdf } = await import("@/lib/report-pdf");
+      const blob = await buildReportPdf({
+        name: b.name, address: b.address, tradeLabel: TRADES[b.trade].label, trade: b.trade, grade,
+        areas: areaList.filter((a) => areas[a] !== undefined).map((a) => ({ area: a, grade: gradeOf(areas[a]!) })),
+        rivals: comps.map((c) => ({ name: c.name, grade: c.grade })),
+        findings: problems, sops: problems.map((f) => sopFor(f, b.trade, b.name)),
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${b.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-fixfirst-pack.pdf`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } finally { setPdfBusy(false); }
   };
 
   const downloadReport = () => {
