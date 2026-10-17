@@ -103,7 +103,7 @@ function Report() {
 
   const downloadReport = () => {
     const lines = [`${b.name}`, `${b.address}`, `FixFirst free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
-      ...(areaList).map((a) => `${a}: ${areas[a] === undefined ? "Not assessed" : gradeOf(areas[a]!)}`),
+      ...areaList.filter((a) => areas[a] !== undefined).map((a) => `${a}: ${gradeOf(areas[a]!)}`),
       "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${c.grade}`),
       "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
       ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
@@ -128,11 +128,11 @@ function Report() {
               <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Your overall grade</p>
               <h2 className="mt-3 text-3xl font-semibold">{allClear ? "Nothing to fix in the public profile we can see." : grade === "A" ? "A strong profile, with room to stay ahead." : "A clearer path to a stronger profile."}</h2>
               <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on {b.live ? "customer rating, review volume, how recent the newest review is, photos you upload yourself, website, opening hours and the credentials named on your own website" : "reputation, response, visuals, profile and credentials"}, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
-              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Every point comes from Google or your own website. Owner replies to reviews are not graded because Google does not publish them. If we cannot read your website, credentials show as not assessed and the highest grade is B.</p>}
+              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Every point comes from Google or your own website. Owner replies to reviews are not graded because Google does not publish them. We only show areas we can actually grade from this evidence.</p>}
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
-            {areaList.map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {areaList.filter((area) => areas[area] !== undefined).map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
           </div>
         </section>
 
@@ -186,7 +186,7 @@ function Report() {
             <h2 className="text-2xl font-semibold">How you compare with {referenceBusiness?.name}</h2>
             <div className="mt-5 grid grid-cols-[1fr_auto_auto] gap-x-6 gap-y-3 text-sm">
               <span /><span className="text-muted-foreground">You</span><span className="text-muted-foreground">Reference</span>
-              {(Object.keys(areas) as Area[]).map((a) => { const you = areas[a]; const target = benchmark[a]; return <div key={a} className="contents"><span>{a}</span><span className="font-semibold">{you === undefined ? "Not assessed" : gradeOf(you)}</span><span className="font-semibold">{target === undefined ? "Not assessed" : gradeOf(target)}</span></div>; })}
+              {(Object.keys(areas) as Area[]).filter((a) => areas[a] !== undefined && benchmark[a] !== undefined).map((a) => { const you = areas[a]; const target = benchmark[a]; return <div key={a} className="contents"><span>{a}</span><span className="font-semibold">{you === undefined ? "Not assessed" : gradeOf(you)}</span><span className="font-semibold">{target === undefined ? "Not assessed" : gradeOf(target)}</span></div>; })}
             </div>
             <p className="mt-5 text-sm text-muted-foreground">These grades compare public profiles, not workmanship or credentials. Unavailable fields are excluded for both businesses.</p>
           </div>
