@@ -8,9 +8,9 @@ export function Header() {
   return (
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
       <div className="flex items-center gap-2">
-        <Link to="/" aria-label="Outshine home" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-paper">O</Link>
+        <Link to="/" aria-label="Outshine home" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold text-paper">O</Link>
         <div className="flex flex-col leading-tight">
-          <Link to="/" className="font-display text-xl font-semibold"><Shine>Outshine</Shine></Link>
+          <Link to="/" className="font-display text-3xl font-extrabold tracking-tight"><Shine>Outshine</Shine></Link>
           <a href={QUIET_CREW_URL} target="_blank" rel="noopener" title="Visit the Quietcrew website" className="-my-1 py-1 text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">by <span className="font-quietcrew font-extrabold tracking-[-0.02em] text-quietcrew">Quietcrew</span></a>
         </div>
       </div>

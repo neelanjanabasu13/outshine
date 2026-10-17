@@ -238,9 +238,10 @@
 @keyframes twinkle { 0%, 70%, 100% { transform: scale(.6) rotate(0deg); opacity: .5; } 82% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
 @keyframes halo { 0%, 100% { opacity: .55; } 50% { opacity: .9; } }
 @utility text-shine {
-  color: var(--ink);
-  background: linear-gradient(110deg, var(--ink) 40%, var(--grade-c) 48%, oklch(0.98 0.03 85) 50%, var(--grade-c) 52%, var(--ink) 60%);
-  background-size: 250% 100%;
+  color: var(--grade-d);
+  background:
+    linear-gradient(110deg, transparent 42%, oklch(0.99 0.03 85 / .9) 50%, transparent 58%) 150% 0 / 250% 100% no-repeat,
+    linear-gradient(90deg, var(--fix) 0%, var(--grade-d) 45%, var(--grade-c) 100%) 0 0 / 100% 100%;
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   animation: shine-sweep 4.5s ease-in-out infinite;
 }
