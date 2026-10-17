@@ -38,7 +38,8 @@ function Report() {
     return { ...c, score: scoreOf(f), areas: areaScores(f) };
   });
   const avgTop = Math.round(comps.reduce((a, c) => a + c.score, 0) / comps.length);
-  const problems = topProblems(findings);
+  // Google does not share owner replies publicly, so live reports skip that claim.
+  const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings);
   const lost = estimateLostRevenue(b.trade, score, avgTop);
   const [all, setAll] = useState(false);
   const [paidItem, setPaidItem] = useState<string | null>(null);
