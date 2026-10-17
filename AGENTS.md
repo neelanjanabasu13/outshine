@@ -17,3 +17,4 @@
 - DIY packs use trade-specific guidance in `src/lib/diy.ts` and unlock a download separately from agent output.
 - Homepage trade browsing reuses live Places search with pure query and review-count ordering helpers in `src/lib/discovery.ts`, keeping discovery distinct from audit grades.
 - Homepage discovery uses the shared Embla carousel with fixed-height slides, keeping live-result loading and horizontal browsing from expanding the list vertically.
+- Curated city/trade references live in the browser-safe reference catalogue with source links; public grades use only exposed fields and unknown areas remain unassessed to avoid fabricated evidence.
