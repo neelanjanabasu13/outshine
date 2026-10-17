@@ -38,6 +38,17 @@ function Report() {
   const problems = topProblems(findings);
   const lost = estimateLostRevenue(b.trade, score, avgTop);
   const [all, setAll] = useState(false);
+  const [paidItem, setPaidItem] = useState<string | null>(null);
+  const verify = useServerFn(verifyCheckout);
+  useEffect(() => {
+    const sid = new URLSearchParams(window.location.search).get("session_id");
+    if (!sid) return;
+    verify({ data: { sessionId: sid } }).then((r) => {
+      if (!r.paid || r.businessId !== b.id) return;
+      if (r.item === "all") setAll(true); else setPaidItem(r.item);
+      window.history.replaceState(null, "", window.location.pathname);
+    }).catch(() => {});
+  }, [b.id, verify]);
 
   return (
     <div className="min-h-screen">
