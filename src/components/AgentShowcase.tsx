@@ -18,7 +18,7 @@ export const SHOWCASE_LOG: Record<FixKind, string[]> = {
 const RESULT: Record<FixKind, (b: Business) => string> = {
   website: () => "Website button now live on your listing",
   description: (b) => `Trusted ${b.area} specialists. Fully insured, fixed quotes, and same-week appointments. Call ${b.phone ?? "us"} today.`,
-  "review-replies": () => "\"Thanks so much, Sarah. We're glad the boiler is running quietly again, and we'll see you at the annual service.\"",
+  "review-replies": (b) => { const r = b.reviews[0]; return r ? `"Thank you so much, ${r.author.split(" ")[0]}. It was a pleasure working with you, and we look forward to seeing you again."` : "Every review now has a personal owner reply"; },
   "review-request": () => "20 review requests sent from your Gmail · 3 new 5 star reviews so far",
   photos: () => "8 new photos live · new cover photo set",
   posts: () => "\"Winter boiler check, £20 off this month\" is live, three more are scheduled",
