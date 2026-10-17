@@ -143,6 +143,14 @@ function Report() {
           <p className="mt-6 text-xs opacity-50">One payment, never a monthly bill. Test mode: use card 4242 4242 4242 4242.</p>
         </section>
       </main>
+      {!all && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
+            <p className="text-sm"><b>{problems.length} fixes found.</b> <span className="text-muted-foreground">£{PRICE_PER_FIX.toFixed(2)} each, or all for £{PRICE_BUNDLE.toFixed(2)}. One payment, no subscription.</span></p>
+            <PayButton b={b} item="all" label="Every fix" className="shrink-0 rounded-full bg-fix px-5 py-2.5 text-sm font-medium text-fix-foreground hover:opacity-90 disabled:opacity-50">Fix everything · £{PRICE_BUNDLE.toFixed(2)}</PayButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
