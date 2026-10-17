@@ -158,7 +158,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
     const f = r.findings[i]!;
     section(`Guide ${i + 1}: ${f.title}`, 1);
     para(`GUIDE ${i + 1}  ·  ${f.area.toUpperCase()}  ·  ${s.time.toUpperCase()}`, 7.5, accent, "bold", 0, 1);
-    para(f.title, 14, ink, "bold", 0, 1);
+    y += 3; para(f.title, 14, ink, "bold", 0, 1);
     para(s.goal, 9.5, muted, "normal", 0, 1);
     if (s.youNeed.length) { label("Before you start"); s.youNeed.forEach((x) => bullet(x)); }
     if (s.rootCauses?.length) { label("Fix the cause first"); s.rootCauses.forEach((c) => { para(c.theme, 9.5, ink, "bold", 0, 0.3); para(c.fix, 9, muted, "normal", 0, 1.5); }); }
