@@ -45,7 +45,7 @@ export function runAgent(kind: FixKind, b: Business): AgentRun {
     case "review-request":
       return {
         steps: ["Creating your short review link", "Writing a friendly text to send after each job", "Writing a follow-up for people who don't reply"],
-        output: `After the job:\nHi {name}, thanks for choosing ${b.name} today! If you were happy with the work, a quick Google review would mean the world to a small local business like ours: g.page/r/${b.id}/review  Thanks, ${first}\n\nThree days later, if no review:\nHi {name}, just a gentle nudge in case you missed it. It only takes 30 seconds: g.page/r/${b.id}/review  Thank you!`,
+        output: (() => { const link = reviewLink(b) ?? "[your Google review link]"; return `After the job:\nHi {name}, thanks for choosing ${b.name} today! If you were happy with the work, a quick Google review would mean the world to a small local business like ours: ${link}  Thanks, ${first}\n\nThree days later, if no review:\nHi {name}, just a gentle nudge in case you missed it. It only takes 30 seconds: ${link}  Thank you!`; })(),
       };
     case "photos":
       return {
@@ -59,3 +59,26 @@ export function runAgent(kind: FixKind, b: Business): AgentRun {
       };
   }
 }
+
+/** Google's own "write a review" page for a live Places id; null for demo businesses. */
+export function reviewLink(b: Pick<Business, "id">): string | null {
+  const m = /^live\.[^.]+\.(.+)$/.exec(b.id);
+  return m ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(m[1])}` : null;
+}
+
+/** Where Google manages the owner's listing; owners must be signed in, so we cannot act there for them. */
+export const GOOGLE_PROFILE_URL = "https://www.google.com/search?q=my+business";
+
+export interface Handoff { created: string; you: string; why: string; }
+
+/** Honest split between what the agent finishes and the one step only the owner can take. */
+export const AGENT_HANDOFF: Record<FixKind, Handoff> = {
+  website: { created: "A live one-page website with your services, reviews and click-to-call, published at its own link.", you: "Paste the link into the Website field of your Google profile.", why: "Google only lets the signed-in owner edit the listing." },
+  "review-request": { created: "Your real Google review link, a printable QR counter card and two ready-to-send customer messages.", you: "Print the card and send the message to customers after each job.", why: "Texts must come from your own phone, and printing needs a printer." },
+  "review-replies": { created: "A personal reply for every unanswered review, written in your voice.", you: "Paste each reply under its review on Google.", why: "Google only lets the listing owner reply to reviews." },
+  description: { created: "A finished business description within Google's 750-character limit.", you: "Paste it into the Description box on your Google profile and save.", why: "Google only lets the signed-in owner edit the listing." },
+  photos: { created: "A shot list and keyword-rich captions for every photo.", you: "Take the photos and upload them to your profile.", why: "An AI cannot take real photos of your work, and fake ones would break Google's rules." },
+  posts: { created: "A month of Google updates, ready to post.", you: "Paste one update a week into Add update on your Google profile.", why: "Google only lets the signed-in owner publish updates." },
+};
+
+export const HANDOFF_NOTE = "Our AI agent does everything it can digitally. Where Google or your own phone needs your personal sign-in, it hands you the finished work with a one-click step, so you never write or design from scratch.";
