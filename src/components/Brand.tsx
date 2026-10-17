@@ -13,8 +13,8 @@ export function Header() {
         </div>
       </div>
       <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
-        {([["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
-          <Link key={to} to={to} className="text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
+        {([["/", "Home"], ["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
+          <Link key={to} to={to} className="text-muted-foreground transition-colors hover:text-foreground" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
         ))}
       </nav>
     </header>
@@ -43,9 +43,11 @@ export function ShellPage({ title, intro }: { title: string; intro: string }) {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-3xl px-6 py-20">
-        <h1 className="text-4xl font-semibold md:text-6xl">{title}</h1>
+        <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground">← Back to home</Link>
+        <h1 className="mt-6 text-4xl font-semibold md:text-6xl">{title}</h1>
         <p className="mt-6 text-lg text-muted-foreground">{intro}</p>
         <p className="mt-10 border-l-2 border-border pl-4 text-sm text-muted-foreground">More on this page is coming soon.</p>
+        <Link to="/" className="mt-10 inline-block rounded-full bg-fix px-6 py-3 font-semibold text-fix-foreground">Scan my business free</Link>
       </main>
       <Footer />
     </div>
