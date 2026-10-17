@@ -216,7 +216,9 @@ export function topProblems(findings: Finding[], n = 5): Finding[] {
 }
 
 export const PRICE_BUNDLE = 29.99;
-export const PRICE_DIY = 11.99;
+export const PRICE_DIY = 7.99;
+export const WAS_DIY = 14.99;
+export const WAS_BUNDLE = 49.99;
 
 /** An illustrative industry target, never presented as a real nearby business. */
 export function benchmarkFindings(trade: Trade): Finding[] {

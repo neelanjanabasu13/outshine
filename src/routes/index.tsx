@@ -172,11 +172,11 @@ function Home() {
               No subscription, no free trial that <em className="font-display italic text-brand-gradient">quietly bills you.</em>
             </h2>
             <p className="mt-4 max-w-md text-muted-foreground">
-              Your scan is free. Choose a DIY guide for £11.99 or let our agent prepare the fixes for £29.99. Both cover your whole report, with one payment and nothing recurring.
+              Your scan is free. Choose a DIY guide for £7.99 (launch price, usually £14.99) or let our agent prepare the fixes for £29.99 (usually £49.99). Both cover your whole report, with one payment and nothing recurring.
             </p>
           </div>
           <ul className="flex flex-col justify-center gap-3">
-            {["Your scan is always free", "DIY £11.99 or done for you £29.99", "Same price, however many fixes you need"].map((t) => (
+            {["Your scan is always free", "DIY £7.99 (was £14.99) or done for you £29.99 (was £49.99)", "Same price, however many fixes you need"].map((t) => (
               <li key={t} className="flex items-center gap-3 rounded-2xl bg-accent px-5 py-4 font-medium text-accent-foreground">
                 <span className="h-2 w-2 rounded-full bg-fix" />{t}
               </li>
