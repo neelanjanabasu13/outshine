@@ -118,7 +118,6 @@ function Report() {
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
-        <Button variant="outline" size="sm" className="ml-4" onClick={downloadReport}><Download />Download free report</Button>
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
@@ -147,11 +146,12 @@ function Report() {
               <p className="font-medium">Free scan</p><p className="font-display text-3xl font-semibold">Free</p>
               <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and the problems worth fixing.</p>
               <p className="flex items-center gap-2 text-sm text-grade-a"><Check className="h-4 w-4" />Your report is ready</p>
+              <Button onClick={downloadReport}><Download />Download free report</Button>
             </div>
             <div className="flex flex-col gap-3">
               <p className="font-medium">DIY pack</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_DIY.toFixed(2)}</span>£{PRICE_DIY.toFixed(2)}</p>
               <p className="flex-1 text-sm text-muted-foreground">A downloadable, step-by-step guide to every finding in your report. You make the changes.</p>
-              {diy ? <Button onClick={downloadDIY} variant="outline"><Download />Download DIY pack</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession} variant="outline">Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
+              {diy ? <Button onClick={downloadDIY}><Download />Download DIY pack</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
             </div>
             <div className="flex flex-col gap-3">
               <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</p>
