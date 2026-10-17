@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
-import { assessedAreaScores, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
+import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
 import { diyInstructions } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
@@ -35,7 +35,7 @@ function Report() {
   const { b } = Route.useLoaderData();
   const findings = evaluate(b.trade, b.signals, b.name, b.live);
   const score = scoreOf(findings);
-  const grade = gradeOf(score);
+  const grade = cappedGrade(score, b.live);
   const areas = assessedAreaScores(findings);
   const reference = b.reference;
   const referenceBusiness = reference?.business;
@@ -49,7 +49,8 @@ function Report() {
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
-  const projectedGrade = gradeOf(projectedScore);
+  const projectedGrade = cappedGrade(projectedScore, b.live);
+  const allClear = problems.length === 0;
   const projectedAreas = assessedAreaScores(projected);
   const [paidItems, setPaidItems] = useState<string[]>([]);
   const [pendingSession, setPendingSession] = useState<string | null>(null);
@@ -106,14 +107,15 @@ function Report() {
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
+          {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
           <h1 className="mt-2 break-words text-4xl font-semibold md:text-6xl">{b.name}</h1>
           <div className="mt-8 grid items-center gap-8 border-y border-border py-8 sm:grid-cols-[auto_1fr]">
             <Gauge score={score} grade={grade} />
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Your overall grade</p>
-              <h2 className="mt-3 text-3xl font-semibold">{grade === "A" ? "A strong profile, with room to stay ahead." : "A clearer path to a stronger profile."}</h2>
+              <h2 className="mt-3 text-3xl font-semibold">{allClear ? "Nothing to fix in the public profile we can see." : grade === "A" ? "A strong profile, with room to stay ahead." : "A clearer path to a stronger profile."}</h2>
               <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on {b.live ? "customer rating, total reviews, visible photos, website link and opening hours" : "reputation, response, visuals, profile and credentials"}, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
-              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Replies, review velocity, description, posts, photo dates and credentials are not graded because Google does not expose enough evidence. Photos reflect the limited public feed, not the full gallery.</p>}
+              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Replies, review velocity, description, posts, photo dates and credentials are not graded because Google does not expose enough evidence. Photos reflect the limited public feed, not the full gallery. Because response and credentials cannot be checked, the highest grade a public scan can give is B.</p>}
             </div>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
@@ -121,7 +123,7 @@ function Report() {
           </div>
         </section>
 
-        <section className="mt-12 border-y border-border py-8" id="pricing">
+        {allClear ? <section className="mt-12 border-y border-border py-8"><p className="flex items-center gap-2 text-grade-a"><Check className="h-5 w-5" />All clear</p><h2 className="mt-2 text-2xl font-semibold">Every public signal we can check already meets the standard</h2><p className="mt-2 max-w-2xl text-muted-foreground">There is nothing for a DIY pack or the agent to fix, so we will not ask you to pay for anything. Your scan is free and complete.</p></section> : <section className="mt-12 border-y border-border py-8" id="pricing">
           <h2 className="text-2xl font-semibold">Choose how you want to fix it</h2>
           <p className="mt-2 text-muted-foreground">Your scan stays free. Each paid option covers your whole report at a fixed price, however many fixes you need, with no subscription.</p>
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
@@ -144,13 +146,13 @@ function Report() {
           <p className="mt-5 text-xs text-muted-foreground">Test payments only. Agent output is currently a draft preview, not automatic changes to your Google profile. No real money is charged.</p>
           {pendingSession && <p role="status" className="mt-3 text-sm">Complete the secure payment in the new tab, then return here.</p>}
           {paymentMessage && <p role="status" className="mt-3 text-sm">{paymentMessage}</p>}
-        </section>
+        </section>}
 
         <section className="mt-16">
           <h2 className="text-2xl font-semibold">You, your nearby rivals, and a real reference</h2>
           <div className="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
             {[{ name: b.name, score, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), ...(referenceBusiness ? [{ name: referenceBusiness.name, score: scoreOf(referenceFindings), category: `${reference?.entry?.city} reference`, photo: photoOf(referenceBusiness) }] : [])].map((c) => {
-              const g = gradeOf(c.score);
+              const g = cappedGrade(c.score, b.live || c.category.endsWith("reference"));
               return <div key={c.name} className={`w-56 shrink-0 snap-start overflow-hidden rounded-lg border bg-card ${c.category === "You" ? "border-ink" : "border-border"}`}>
                 <img src={c.photo} alt="" loading="lazy" width={400} height={200} className="h-32 w-full object-cover" />
                 <div className="p-4"><p className="text-xs text-muted-foreground">{c.category}</p><div className="mt-2 flex items-start justify-between gap-3"><p className="break-words font-medium leading-tight">{c.name}</p><p className={`shrink-0 font-display text-4xl font-bold ${gradeColor(g)}`}>{g}</p></div></div>
@@ -174,7 +176,7 @@ function Report() {
           </div>
         </section>}
 
-        <section className="mt-16 border-y border-border py-8">
+        {!allClear && <section className="mt-16 border-y border-border py-8">
           <div className="grid gap-8 sm:grid-cols-[1fr_auto]">
             <div>
               <h2 className="text-3xl font-semibold">See what could change</h2>
@@ -191,14 +193,14 @@ function Report() {
               <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">{(Object.keys(projectedAreas) as Area[]).map((a) => { const value = projectedAreas[a]; return value === undefined ? null : <span key={a}>{a} <b className={gradeColor(gradeOf(value))}>{gradeOf(value)}</b></span>; })}</div>
             </div>
           </div>
-        </section>
+        </section>}
 
-        <section className="mt-16">
+        {!allClear && <section className="mt-16">
           <h2 className="text-3xl font-semibold md:text-4xl">The {problems.length} things costing you the most</h2>
           <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} />)}</div>
-        </section>
+        </section>}
       </main>
-      {!all && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY £{PRICE_DIY.toFixed(2)} · Agent £{PRICE_BUNDLE.toFixed(2)}</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
+      {!all && !allClear && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY £{PRICE_DIY.toFixed(2)} · Agent £{PRICE_BUNDLE.toFixed(2)}</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
     </div>
   );
 }
