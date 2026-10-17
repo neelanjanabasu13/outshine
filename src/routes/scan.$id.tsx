@@ -93,7 +93,7 @@ function Scan() {
         <div>
           <Button asChild variant="link" className="mb-4 px-0"><Link to="/"><ArrowLeft />Try another business</Link></Button>
           <div className="relative overflow-hidden rounded-3xl bg-secondary">
-            <img key={frame.src + current} src={frame.src} alt={frame.caption} className="animate-kenburns aspect-[4/3] w-full object-cover" width={1024} height={768} />
+            <img key={frame.src + current} src={frame.src} alt={frame.caption} className="animate-kenburns aspect-video md:aspect-[4/3] w-full object-cover" width={1024} height={768} />
             <div className="absolute inset-0 bg-ink/25" />
             <div className="animate-laser absolute inset-x-0 h-0.5 bg-fix shadow-[0_0_24px_6px_var(--fix)]" />
             <span className="absolute left-4 top-4 rounded-full bg-paper/90 px-3 py-1 font-mono text-xs">LIVE · {pct}%</span>
