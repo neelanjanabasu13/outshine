@@ -12,6 +12,18 @@ export function discoveryQuery(trade: Trade, city: string): string {
   return `${QUERIES[trade]} in ${city} UK`;
 }
 
+/** Google text search ranks prominent, highly rated places first, so we also search a few local areas to reach ordinary businesses. */
+const AREAS: Record<string, string[]> = {
+  London: ["Croydon", "Ealing", "Walthamstow", "Lewisham", "Harrow"],
+  Manchester: ["Salford", "Stockport", "Oldham"],
+  Birmingham: ["Solihull", "Sutton Coldfield", "Erdington"],
+  Leeds: ["Headingley", "Horsforth", "Morley"],
+  Edinburgh: ["Leith", "Portobello", "Corstorphine"],
+};
+export function discoveryQueries(trade: Trade, city: string): string[] {
+  return [discoveryQuery(trade, city), ...(AREAS[city] ?? []).map((a) => `${QUERIES[trade]} in ${a}, ${city} UK`)];
+}
+
 /** Likely to show real gaps on a public scan: below the 4.9 star / 250 review public targets. */
 export const hasRoomToImprove = (r: { rating: number; reviewCount: number }) => r.rating < 4.8 || r.reviewCount < 250;
 
@@ -42,8 +54,8 @@ export function pickDiscovery<T extends { grade: string; reviewCount: number }>(
   return [...picked, ...byNeed.filter((r) => !picked.includes(r))].slice(0, 5);
 }
 
-/** Example pills: businesses rated 3.5 to 4.0 stars, which almost always have something to improve. */
-export const inExampleRange = (r: { rating: number }) => r.rating >= 3.5 && r.rating <= 4.0;
+/** Example pills: businesses rated 4.0 to 4.5 stars, which almost always have something to improve. */
+export const inExampleRange = (r: { rating: number }) => r.rating >= 4.0 && r.rating <= 4.5;
 
 export function pickExamples<T extends { grade: string; reviewCount: number; rating: number }>(results: T[]): T[] {
   const inRange = results.filter(inExampleRange).sort((a, b) => b.reviewCount - a.reviewCount);
