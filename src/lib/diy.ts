@@ -2,6 +2,11 @@ import { TRADES, type Finding, type Trade } from "./audit";
 
 export function diyInstructions(f: Finding, trade: Trade): string[] {
   const t = TRADES[trade];
+  if (f.id === "hours") return [
+    "Open Edit profile in your Google Business Profile and choose Hours.",
+    "Enter your actual regular opening hours, or choose the appropriate option if your business does not use regular hours.",
+    "Add holiday exceptions, save and check your public profile.",
+  ];
   switch (f.fix) {
     case "description": return [
       "Open your Google Business Profile, choose Edit profile, then Business information.",

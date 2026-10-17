@@ -1,4 +1,6 @@
 # FixFirst roadmap
+- [x] Correct live grading and replace fictional benchmarks with sourced real reference candidates for all 25 city/trade pairs
+- [ ] Verify A-grade reference profiles for all 25 pairs (blocked: authorized Google evidence validation; current references are ungraded candidates, not proven best-in-class)
 - [x] Add return navigation, letter-only grades, illustrative A benchmark and interactive improvement preview
 - [x] Clarify free / DIY / done-for-you pricing and verify checkout without a blank preview
 - [x] Home search, live scan, report (grade, competitors, radar, top 5 fixes), agent fix demos, generated one-page website, all on sample data

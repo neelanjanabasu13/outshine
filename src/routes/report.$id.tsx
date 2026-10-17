@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
-import { areaScores, benchmarkFindings, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
+import { assessedAreaScores, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
 import { diyInstructions } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/report/$id")({
   head: ({ loaderData }) => ({
     meta: [
       { title: loaderData ? `${loaderData.b.name} report · FixFirst` : "Report · FixFirst" },
-      { name: "description", content: "Your letter grade, nearby competitors, an illustrative best-in-class benchmark and the fixes that matter." },
+      { name: "description", content: "Your evidence-based letter grade, nearby competitors, real city reference businesses and the fixes that matter." },
       { property: "og:title", content: loaderData ? `${loaderData.b.name}'s FixFirst grade` : "FixFirst report" },
       { property: "og:description", content: "Compare your profile with local rivals and preview how improvements could change your grade." },
       { property: "og:type", content: "article" },
@@ -33,21 +33,24 @@ export const Route = createFileRoute("/report/$id")({
 
 function Report() {
   const { b } = Route.useLoaderData();
-  const findings = evaluate(b.trade, b.signals, b.name);
+  const findings = evaluate(b.trade, b.signals, b.name, b.live);
   const score = scoreOf(findings);
   const grade = gradeOf(score);
-  const areas = areaScores(findings);
-  const benchmark = areaScores(benchmarkFindings(b.trade));
+  const areas = assessedAreaScores(findings);
+  const reference = b.reference;
+  const referenceBusiness = reference?.business;
+  const referenceFindings = referenceBusiness ? evaluate(b.trade, referenceBusiness.signals, referenceBusiness.name, true) : [];
+  const benchmark = referenceBusiness ? assessedAreaScores(referenceFindings) : null;
   const comps = b.competitors.map((c) => {
-    const f = evaluate(b.trade, c.signals, c.name);
-    return { ...c, score: scoreOf(f), areas: areaScores(f) };
+    const f = evaluate(b.trade, c.signals, c.name, b.live);
+    return { ...c, score: scoreOf(f), areas: assessedAreaScores(f) };
   }).sort((a, c) => c.score - a.score);
   const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings);
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
   const projectedGrade = gradeOf(projectedScore);
-  const projectedAreas = areaScores(projected);
+  const projectedAreas = assessedAreaScores(projected);
   const [paidItems, setPaidItems] = useState<string[]>([]);
   const [pendingSession, setPendingSession] = useState<string | null>(null);
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
@@ -109,12 +112,12 @@ function Report() {
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Your overall grade</p>
               <h2 className="mt-3 text-3xl font-semibold">{grade === "A" ? "A strong profile, with room to stay ahead." : "A clearer path to a stronger profile."}</h2>
-              <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on reputation, response, visuals, profile and credentials, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
-              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Provisional audit from public Google data. Replies, post activity and photo dates are not available, while review activity and profile completeness use partial data. This is not a Google ranking or a measure of customer clicks.</p>}
+              <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on {b.live ? "customer rating, total reviews, visible photos, website link and opening hours" : "reputation, response, visuals, profile and credentials"}, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
+              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Replies, review velocity, description, posts, photo dates and credentials are not graded because Google does not expose enough evidence. Photos reflect the limited public feed, not the full gallery.</p>}
             </div>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
-            {(Object.keys(areas) as Area[]).map((area) => <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p><p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(areas[area]))}`}>{gradeOf(areas[area])}</p></div>)}
+            {(["Reputation", "Response", "Visuals", "Profile", "Credentials"] as Area[]).map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
           </div>
         </section>
 
@@ -144,9 +147,9 @@ function Report() {
         </section>
 
         <section className="mt-16">
-          <h2 className="text-2xl font-semibold">You, your nearby rivals, and best-in-class</h2>
+          <h2 className="text-2xl font-semibold">You, your nearby rivals, and a real reference</h2>
           <div className="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
-            {[{ name: b.name, score, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), { name: `Best-in-class ${TRADES[b.trade].label.toLowerCase()}`, score: scoreOf(benchmarkFindings(b.trade)), category: "Illustrative benchmark", photo: TRADE_PHOTOS[b.trade] }].map((c) => {
+            {[{ name: b.name, score, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), ...(referenceBusiness ? [{ name: referenceBusiness.name, score: scoreOf(referenceFindings), category: `${reference?.entry?.city} reference`, photo: photoOf(referenceBusiness) }] : [])].map((c) => {
               const g = gradeOf(c.score);
               return <div key={c.name} className={`w-56 shrink-0 snap-start overflow-hidden rounded-lg border bg-card ${c.category === "You" ? "border-ink" : "border-border"}`}>
                 <img src={c.photo} alt="" loading="lazy" width={400} height={200} className="h-32 w-full object-cover" />
@@ -154,20 +157,22 @@ function Report() {
               </div>;
             })}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">{b.live ? "Nearby profiles are from Google. " : "Nearby profiles are demo data. "}The A-grade benchmark is an illustrative {TRADES[b.trade].label.toLowerCase()} profile, not a real business or a local rival.</p>
+          {reference?.entry && !referenceBusiness && <article className="mt-4 rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">{reference.entry.city} · Real reference business</p><h3 className="mt-2 text-xl font-semibold">{reference.entry.name}</h3><p className="mt-2 text-sm text-muted-foreground">Grade not verified</p><Button asChild variant="link" className="h-auto px-0"><a href={reference.entry.source} target="_blank" rel="noopener noreferrer">View selection source<ArrowUpRight /></a></Button></article>}
+          {reference?.entry && <div className="mt-4 border-l-2 border-border pl-4"><p className="font-medium">{reference.entry.name} · {reference.entry.city} reference</p><p className="mt-1 text-sm text-muted-foreground">Selected once as a real {TRADES[b.trade].label.toLowerCase()} example, not an official city ranking. {referenceBusiness ? "Its grade uses the same public evidence as yours." : "Its public-profile grade has not been verified, so no A grade or best-in-class claim is made."}</p><Button asChild variant="link" className="h-auto px-0"><a href={reference.entry.website} target="_blank" rel="noopener noreferrer">Visit this business<ArrowUpRight /></a></Button>{referenceBusiness && <Button asChild variant="link"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(referenceBusiness.name)}&query_place_id=${encodeURIComponent(referenceBusiness.id.split(".").slice(2).join("."))}`} target="_blank" rel="noopener noreferrer">View on Google Maps<ArrowUpRight /></a></Button>}</div>}
+          <p className="mt-3 text-xs text-muted-foreground">{b.live ? "Business information from Google Maps. " : "Nearby profiles are demo data. "}{reference?.checkedAt ? `Reference evidence retrieved ${new Date(reference.checkedAt).toLocaleDateString("en-GB", { timeZone: "UTC" })}. ` : ""}{!reference && "No curated reference is available for this location yet; no fictional business is substituted."}</p>
         </section>
 
-        <section className="mt-16 grid items-center gap-10 md:grid-cols-2">
+        {benchmark && <section className="mt-16 grid items-center gap-10 md:grid-cols-2">
           <Radar you={selected.length ? projectedAreas : areas} them={benchmark} />
           <div>
-            <h2 className="text-2xl font-semibold">What best-in-class looks like</h2>
+            <h2 className="text-2xl font-semibold">How you compare with {referenceBusiness?.name}</h2>
             <div className="mt-5 grid grid-cols-[1fr_auto_auto] gap-x-6 gap-y-3 text-sm">
-              <span /><span className="text-muted-foreground">You</span><span className="text-muted-foreground">Target</span>
-              {(Object.keys(areas) as Area[]).map((a) => <div key={a} className="contents"><span>{a}</span><span className={`font-semibold ${gradeColor(gradeOf(areas[a]))}`}>{gradeOf(areas[a])}</span><span className="font-semibold text-grade-a">A</span></div>)}
+              <span /><span className="text-muted-foreground">You</span><span className="text-muted-foreground">Reference</span>
+              {(Object.keys(areas) as Area[]).map((a) => { const you = areas[a]; const target = benchmark[a]; return <div key={a} className="contents"><span>{a}</span><span className="font-semibold">{you === undefined ? "Not assessed" : gradeOf(you)}</span><span className="font-semibold">{target === undefined ? "Not assessed" : gradeOf(target)}</span></div>; })}
             </div>
-            <p className="mt-5 text-sm text-muted-foreground">{TRADES[b.trade].minPhotos} useful photos of {TRADES[b.trade].expectedPhotos}, a clear description, real credentials explained simply, and a steady flow of honest reviews.</p>
+            <p className="mt-5 text-sm text-muted-foreground">These grades compare public profiles, not workmanship or credentials. Unavailable fields are excluded for both businesses.</p>
           </div>
-        </section>
+        </section>}
 
         <section className="mt-16 border-y border-border py-8">
           <div className="grid gap-8 sm:grid-cols-[1fr_auto]">
@@ -183,7 +188,7 @@ function Report() {
               <p className="mb-3 text-sm text-muted-foreground">Projected overall grade</p>
               <Gauge score={projectedScore} grade={projectedGrade} />
               <p role="status" className="mt-3 text-sm">{selected.length ? `${grade} → ${projectedGrade}` : `Current grade: ${grade}`}</p>
-              <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">{(Object.keys(projectedAreas) as Area[]).map((a) => <span key={a}>{a} <b className={gradeColor(gradeOf(projectedAreas[a]))}>{gradeOf(projectedAreas[a])}</b></span>)}</div>
+              <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">{(Object.keys(projectedAreas) as Area[]).map((a) => { const value = projectedAreas[a]; return value === undefined ? null : <span key={a}>{a} <b className={gradeColor(gradeOf(value))}>{gradeOf(value)}</b></span>; })}</div>
             </div>
           </div>
         </section>
@@ -271,9 +276,9 @@ function Gauge({ score, grade }: { score: number; grade: ReturnType<typeof grade
   </div>;
 }
 
-function Radar({ you, them }: { you: Record<Area, number>; them: Record<Area, number> }) {
+function Radar({ you, them }: { you: Partial<Record<Area, number>>; them: Partial<Record<Area, number>> }) {
   const keys = Object.keys(you) as Area[];
   const pt = (i: number, v: number) => { const a = (Math.PI * 2 * i) / keys.length - Math.PI / 2; return [150 + Math.cos(a) * v * 1.1, 150 + Math.sin(a) * v * 1.1]; };
-  const poly = (d: Record<Area, number>) => keys.map((k, i) => pt(i, d[k]).join(",")).join(" ");
-  return <div><svg viewBox="-50 -10 400 320" role="img" aria-label="Your profile compared with the illustrative A-grade benchmark" className="mx-auto w-full max-w-sm">{[25, 50, 75, 100].map((r) => <polygon key={r} points={keys.map((_, i) => pt(i, r).join(",")).join(" ")} fill="none" stroke="var(--border)" />)}<polygon points={poly(them)} fill="var(--grade-a)" fillOpacity="0.12" stroke="var(--grade-a)" strokeDasharray="4 4" /><polygon points={poly(you)} fill="var(--fix)" fillOpacity="0.25" stroke="var(--fix)" strokeWidth="2" />{keys.map((k, i) => { const [x, y] = pt(i, 125); return <text key={k} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="var(--foreground)">{k}</text>; })}</svg><p className="text-center text-xs"><span className="text-fix">Your profile / projection</span> · <span className="text-grade-a">A-grade benchmark</span></p></div>;
+  const poly = (d: Partial<Record<Area, number>>) => keys.map((k, i) => pt(i, d[k] ?? 0).join(",")).join(" ");
+  return <div><svg viewBox="-50 -10 400 320" role="img" aria-label="Your profile compared with a real reference business" className="mx-auto w-full max-w-sm">{[25, 50, 75, 100].map((r) => <polygon key={r} points={keys.map((_, i) => pt(i, r).join(",")).join(" ")} fill="none" stroke="var(--border)" />)}<polygon points={poly(them)} fill="var(--grade-a)" fillOpacity="0.12" stroke="var(--grade-a)" strokeDasharray="4 4" /><polygon points={poly(you)} fill="var(--fix)" fillOpacity="0.25" stroke="var(--fix)" strokeWidth="2" />{keys.map((k, i) => { const [x, y] = pt(i, 125); return <text key={k} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="var(--foreground)">{k}</text>; })}</svg><p className="text-center text-xs"><span className="text-fix">Your profile / projection</span> · <span className="text-grade-a">Real reference profile</span></p></div>;
 }

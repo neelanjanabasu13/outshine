@@ -1,8 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { estimateLostRevenue, evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_DIY, benchmarkFindings, projectFindings, areaScores, TRADES, checkoutPrice, type Trade } from "./audit";
+import { estimateLostRevenue, evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_DIY, benchmarkFindings, projectFindings, areaScores, assessedAreaScores, TRADES, checkoutPrice, type Trade } from "./audit";
 import { BUSINESSES } from "./sample";
 
 describe("grading", () => {
+  it("does not penalise live businesses for unexposed fields", () => {
+    const s = { ...BUSINESSES[0]?.signals, rating: 4.8, reviewCount: 50, photoCount: 10, hasWebsite: true, hasHours: true, reviewsLast90: 0, replyRate: 0, newestPhotoDays: 0, descriptionLength: 0, postsLast30: 0, credentialMentioned: false, servicesListed: 0 };
+    for (const trade of Object.keys(TRADES) as Trade[]) {
+      const f = evaluate(trade, s, "Real profile", true);
+      expect(gradeOf(scoreOf(f))).toBe("A");
+      expect(Object.keys(assessedAreaScores(f)).sort()).toEqual(["Profile", "Reputation", "Visuals"]);
+      expect(f.map((x) => x.id)).toEqual(["rating", "velocity", "photos", "website", "hours"]);
+      expect(scoreOf(evaluate(trade, { ...s, replyRate: 1, postsLast30: 4, credentialMentioned: true, descriptionLength: 750, reviewsLast90: 100 }, "Same profile", true))).toBe(scoreOf(f));
+    }
+  });
+
+  it("uses actual exposed photo counts and keeps live gaps actionable", () => {
+    const b = BUSINESSES[0];
+    if (!b) throw new Error("Missing fixture");
+    const f = evaluate("cleaning", { ...b.signals, photoCount: 2, hasWebsite: false, hasHours: false }, "Real profile", true);
+    expect(f.find((x) => x.id === "photos")?.score).toBe(0.2);
+    expect(f.find((x) => x.id === "website")?.score).toBe(0);
+    expect(f.find((x) => x.id === "hours")?.score).toBe(0);
+    expect(gradeOf(scoreOf(f))).not.toBe("A");
+  });
   it("maps scores to letter grades A to F", () => {
     expect(gradeOf(85)).toBe("A");
     expect(gradeOf(70)).toBe("B");
