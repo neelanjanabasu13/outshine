@@ -63,11 +63,16 @@ function Home() {
       <main className="mx-auto max-w-6xl px-6 pb-24 pt-6 md:pt-12">
         <p className="animate-rise text-sm font-medium uppercase tracking-[0.2em] text-fix">Free scan · Fixed prices · No subscription</p>
         <h1 className="animate-rise mt-5 max-w-4xl text-4xl font-semibold leading-[0.95] md:text-6xl">
-          How do you <em className="font-display italic text-brand-gradient">stack up against local rivals?</em>
+          Turn local searches into <em className="font-display italic text-brand-gradient">booked jobs.</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          We will find what is holding you back and <span className="font-semibold text-brand-gradient">fix it for you.</span>
+          Discover how your business can win more calls, beat nearby rivals and keep customers coming back, and <span className="font-semibold text-brand-gradient">we fix it for you.</span>
         </p>
+        <ul aria-label="What FixFirst helps you get" className="animate-rise mt-5 flex flex-wrap gap-2">
+          {["More customer calls", "Win jobs over local rivals", "More sales", "More repeat customers"].map((o) => (
+            <li key={o} className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">✓ {o}</li>
+          ))}
+        </ul>
 
         <div className="mt-8 max-w-2xl">
           <div className="flex flex-wrap gap-2">

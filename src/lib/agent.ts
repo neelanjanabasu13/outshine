@@ -4,6 +4,16 @@ import type { Business } from "./sample";
 
 export interface AgentRun { steps: string[]; output: string; }
 
+/** One active sentence per fix saying what FixFirst does for the owner. */
+export const AGENT_ACTION: Record<FixKind, string> = {
+  website: "We build your website for you in one click, in under a minute.",
+  "review-request": "We create your review link and write the messages that ask happy customers for reviews.",
+  "review-replies": "We write a personal reply to every unanswered review for you.",
+  description: "We write your Google business description for you, with your services and credentials.",
+  photos: "We build your photo shot list and write captions with local keywords for you.",
+  posts: "We write a month of Google updates for you, ready to post.",
+};
+
 export function runAgent(kind: FixKind, b: Business): AgentRun {
   const t = TRADES[b.trade];
   const first = b.name.split(" ")[0];
