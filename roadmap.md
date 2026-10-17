@@ -1,4 +1,5 @@
 # FixFirst roadmap
+- [ ] Correct live grading and replace fictional benchmarks with real examples for all 25 city/trade pairs
 - [x] Add return navigation, letter-only grades, illustrative A benchmark and interactive improvement preview
 - [x] Clarify free / DIY / done-for-you pricing and verify checkout without a blank preview
 - [x] Home search, live scan, report (grade, competitors, radar, top 5 fixes), agent fix demos, generated one-page website, all on sample data
