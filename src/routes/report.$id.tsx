@@ -224,7 +224,7 @@ function Report() {
 function PayButton({ b, item, label, children, onSession, variant = "default" }: { b: Business; item: "diy" | "all"; label: string; children: React.ReactNode; onSession: (id: string) => void; variant?: "default" | "outline" }) {
   const go = useServerFn(createCheckout);
   const [err, setErr] = useState<string | null>(null);
-  const [session, setSession] = useState<{ url: string; id?: string } | null>(null);
+  const [session, setSession] = useState<{ url: string; id: string | undefined } | null>(null);
   // Prepare the Stripe session up front so the button is a real link: a direct
   // click on a link opens Stripe in a new tab reliably, including inside the preview.
   useEffect(() => {
