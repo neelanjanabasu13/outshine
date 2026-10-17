@@ -1,6 +1,8 @@
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Brand";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { TRADES } from "@/lib/audit";
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS } from "@/lib/sample";
@@ -48,7 +50,7 @@ function Scan() {
     return () => clearTimeout(to);
   }, [n, all.length, b.id, navigate]);
 
-  const current = n < all.length ? all[n]!.i : steps.length;
+  const current = all[n]?.i ?? steps.length;
   const pct = Math.round((n / all.length) * 100);
 
   return (
@@ -56,6 +58,7 @@ function Scan() {
       <Header />
       <main className="mx-auto grid max-w-6xl gap-10 px-6 pb-20 pt-6 md:grid-cols-2">
         <div>
+          <Button asChild variant="link" className="mb-4 px-0"><Link to="/"><ArrowLeft />Try another business</Link></Button>
           <div className="relative overflow-hidden rounded-3xl">
             <img src={photoOf(b)} alt={b.name} className="aspect-[4/3] w-full object-cover" width={1024} height={768} />
             <div className="absolute inset-0 bg-ink/20" />
