@@ -5,6 +5,8 @@ import { Header } from "@/components/Brand";
 import { TRADES, type Trade } from "@/lib/audit";
 import { TRADE_PHOTOS } from "@/lib/sample";
 import { liveId, searchBusinesses } from "@/lib/places.functions";
+import { Button } from "@/components/ui/button";
+import { discoveryQuery, discoveryResults } from "@/lib/discovery";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,6 +27,7 @@ type Hit = { placeId: string; name: string; address: string; rating: number; rev
 function Home() {
   const [q, setQ] = useState("");
   const [trade, setTrade] = useState<Trade | null>(null);
+  const [city, setCity] = useState("London");
   const [picked, setPicked] = useState<Hit | null>(null);
   const [hits, setHits] = useState<Hit[]>([]);
   const [loading, setLoading] = useState(false);
@@ -34,18 +37,21 @@ function Home() {
 
   useEffect(() => {
     const s = q.trim();
-    if (s.length < 3) { setHits([]); return; }
+    const browsing = s.length < 3 && trade !== null;
+    if (s.length < 3 && !browsing) { setHits([]); setLoading(false); setErr(null); return; }
     let live = true;
     setLoading(true);
+    setHits([]);
+    setErr(null);
     const to = setTimeout(async () => {
       try {
-        const r = await search({ data: { q: trade ? `${s} ${TRADES[trade].label}` : s } });
-        if (live) { setHits(r.results); setErr(r.error); }
+        const r = await search({ data: { q: browsing && trade ? discoveryQuery(trade, city) : trade ? `${s} ${TRADES[trade].label}` : s } });
+        if (live) { setHits(browsing && trade ? discoveryResults(r.results, trade) : r.results); setErr(r.error); }
       } catch { if (live) setErr("Search is having a moment. Please try again."); }
       if (live) setLoading(false);
-    }, 400);
+    }, browsing ? 0 : 400);
     return () => { live = false; clearTimeout(to); };
-  }, [q, trade, search]);
+  }, [q, trade, city, search]);
 
   const pickedTrade = picked ? (picked.trade ?? trade) : null;
 
@@ -64,30 +70,37 @@ function Home() {
         <div className="mt-8 max-w-2xl">
           <div className="flex flex-wrap gap-2">
             {(Object.keys(TRADES) as Trade[]).map((t) => (
-              <button key={t} onClick={() => setTrade(trade === t ? null : t)}
-                className={`rounded-full border px-4 py-1.5 text-sm transition ${(picked ? pickedTrade : trade) === t ? "border-ink bg-ink text-paper" : "border-border bg-card hover:border-ink"}`}>
+              <Button key={t} variant={(picked ? pickedTrade : trade) === t ? "default" : "outline"} aria-pressed={(picked ? pickedTrade : trade) === t} onClick={() => { setTrade(t); if (!picked || picked.trade) { setPicked(null); setQ(""); } }}
+                className="h-auto rounded-full px-4 py-1.5">
                 {TRADES[t].label}
-              </button>
+              </Button>
             ))}
           </div>
 
           {!picked ? (
             <div className="relative mt-4">
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town, e.g. ProLux Cleaning London"
+              <input aria-label="Business name and town" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town, e.g. ProLux Cleaning London"
                 className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
-              {q.trim().length >= 3 && <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
+              {trade && q.trim().length < 3 && <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">Popular {TRADES[trade].label.toLowerCase()} businesses</h2>
+                <select aria-label="Browse city" value={city} onChange={(e) => setCity(e.target.value)} className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
+                  {["London", "Manchester", "Birmingham", "Leeds", "Edinburgh"].map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>}
+              {(q.trim().length >= 3 || trade) && <ul aria-label="Business results" aria-busy={loading} className="mt-2 overflow-hidden rounded-lg border border-border bg-card">
                 {hits.map((b) => (
                   <li key={b.placeId}>
-                    <button onClick={() => setPicked(b)} className="flex w-full items-center gap-4 px-5 py-3 text-left hover:bg-secondary">
+                    <Button variant="ghost" onClick={() => setPicked(b)} className="flex h-auto w-full justify-start gap-4 rounded-none px-5 py-3 text-left whitespace-normal">
                       {b.photo ? <img src={b.photo} alt="" className="h-10 w-10 rounded-lg object-cover" loading="lazy" width={40} height={40} /> : <span className="h-10 w-10 rounded-lg bg-secondary" />}
-                      <span className="flex-1"><span className="block font-medium">{b.name}</span><span className="text-sm text-muted-foreground">{b.address}</span></span>
-                      {b.rating > 0 && <span className="text-xs text-muted-foreground">{b.rating.toFixed(1)} ★</span>}
-                    </button>
+                      <span className="min-w-0 flex-1"><span className="block font-medium">{b.name}</span><span className="text-sm text-muted-foreground">{b.address}</span></span>
+                      <span className="shrink-0 text-right text-xs text-muted-foreground">{b.rating > 0 && <span className="block">{b.rating.toFixed(1)} ★</span>}<span>{b.reviewCount.toLocaleString("en-GB")} reviews</span></span>
+                    </Button>
                   </li>
                 ))}
                 {loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">Searching Google…</li>}
                 {!loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">{err ?? "No match on Google. Try adding your town or postcode."}</li>}
               </ul>}
+              {trade && q.trim().length < 3 && hits.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Live Google results for {city}, ordered by review count. These are not an official top-five ranking.</p>}
             </div>
           ) : (
             <div className="animate-rise mt-4 flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 sm:flex-row sm:items-center">
