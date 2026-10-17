@@ -241,8 +241,11 @@ function PayButton({ b, item, label, children, onSession, variant = "default" }:
         if (r.url) {
           setCheckoutUrl(r.url);
           if (r.sessionId) onSession(r.sessionId);
-          if (tab) tab.location.replace(r.url);
-          else setErr("Your browser blocked the new tab. Open secure payment using the link below.");
+          let navigated = false;
+          if (tab && !tab.closed) {
+            try { tab.location.href = r.url; navigated = true; } catch { navigated = false; }
+          }
+          if (!navigated) tab?.close();
         } else { tab?.close(); setErr(r.error); }
       } catch { tab?.close(); setErr("We could not open the payment page. Please try again."); }
       setBusy(false);
