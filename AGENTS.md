@@ -19,3 +19,5 @@
 - Homepage discovery uses the shared Embla carousel with fixed-height slides, keeping live-result loading and horizontal browsing from expanding the list vertically.
 - Curated city/trade references live in the browser-safe reference catalogue with source links; public grades use only exposed fields and unknown areas remain unassessed to avoid fabricated evidence.
 - Live grading uses only verifiable evidence: Google Places fields (rating, review count, photo count, website, hours) plus a server-side read of the business's own website for trade credentials; review dates and photo uploaders from the five-review, ten-photo samples are never graded; an overall A requires Credentials to be assessed and no area graded D or F.
+- Trade-specific DIY depth (root causes, shot lists, scripts, guardrails) lives in browser-safe `src/lib/playbook.ts` and is merged into SOPs by `sopFor`, so research updates never touch page code.
+- The paid pack downloads as a text-based PDF built in the browser by `src/lib/report-pdf.ts` from the same SOP data the page shows, keeping page and PDF in sync and searchable.
