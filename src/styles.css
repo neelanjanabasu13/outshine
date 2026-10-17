@@ -232,3 +232,20 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-deal, .animate-marker, .animate-rise { animation: none !important; }
 }
+
+/* Outshine shimmer: ink word with a light sweep, warm halo and a twinkling star */
+@keyframes shine-sweep { 0%, 55% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
+@keyframes twinkle { 0%, 70%, 100% { transform: scale(.6) rotate(0deg); opacity: .5; } 82% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+@keyframes halo { 0%, 100% { opacity: .55; } 50% { opacity: .9; } }
+@utility text-shine {
+  color: var(--ink);
+  background: linear-gradient(110deg, var(--ink) 40%, var(--grade-c) 48%, oklch(0.98 0.03 85) 50%, var(--grade-c) 52%, var(--ink) 60%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shine-sweep 4.5s ease-in-out infinite;
+}
+@utility animate-twinkle { animation: twinkle 4.5s ease-in-out infinite; }
+@utility animate-halo { animation: halo 4.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .text-shine, .animate-twinkle, .animate-halo { animation: none; }
+}
