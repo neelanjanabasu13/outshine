@@ -67,12 +67,9 @@ function Home() {
         <div>
           <p className="animate-rise inline-block text-sm font-medium uppercase tracking-[0.2em] text-fix">One-off payments. No subscription.</p>
           <h1 className="animate-rise mt-6 font-display text-5xl font-extrabold leading-[0.95] md:text-6xl">
-            Fix what's{" "}
-            <span className="relative inline-block">
-              <span aria-hidden className="animate-marker absolute inset-x-[-0.08em] bottom-[0.08em] -z-0 h-[0.38em] rounded-sm bg-grade-c/60" />
-              <span className="relative">holding</span>
-            </span>{" "}
-            your business back.
+            Make your business{" "}
+            <Shine halo>outshine</Shine>{" "}
+            every rival down the road.
           </h1>
           <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
             Free scan of your Google listing and website against local rivals. Fix it yourself, or <span className="font-semibold text-brand-gradient">let our AI agent fix it for you.</span>
