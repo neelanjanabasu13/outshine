@@ -1,4 +1,5 @@
 import { TRADES, type Finding, type Trade } from "./audit";
+import { PLAYBOOKS } from "./playbook";
 
 export interface Sop {
   /** What this SOP achieves, in one line. */
@@ -13,6 +14,12 @@ export interface Sop {
   proTips: string[];
   /** Rough time to complete. */
   time: string;
+  /** Trade-specific causes behind the symptom, each with the business change that removes it. */
+  rootCauses?: { theme: string; fix: string }[];
+  /** Trade-specific photo shot list. */
+  shotList?: { shot: string; how: string }[];
+  /** Lines the owner must not cross. */
+  guardrails?: string[];
 }
 
 /**
@@ -22,6 +29,65 @@ export interface Sop {
  * by searching your own business name on Google while signed in).
  */
 export function sopFor(f: Finding, trade: Trade, businessName: string): Sop {
+  const p = PLAYBOOKS[trade];
+  const t = TRADES[trade];
+  if (f.id === "credential") return credentialSop(trade, businessName);
+  const base = baseSop(f, trade, businessName);
+  switch (f.fix) {
+    case "review-request":
+      return {
+        ...base,
+        steps: [...base.steps.slice(0, 6), `Pick your asking moment. For ${t.label.toLowerCase()}, the best one is: ${p.askMoment}`, ...base.steps.slice(6)],
+        scripts: [...base.scripts, p.expectationScript],
+        ...(f.id === "rating" ? { rootCauses: p.rootCauses } : {}),
+        proTips: [...base.proTips, ...(f.id === "rating" ? ["Fix the cause before chasing new reviews. More reviews only help once the complaint behind the low ones stops happening."] : [])],
+        guardrails: p.guardrails,
+      };
+    case "review-replies":
+      return { ...base, rootCauses: p.rootCauses, guardrails: p.guardrails };
+    case "description":
+      return {
+        ...base,
+        steps: base.steps.map((s, i) => i === 3 ? `${s} Customers in your trade search for phrases like: ${p.serviceTerms.join(", ")}. Use the ones you genuinely offer.` : s),
+      };
+    case "photos":
+      return {
+        ...base,
+        shotList: p.shotList,
+        proTips: [...base.proTips.filter((x) => !x.startsWith("If you need filler")), `For graphics only (price lists, offers), paste this into ChatGPT or Canva's Magic Media: "${p.aiPrompt}". Always label these as graphics, never as photos of your work.`],
+        guardrails: p.guardrails,
+      };
+    case "posts":
+      return { ...base, proTips: [...base.proTips, `Ideas that work for ${t.label.toLowerCase()}: ${p.postIdeas.join("; ")}.`] };
+    default:
+      return base;
+  }
+}
+
+function credentialSop(trade: Trade, businessName: string): Sop {
+  const t = TRADES[trade];
+  const p = PLAYBOOKS[trade];
+  return {
+    goal: `Show customers, in plain words, that you hold ${t.credential}, so they trust you before they call.`,
+    time: "20 minutes",
+    youNeed: ["Your certificate, membership card or licence number", "A Google account that manages your Business Profile", "Access to edit your website, if you have one"],
+    steps: [
+      "Find your certificate or card and write down the exact scheme name and your registration or licence number.",
+      `Check it yourself the way a customer would. ${p.credentialCheck}`,
+      "If the public listing is out of date (old address, expired), update it with the scheme first. Customers trust the register over your word.",
+      "Go to google.com/business, sign in, click 'Edit profile' and open the 'Description' field.",
+      "Add one plain sentence naming the credential and your number, using the script below. Click 'Save'.",
+      "If you have a website, add the same sentence near the top of the home page, plus the scheme's logo only if the scheme allows members to use it.",
+      "Add one photo of your card or certificate to your Google photos, covering any personal home address.",
+      "Search your business name in an incognito window and confirm the sentence shows on your public profile.",
+    ],
+    scripts: [{ label: "Credential sentence for your profile and website", text: `${businessName} holds ${t.credential} (number [your number]). ${t.credentialPlain} You can check us on the official register any time.` }],
+    proTips: ["Name the credential exactly as the scheme writes it. Customers search for it by name.", "Mention it again in replies to reviews where it is relevant, for example after a boiler or rewiring job."],
+    guardrails: ["Only claim a credential that is current and held by your business or the person doing the work. False claims can be a criminal offence and get profiles removed.", ...p.guardrails.slice(1)],
+  };
+}
+
+function baseSop(f: Finding, trade: Trade, businessName: string): Sop {
   const t = TRADES[trade];
   switch (f.fix) {
     case "review-request":

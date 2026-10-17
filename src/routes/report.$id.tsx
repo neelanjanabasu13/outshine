@@ -8,7 +8,7 @@ import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { AGENT_ACTION, runAgent } from "@/lib/agent";
-import { diyInstructions, sopFor } from "@/lib/diy";
+import { sopFor } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
@@ -103,12 +103,23 @@ function Report() {
     return () => { active = false; clearInterval(interval); };
   }, [pendingSession, b.id, verify]);
 
-  const downloadDIY = () => {
-    const text = `${b.name}\nFixFirst DIY pack\n\n` + problems.map((f) => `${f.title}\n${f.evidence}\n\n${diyInstructions(f, b.trade).map((s, i) => `${i + 1}. ${s}`).join("\n")}\n`).join("\n");
-    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = url; a.download = "fixfirst-diy-pack.txt"; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const downloadDIY = async () => {
+    setPdfBusy(true);
+    try {
+      const { buildReportPdf } = await import("@/lib/report-pdf");
+      const blob = await buildReportPdf({
+        name: b.name, address: b.address, tradeLabel: TRADES[b.trade].label, trade: b.trade, grade,
+        areas: areaList.filter((a) => areas[a] !== undefined).map((a) => ({ area: a, grade: gradeOf(areas[a]!) })),
+        rivals: comps.map((c) => ({ name: c.name, grade: c.grade })),
+        findings: problems, sops: problems.map((f) => sopFor(f, b.trade, b.name)),
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${b.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-fixfirst-pack.pdf`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } finally { setPdfBusy(false); }
   };
 
   const downloadReport = () => {
@@ -161,7 +172,7 @@ function Report() {
             <div className="flex flex-col gap-3">
               <p className="font-medium">DIY pack</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_DIY.toFixed(2)}</span>£{PRICE_DIY.toFixed(2)}</p>
               <p className="flex-1 text-sm text-muted-foreground">A downloadable, step-by-step guide to every finding in your report. You make the changes.</p>
-              {diy ? <Button onClick={downloadDIY} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />Download DIY pack</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
+              {diy ? <Button onClick={downloadDIY} disabled={pdfBusy} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
             </div>
             <div className="flex flex-col gap-3">
               <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</p>
@@ -232,10 +243,15 @@ function Report() {
               <h2 className="text-3xl font-semibold md:text-4xl">How to fix it yourself, step by step</h2>
               <p className="mt-3 max-w-2xl text-muted-foreground">A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before.</p>
             </div>
-            {diy && <Button onClick={downloadDIY}><Download />Download DIY pack</Button>}
           </div>
           {diy ? (
+            <>
+            <div className="sticky top-2 z-30 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-fix bg-card p-4 shadow-lg">
+              <p className="text-sm"><span className="font-semibold">Your DIY pack is unlocked.</span> <span className="text-muted-foreground">Download the full report and every guide as one searchable PDF with clickable contents.</span></p>
+              <Button onClick={downloadDIY} disabled={pdfBusy}><Download />{pdfBusy ? "Preparing PDF..." : "Download full PDF report"}</Button>
+            </div>
             <div className="mt-8 space-y-6">{problems.map((f, i) => <SopCard key={f.id} f={f} n={i + 1} b={b} />)}</div>
+            </>
           ) : (
             <div className="relative mt-8">
               <div className="pointer-events-none select-none space-y-6 blur-md" aria-hidden="true">
@@ -355,9 +371,17 @@ function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Before you start</p>
       <ul className="mt-2 space-y-1 text-sm">{sop.youNeed.map((y) => <li key={y} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-grade-a" />{y}</li>)}</ul>
     </div>}
+    {sop.rootCauses && <div className="mt-6">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Fix the cause first</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">{sop.rootCauses.map((c) => <div key={c.theme} className="rounded-lg bg-secondary p-3 text-sm"><p className="font-medium">{c.theme}</p><p className="mt-1 text-muted-foreground">{c.fix}</p></div>)}</div>
+    </div>}
     <ol className="mt-6 space-y-3">
       {sop.steps.map((s, i) => <li key={i} className="flex gap-3 text-sm"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fix text-xs font-bold text-fix-foreground">{i + 1}</span><span className="pt-0.5">{s}</span></li>)}
     </ol>
+    {sop.shotList && <div className="mt-6">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Your five-shot photo set</p>
+      <ul className="mt-2 space-y-2 text-sm">{sop.shotList.map((c) => <li key={c.shot}><span className="font-medium">{c.shot}:</span> <span className="text-muted-foreground">{c.how}</span></li>)}</ul>
+    </div>}
     {sop.scripts.length > 0 && <div className="mt-6 space-y-3">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Word-for-word scripts</p>
       {sop.scripts.map((sc) => <div key={sc.label} className="rounded-lg bg-secondary p-4">
@@ -371,6 +395,10 @@ function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
     {sop.proTips.length > 0 && <div className="mt-6 border-l-2 border-fix pl-4">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-fix">Pro tips</p>
       <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">{sop.proTips.map((p) => <li key={p}>{p}</li>)}</ul>
+    </div>}
+    {sop.guardrails && <div className="mt-6 border-l-2 border-destructive pl-4">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-destructive">Do not</p>
+      <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">{sop.guardrails.map((g) => <li key={g}>{g}</li>)}</ul>
     </div>}
   </article>;
 }
