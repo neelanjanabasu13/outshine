@@ -34,6 +34,6 @@ describe("example pills", () => {
   });
   it("leads with in-range businesses", () => {
     const r = [{ grade: "A", reviewCount: 900, rating: 4.9 }, { grade: "C", reviewCount: 50, rating: 3.8 }];
-    expect(_pe(r)[0].rating).toBe(3.8);
+    expect(_pe(r)[0]?.rating).toBe(3.8);
   });
 });
