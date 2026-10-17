@@ -274,6 +274,7 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
       <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by our AI agent</p>
         <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
+        <p className="mt-2 text-sm text-muted-foreground">Choose <span className="font-semibold text-foreground">Fix it for me</span> and our AI agent creates it for you, or choose the <span className="font-semibold text-foreground">DIY pack</span> to do it yourself for less.</p>
       </div>
       {state !== "idle" && <ul className="mt-6 space-y-1.5 text-xs">{run.steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : "text-muted-foreground"}>{i < step ? "✓" : "○"} {s}</li>)}</ul>}
     </div>
