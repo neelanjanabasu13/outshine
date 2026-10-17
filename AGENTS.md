@@ -11,4 +11,4 @@
 
 ## Project rules
 - Grading logic lives in `src/lib/audit.ts` as pure functions with tests in `audit.test.ts`; keep it I/O-free so real Google data can be swapped in for sample data.
-- Sample businesses in `src/lib/sample.ts` stand in for Google Places until the API key is connected; agent outputs in `src/lib/agent.ts` stand in for live AI generation.
+- Live businesses come from Google Places via `src/lib/places.server.ts` (ids `live.<trade>.<placeId>`), mapped into the sample `Business` shape; `src/lib/sample.ts` remains as fallback demo data; agent outputs in `src/lib/agent.ts` stand in for live AI generation.

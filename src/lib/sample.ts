@@ -18,7 +18,9 @@ export interface Business {
   signals: Signals;
   services: string[];
   reviews: { author: string; stars: number; text: string; replied: boolean }[];
-  competitors: { name: string; signals: Signals }[];
+  competitors: { name: string; signals: Signals; photo?: string | undefined }[];
+  photo?: string | undefined;
+  live?: boolean;
 }
 
 const sig = (o: Partial<Signals>): Signals => ({
@@ -93,3 +95,5 @@ export const BUSINESSES: Business[] = [
 ];
 
 export const findBusiness = (id: string) => BUSINESSES.find((b) => b.id === id);
+
+export const photoOf = (b: Pick<Business, "photo" | "trade">) => b.photo ?? TRADE_PHOTOS[b.trade];

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as SiteIdRouteImport } from './routes/site.$id'
+import { Route as ApiPublicPhotoRouteImport } from './routes/api/public/photo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const SiteIdRoute = SiteIdRouteImport.update({
   path: '/site/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPhotoRoute = ApiPublicPhotoRouteImport.update({
+  id: '/api/public/photo',
+  path: '/api/public/photo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
+  '/api/public/photo': typeof ApiPublicPhotoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
+  '/api/public/photo': typeof ApiPublicPhotoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,21 @@ export interface FileRoutesById {
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
+  '/api/public/photo': typeof ApiPublicPhotoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/report/$id' | '/scan/$id' | '/site/$id'
+  fullPaths:
+    '/' | '/report/$id' | '/scan/$id' | '/site/$id' | '/api/public/photo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/report/$id' | '/scan/$id' | '/site/$id'
-  id: '__root__' | '/' | '/report/$id' | '/scan/$id' | '/site/$id'
+  to: '/' | '/report/$id' | '/scan/$id' | '/site/$id' | '/api/public/photo'
+  id:
+    | '__root__'
+    | '/'
+    | '/report/$id'
+    | '/scan/$id'
+    | '/site/$id'
+    | '/api/public/photo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +83,7 @@ export interface RootRouteChildren {
   ReportIdRoute: typeof ReportIdRoute
   ScanIdRoute: typeof ScanIdRoute
   SiteIdRoute: typeof SiteIdRoute
+  ApiPublicPhotoRoute: typeof ApiPublicPhotoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/photo': {
+      id: '/api/public/photo'
+      path: '/api/public/photo'
+      fullPath: '/api/public/photo'
+      preLoaderRoute: typeof ApiPublicPhotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +131,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportIdRoute: ReportIdRoute,
   ScanIdRoute: ScanIdRoute,
   SiteIdRoute: SiteIdRoute,
+  ApiPublicPhotoRoute: ApiPublicPhotoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
