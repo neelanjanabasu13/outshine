@@ -29,7 +29,7 @@ export function TradeDeck({ selected, onPick }: { selected: Trade | null; onPick
     <ul aria-label="Choose your trade" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
       {TILES.map((t, i) => {
         const on = selected === t.trade;
-        const d = DECK[i];
+        const d = DECK[i] ?? DECK[2]!;
         return (
           <li key={t.trade} className="lg:animate-deal" style={{ ["--dx" as string]: d.dx, ["--r1" as string]: d.r1, ["--r2" as string]: d.r2, ["--wob" as string]: d.wob, animationDelay: `${(4 - i) * 70}ms`, zIndex: on ? 10 : 5 - Math.abs(2 - i) }}>
             <button type="button" aria-pressed={on} onClick={() => onPick(t.trade)}
