@@ -91,14 +91,15 @@ function Home() {
                     className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${trade === t ? "border-ink bg-ink text-background" : "border-border bg-card hover:border-ink"}`}>{TRADES[t].label}</button>
                 ))}
               </div>
-              {browsing && <div className="mt-3 flex min-h-9 flex-wrap items-center gap-2" aria-label="Example businesses" aria-busy={loading}>
-                <span className="text-xs text-muted-foreground">Try one in {city}:</span>
-                {hits.slice(0, 4).map((b) => (
-                  <button key={b.placeId} onClick={() => setPicked(b)} className="max-w-56 truncate rounded-full bg-secondary px-3 py-1.5 text-xs font-medium hover:bg-accent">
+              {browsing && <div className="mt-3 flex min-h-9 items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:thin]" aria-label="Example businesses" aria-busy={loading}>
+                <span className="shrink-0 text-xs text-muted-foreground">Try one in {city}:</span>
+                {hits.map((b) => (
+                  <button key={b.placeId} onClick={() => setPicked(b)} className="max-w-56 shrink-0 truncate rounded-full bg-secondary px-3 py-1.5 text-xs font-medium hover:bg-accent">
                     {b.name}{b.rating > 0 && ` · ${b.rating.toFixed(1)} ★`}
                   </button>
                 ))}
                 {loading && <span className="text-xs text-muted-foreground">Finding local businesses…</span>}
+                {!loading && !hits.length && <span className="text-xs text-muted-foreground">No 3.5 to 4 star examples here. Try another city.</span>}
               </div>}
               {q.trim().length >= 3 && <ul aria-label="Business results" aria-busy={loading} className="absolute inset-x-0 z-30 mt-2 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_20px_50px_-30px_var(--ink)] focus-within:border-ink">
                 {hits.map((b) => (
