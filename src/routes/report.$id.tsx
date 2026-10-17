@@ -1,14 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowUpRight, Check, Download, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Copy, Download, Lock, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
 import { assessedAreaScores, cappedGrade, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, WAS_BUNDLE, WAS_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { AGENT_ACTION, runAgent } from "@/lib/agent";
-import { diyInstructions } from "@/lib/diy";
+import { diyInstructions, sopFor } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
 import { photoOf, TRADE_PHOTOS, type Business } from "@/lib/sample";
 
