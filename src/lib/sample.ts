@@ -18,9 +18,11 @@ export interface Business {
   signals: Signals;
   services: string[];
   reviews: { author: string; stars: number; text: string; replied: boolean }[];
-  competitors: { name: string; signals: Signals; photo?: string | undefined }[];
+  competitors: { name: string; signals: Signals; photo?: string | undefined; location?: { latitude: number; longitude: number } | undefined }[];
   photo?: string | undefined;
   gallery?: string[] | undefined;
+  website?: string | undefined;
+  openNow?: boolean | undefined;
   live?: boolean;
   location?: { latitude: number; longitude: number };
 }

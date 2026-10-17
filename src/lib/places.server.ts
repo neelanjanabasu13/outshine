@@ -63,7 +63,7 @@ export async function searchPlaces(q: string, max = 8) {
 
 export const photoUrl = (name: string) => `/api/public/photo?name=${encodeURIComponent(name)}`;
 
-const FIELDS = "id,displayName,formattedAddress,shortFormattedAddress,addressComponents,location,rating,userRatingCount,reviews,photos,websiteUri,regularOpeningHours,editorialSummary,nationalPhoneNumber,types";
+const FIELDS = "currentOpeningHours,id,displayName,formattedAddress,shortFormattedAddress,addressComponents,location,rating,userRatingCount,reviews,photos,websiteUri,regularOpeningHours,editorialSummary,nationalPhoneNumber,types";
 
 /** Reads the business's own homepage and checks it for trade credentials. null when no website can be read. */
 async function websiteCredential(url: string | undefined, trade: Trade): Promise<boolean | null> {
@@ -123,6 +123,7 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
       name: c.displayName?.text ?? "Nearby business",
       signals: toSignals(c, trade, creds[i] ?? null),
       photo: c.photos?.[0]?.name ? photoUrl(c.photos[0].name) : undefined,
+      location: c.location,
     }));
   }
 
@@ -138,6 +139,8 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
     })),
     competitors,
     photo: p.photos?.[0]?.name ? photoUrl(p.photos[0].name) : undefined,
+    website: p.websiteUri,
+    openNow: p.currentOpeningHours?.openNow,
     gallery: ((p.photos ?? []) as any[]).slice(0, 6).filter((ph) => ph.name).map((ph) => photoUrl(ph.name)),
     live: true,
   };
