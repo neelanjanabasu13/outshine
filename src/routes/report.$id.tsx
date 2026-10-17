@@ -79,20 +79,29 @@ function Report() {
   const all = paidItems.includes("all");
   const diy = paidItems.includes("diy");
 
+  const [demo, setDemo] = useState<string | null>(null);
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Showcase mode for demo businesses only: unlocks a tier without payment, never for live listings.
+    const d = !b.live ? params.get("demo") : null;
+    if (d === "diy" || d === "agent" || d === "free") {
+      setDemo(d);
+      setPaidItems(d === "diy" ? ["diy"] : d === "agent" ? ["all"] : []);
+      return;
+    }
     // Restore a previously verified purchase so returning owners keep their unlock.
     try {
       const saved = window.localStorage.getItem(`fixfirst-paid-${b.id}`);
       if (saved) setPaidItems(JSON.parse(saved) as string[]);
     } catch { /* private mode etc. */ }
-    const sid = new URLSearchParams(window.location.search).get("session_id");
+    const sid = params.get("session_id");
     if (sid) setPendingSession(sid);
-  }, [b.id]);
+  }, [b.id, b.live]);
 
   useEffect(() => {
-    if (!paidItems.length) return;
+    if (!paidItems.length || demo) return;
     try { window.localStorage.setItem(`fixfirst-paid-${b.id}`, JSON.stringify(paidItems)); } catch { /* ignore */ }
-  }, [paidItems, b.id]);
+  }, [paidItems, b.id, demo]);
 
   useEffect(() => {
     if (!pendingSession) return;
