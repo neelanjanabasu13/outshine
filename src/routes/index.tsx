@@ -13,9 +13,9 @@ import { ReportStack } from "@/components/ReportStack";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FixFirst · Free Google profile audit for UK trades" },
+      { title: "FixFirst · Free online presence audit for UK trades" },
       { name: "description", content: "Get a free A to F grade for your plumbing, electrical, cleaning, landscaping or salon business in under a minute, then let our agent fix it." },
-      { property: "og:title", content: "FixFirst · Free Google profile audit for UK trades" },
+      { property: "og:title", content: "FixFirst · Free online presence audit for UK trades" },
       { property: "og:description", content: "A to F grade, the five things costing you calls, and an agent that fixes them for you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -75,7 +75,7 @@ function Home() {
             your business back.
           </h1>
           <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-            A free scan of your Google profile against nearby rivals. In under a minute you get a letter grade, the exact problems costing you calls, and <span className="font-semibold text-brand-gradient">our AI agent fixes them for you.</span>
+            A free scan of your online presence, from your Google listing to your website, against nearby rivals. In under a minute you get a letter grade, the exact problems costing you calls, and the choice to fix them yourself with our DIY pack or <span className="font-semibold text-brand-gradient">let our AI agent fix them for you.</span>
           </p>
 
           {!picked ? (
@@ -158,7 +158,7 @@ function Home() {
           {[
             { k: "Spot the leaks", d: "Missing website, thin photos, unanswered reviews and gaps your rivals have already filled, found in under a minute.", bg: "bg-pop-yellow" },
             { k: "See who's winning nearby", d: "Your grade next to the three closest businesses in your trade, so you know exactly who is taking your calls.", bg: "bg-pop-mint" },
-            { k: "Get it fixed, not flagged", d: "Our AI agent writes your review replies, your description and a one-page website for you.*", bg: "bg-pop-lilac" },
+            { k: "Get it fixed, your way", d: "Follow our step-by-step DIY pack, or let our AI agent draft your review replies, your description and a one-page website for you.*", bg: "bg-pop-lilac" },
           ].map((c) => (
             <li key={c.k} className={`rounded-2xl border border-border bg-card p-6`}>
               <p className="font-display text-2xl font-extrabold">{c.k}</p>
