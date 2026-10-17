@@ -85,7 +85,7 @@ function Scan() {
   const done = n >= all.length;
   const pct = Math.round((n / all.length) * 100);
   const step = steps[current]!;
-  const pool = step.frames.length ? steps[current].frames : [{ src: first, caption: "Google profile" }];
+  const pool = step.frames.length ? step.frames : [{ src: first, caption: "Google profile" }];
   const frame = pool[tick % pool.length]!;
 
   return (
