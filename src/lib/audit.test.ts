@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateLostRevenue, evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_PER_FIX, PRICE_DIY, benchmarkFindings, projectFindings, areaScores, TRADES, checkoutPrice, type Trade } from "./audit";
+import { estimateLostRevenue, evaluate, gradeOf, scoreOf, topProblems, PRICE_BUNDLE, PRICE_DIY, benchmarkFindings, projectFindings, areaScores, TRADES, checkoutPrice, type Trade } from "./audit";
 import { BUSINESSES } from "./sample";
 
 describe("grading", () => {
@@ -20,9 +20,9 @@ describe("grading", () => {
     expect(scoreOf(evaluate("plumbing", s, "X"))).toBe(100);
   });
 
-  it("uses £7.99 per agent fix and £29.99 for all", () => {
-    expect(PRICE_PER_FIX).toBe(7.99);
+  it("charges a fixed £29.99 for the whole done-for-you report", () => {
     expect(PRICE_BUNDLE).toBe(29.99);
+    expect(checkoutPrice("all")).toBe(29.99);
   });
 
   it("prices the DIY pack separately at £11.99", () => {
@@ -49,9 +49,14 @@ describe("grading", () => {
     expect(scoreOf(projectFindings(findings, []))).toBe(before);
   });
 
-  it("charges the correct agent prices and rejects unknown purchases", () => {
-    expect(checkoutPrice("all")).toBe(29.99);
-    expect(checkoutPrice("description")).toBe(7.99);
+  it("rejects every individual-fix purchase", () => {
+    for (const item of ["rating", "velocity", "replies", "photos", "description", "website", "posts", "credential"]) {
+      expect(() => checkoutPrice(item)).toThrow("Unknown purchase item");
+    }
+  });
+
+  it("rejects unknown purchases and keeps the scan outside paid checkout", () => {
+    expect(() => checkoutPrice("scan")).toThrow();
     expect(() => checkoutPrice("anything")).toThrow();
   });
 

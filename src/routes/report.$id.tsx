@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createCheckout, verifyCheckout } from "@/lib/checkout.functions";
 import { gradeColor, Header } from "@/components/Brand";
-import { areaScores, benchmarkFindings, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, PRICE_PER_FIX, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
+import { areaScores, benchmarkFindings, evaluate, gradeOf, PRICE_BUNDLE, PRICE_DIY, projectFindings, scoreOf, topProblems, TRADES, type Area, type Finding } from "@/lib/audit";
 import { runAgent } from "@/lib/agent";
 import { diyInstructions } from "@/lib/diy";
 import { getBusiness } from "@/lib/places.functions";
@@ -120,7 +120,7 @@ function Report() {
 
         <section className="mt-12 border-y border-border py-8" id="pricing">
           <h2 className="text-2xl font-semibold">Choose how you want to fix it</h2>
-          <p className="mt-2 text-muted-foreground">One payment, never a subscription. Your scan and findings stay free.</p>
+          <p className="mt-2 text-muted-foreground">Your scan stays free. Each paid option covers your whole report at a fixed price, however many fixes you need, with no subscription.</p>
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
             <div className="flex flex-col gap-3">
               <p className="font-medium">Free scan</p><p className="font-display text-3xl font-semibold">Free</p>
@@ -133,8 +133,8 @@ function Report() {
               {diy ? <Button onClick={downloadDIY} variant="outline"><Download />Download DIY pack</Button> : <PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession} variant="outline">Get my DIY pack · £{PRICE_DIY.toFixed(2)}</PayButton>}
             </div>
             <div className="flex flex-col gap-3">
-              <p className="font-medium">Fix it for me</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£49.99</span>£{PRICE_BUNDLE.toFixed(2)}</p>
-              <p className="flex-1 text-sm text-muted-foreground">The agent prepares every fix, or choose one below for £{PRICE_PER_FIX.toFixed(2)}.</p>
+              <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold"><span className="mr-2 text-lg text-muted-foreground line-through">£49.99</span>£{PRICE_BUNDLE.toFixed(2)}</p>
+              <p className="flex-1 text-sm text-muted-foreground">The agent prepares all the fixes in your report for one fixed price.</p>
               {all ? <p className="text-grade-a">Your agent drafts are unlocked below.</p> : <PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton>}
             </div>
           </div>
@@ -190,7 +190,7 @@ function Report() {
 
         <section className="mt-16">
           <h2 className="text-3xl font-semibold md:text-4xl">The {problems.length} things costing you the most</h2>
-          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all || paidItems.includes(f.id)} onSession={setPendingSession} />)}</div>
+          <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all} />)}</div>
         </section>
       </main>
       {!all && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3"><p className="text-sm text-muted-foreground">Free scan · DIY £{PRICE_DIY.toFixed(2)} · Agent £{PRICE_BUNDLE.toFixed(2)}</p><PayButton b={b} item="all" label="Every fix" onSession={setPendingSession}>Fix it for me · £{PRICE_BUNDLE.toFixed(2)}</PayButton></div></div>}
@@ -198,7 +198,7 @@ function Report() {
   );
 }
 
-function PayButton({ b, item, label, children, onSession, variant = "default" }: { b: Business; item: string; label: string; children: React.ReactNode; onSession: (id: string) => void; variant?: "default" | "outline" }) {
+function PayButton({ b, item, label, children, onSession, variant = "default" }: { b: Business; item: "diy" | "all"; label: string; children: React.ReactNode; onSession: (id: string) => void; variant?: "default" | "outline" }) {
   const go = useServerFn(createCheckout);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -229,7 +229,7 @@ function PayButton({ b, item, label, children, onSession, variant = "default" }:
   </div>;
 }
 
-function ProblemCard({ f, n, b, autoRun, onSession }: { f: Finding; n: number; b: Business; autoRun: boolean; onSession: (id: string) => void }) {
+function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business; autoRun: boolean }) {
   const [state, setState] = useState<"idle" | "running" | "done">("idle");
   const [step, setStep] = useState(0);
   const [showAfter, setShowAfter] = useState(false);
@@ -248,7 +248,6 @@ function ProblemCard({ f, n, b, autoRun, onSession }: { f: Finding; n: number; b
       <h3 className="mt-3 text-2xl font-semibold">{f.title}</h3>
       <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
       <p className="mt-2 text-muted-foreground">{f.impact}</p>
-      {state === "idle" && <div className="mt-6"><PayButton b={b} item={f.id} label={f.title} onSession={onSession}>Agent fix · £{PRICE_PER_FIX.toFixed(2)}</PayButton></div>}
       {state !== "idle" && <ul className="mt-6 space-y-1.5 text-xs">{run.steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : "text-muted-foreground"}>{i < step ? "✓" : "○"} {s}</li>)}</ul>}
     </div>
     <div className="flex flex-col">

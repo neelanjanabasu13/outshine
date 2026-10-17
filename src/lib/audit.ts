@@ -191,8 +191,7 @@ export function topProblems(findings: Finding[], n = 5): Finding[] {
     .slice(0, n);
 }
 
-export const PRICE_PER_FIX = 7.99; // placeholder, final pricing tbc
-export const PRICE_BUNDLE = 29.99; // placeholder, final pricing tbc
+export const PRICE_BUNDLE = 29.99;
 export const PRICE_DIY = 11.99;
 
 /** An illustrative industry target, never presented as a real nearby business. */
@@ -214,7 +213,6 @@ export function projectFindings(findings: Finding[], selectedIds: string[]): Fin
 export function checkoutPrice(item: string): number {
   if (item === "all") return PRICE_BUNDLE;
   if (item === "diy") return PRICE_DIY;
-  if (["rating", "velocity", "replies", "photos", "description", "website", "posts", "credential"].includes(item)) return PRICE_PER_FIX;
   throw new Error("Unknown purchase item");
 }
 
