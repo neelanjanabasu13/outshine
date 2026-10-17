@@ -67,7 +67,8 @@ function Report() {
     const f = evaluate(b.trade, c.signals, c.name, b.live);
     return { ...c, score: scoreOf(f), grade: cappedGrade(f), areas: assessedAreaScores(f) };
   }).sort((a, c) => c.score - a.score);
-  const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings);
+  // The seeded showcase lists every problem so judges see the website build and Gmail actions too.
+  const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings, b.seeded ? 8 : 5);
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
