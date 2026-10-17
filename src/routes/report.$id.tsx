@@ -336,6 +336,45 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
   </article>;
 }
 
+function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
+  const sop = sopFor(f, b.trade, b.name);
+  const [copied, setCopied] = useState<string | null>(null);
+  const copy = async (label: string, text: string) => {
+    try { await navigator.clipboard.writeText(text); setCopied(label); } catch { setCopied(null); }
+  };
+  return <article className="rounded-lg border border-border bg-card p-6 md:p-8">
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p className="text-xs text-muted-foreground">SOP {n} · {f.area}</p>
+        <h3 className="mt-2 text-2xl font-semibold">{f.title}</h3>
+        <p className="mt-2 max-w-2xl text-muted-foreground">{sop.goal}</p>
+      </div>
+      <p className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{sop.time}</p>
+    </div>
+    {sop.youNeed.length > 0 && <div className="mt-5">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Before you start</p>
+      <ul className="mt-2 space-y-1 text-sm">{sop.youNeed.map((y) => <li key={y} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-grade-a" />{y}</li>)}</ul>
+    </div>}
+    <ol className="mt-6 space-y-3">
+      {sop.steps.map((s, i) => <li key={i} className="flex gap-3 text-sm"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fix text-xs font-bold text-fix-foreground">{i + 1}</span><span className="pt-0.5">{s}</span></li>)}
+    </ol>
+    {sop.scripts.length > 0 && <div className="mt-6 space-y-3">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Word-for-word scripts</p>
+      {sop.scripts.map((sc) => <div key={sc.label} className="rounded-lg bg-secondary p-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-medium">{sc.label}</p>
+          <Button size="sm" variant="ghost" onClick={() => copy(sc.label, sc.text)}><Copy className="h-3.5 w-3.5" />{copied === sc.label ? "Copied ✓" : "Copy"}</Button>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{sc.text}</p>
+      </div>)}
+    </div>}
+    {sop.proTips.length > 0 && <div className="mt-6 border-l-2 border-fix pl-4">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-fix">Pro tips</p>
+      <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">{sop.proTips.map((p) => <li key={p}>{p}</li>)}</ul>
+    </div>}
+  </article>;
+}
+
 function Gauge({ score, grade }: { score: number; grade: ReturnType<typeof gradeOf> }) {
   const [v, setV] = useState(0);
   useEffect(() => { const to = setTimeout(() => setV(score), 150); return () => clearTimeout(to); }, [score]);
