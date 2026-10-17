@@ -10,6 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as SolutionRouteImport } from './routes/solution'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as SiteIdRouteImport } from './routes/site.$id'
@@ -18,6 +22,26 @@ import { Route as ApiPublicPhotoRouteImport } from './routes/api/public/photo'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionRoute = SolutionRouteImport.update({
+  id: '/solution',
+  path: '/solution',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportIdRoute = ReportIdRouteImport.update({
@@ -43,6 +67,10 @@ const ApiPublicPhotoRoute = ApiPublicPhotoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
+  '/solution': typeof SolutionRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -50,6 +78,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
+  '/solution': typeof SolutionRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -58,6 +90,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/pricing': typeof PricingRoute
+  '/solution': typeof SolutionRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -66,12 +102,33 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/report/$id' | '/scan/$id' | '/site/$id' | '/api/public/photo'
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/pricing'
+    | '/solution'
+    | '/report/$id'
+    | '/scan/$id'
+    | '/site/$id'
+    | '/api/public/photo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/report/$id' | '/scan/$id' | '/site/$id' | '/api/public/photo'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/pricing'
+    | '/solution'
+    | '/report/$id'
+    | '/scan/$id'
+    | '/site/$id'
+    | '/api/public/photo'
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/contact'
+    | '/pricing'
+    | '/solution'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -80,6 +137,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
+  PricingRoute: typeof PricingRoute
+  SolutionRoute: typeof SolutionRoute
   ReportIdRoute: typeof ReportIdRoute
   ScanIdRoute: typeof ScanIdRoute
   SiteIdRoute: typeof SiteIdRoute
@@ -93,6 +154,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solution': {
+      id: '/solution'
+      path: '/solution'
+      fullPath: '/solution'
+      preLoaderRoute: typeof SolutionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/report/$id': {
@@ -128,6 +217,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
+  PricingRoute: PricingRoute,
+  SolutionRoute: SolutionRoute,
   ReportIdRoute: ReportIdRoute,
   ScanIdRoute: ScanIdRoute,
   SiteIdRoute: SiteIdRoute,
