@@ -12,9 +12,9 @@ const CARDS = [
 
 // Resting positions, front to back.
 const SLOTS = [
-  "translate-x-0 translate-y-0 rotate-[-3deg] z-30",
-  "translate-x-[7%] -translate-y-[4%] rotate-[3deg] z-20",
-  "translate-x-[13%] -translate-y-[8%] rotate-[8deg] z-10",
+  "translate-x-0 translate-y-0 rotate-[-3deg]",
+  "translate-x-[7%] -translate-y-[4%] rotate-[3deg]",
+  "translate-x-[13%] -translate-y-[8%] rotate-[8deg]",
 ];
 
 export function ReportStack() {
@@ -33,7 +33,7 @@ export function ReportStack() {
         const slot = (i - front + CARDS.length) % CARDS.length;
         return (
           <button key={c.name} type="button" onClick={() => setFront(i)} aria-label={`Show example report for ${c.name}`}
-            className="animate-deal absolute inset-0 text-left" style={{ ["--dx" as string]: "0%", ["--r1" as string]: `${(i - 1) * 8}deg`, ["--r2" as string]: `${(1 - i) * 6}deg`, ["--wob" as string]: `${(i - 1) * 30}px`, animationDelay: `${i * 120}ms` }}>
+            className="animate-deal absolute inset-0 text-left" style={{ ["--dx" as string]: "0%", ["--r1" as string]: `${(i - 1) * 8}deg`, ["--r2" as string]: `${(1 - i) * 6}deg`, ["--wob" as string]: `${(i - 1) * 30}px`, animationDelay: `${i * 120}ms`, zIndex: 30 - slot * 10 }}>
             <div className={`h-full w-full rounded-3xl border border-border bg-card p-6 shadow-[0_30px_60px_-30px_var(--ink)] transition-all duration-700 ease-[cubic-bezier(.3,.8,.25,1)] ${SLOTS[slot]}`}>
               <div className="flex items-start justify-between gap-3">
                 <div><p className="font-display text-xl font-bold leading-tight">{c.name}</p><p className="text-sm text-muted-foreground">{c.town}</p></div>
