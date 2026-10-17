@@ -6,12 +6,12 @@ export interface AgentRun { steps: string[]; output: string; }
 
 /** One active sentence per fix saying what FixFirst does for the owner. */
 export const AGENT_ACTION: Record<FixKind, string> = {
-  website: "We build your website for you in one click, in under a minute.",
-  "review-request": "We create your review link and write the messages that ask happy customers for reviews.",
-  "review-replies": "We write a personal reply to every unanswered review for you.",
-  description: "We write your Google business description for you, with your services and credentials.",
-  photos: "We build your photo shot list and write captions with local keywords for you.",
-  posts: "We write a month of Google updates for you, ready to post.",
+  website: "Our AI agent builds your website for you in one click, in under a minute.",
+  "review-request": "Our AI agent creates your review link and writes the messages that ask happy customers for reviews.",
+  "review-replies": "Our AI agent writes a personal reply to every unanswered review for you.",
+  description: "Our AI agent writes your Google business description for you, with your services and credentials.",
+  photos: "Our AI agent builds your photo shot list and writes captions with local keywords for you.",
+  posts: "Our AI agent writes a month of Google updates for you, ready to post.",
 };
 
 export function runAgent(kind: FixKind, b: Business): AgentRun {

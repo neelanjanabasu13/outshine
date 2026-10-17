@@ -66,7 +66,7 @@ function Home() {
           Turn local searches into <em className="font-display italic text-brand-gradient">booked jobs.</em>
         </h1>
         <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-          Discover how your business can win more calls, beat nearby rivals and keep customers coming back, and <span className="font-semibold text-brand-gradient">we fix it for you.</span>
+          Discover how your business can win more calls, beat nearby rivals and keep customers coming back, and <span className="font-semibold text-brand-gradient">our AI agent fixes it for you.</span>
         </p>
         <ul aria-label="What FixFirst helps you get" className="animate-rise mt-5 flex flex-wrap gap-2">
           {["More customer calls", "Win jobs over local rivals", "More sales", "More repeat customers"].map((o) => (

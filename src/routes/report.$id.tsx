@@ -272,7 +272,7 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
       <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
       <p className="mt-2 text-muted-foreground">{f.impact}</p>
       <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by FixFirst</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">Done for you by our AI agent</p>
         <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
       </div>
       {state !== "idle" && <ul className="mt-6 space-y-1.5 text-xs">{run.steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : "text-muted-foreground"}>{i < step ? "✓" : "○"} {s}</li>)}</ul>}
