@@ -193,6 +193,30 @@ export function topProblems(findings: Finding[], n = 5): Finding[] {
 
 export const PRICE_PER_FIX = 7.99; // placeholder, final pricing tbc
 export const PRICE_BUNDLE = 29.99; // placeholder, final pricing tbc
+export const PRICE_DIY = 11.99;
+
+/** An illustrative industry target, never presented as a real nearby business. */
+export function benchmarkFindings(trade: Trade): Finding[] {
+  const t = TRADES[trade];
+  return evaluate(trade, {
+    rating: 4.8, reviewCount: 120, reviewsLast90: 12, replyRate: 0.9,
+    photoCount: t.minPhotos, newestPhotoDays: 60, descriptionLength: 750,
+    hasWebsite: true, hasHours: true, postsLast30: 4,
+    credentialMentioned: true, servicesListed: t.minServices,
+  }, "Illustrative best-in-class profile");
+}
+
+/** What-if projection only. Selected findings meet their benchmark, not a live re-grade. */
+export function projectFindings(findings: Finding[], selectedIds: string[]): Finding[] {
+  return findings.map((f) => selectedIds.includes(f.id) ? { ...f, score: 1 } : f);
+}
+
+export function checkoutPrice(item: string): number {
+  if (item === "all") return PRICE_BUNDLE;
+  if (item === "diy") return PRICE_DIY;
+  if (["rating", "velocity", "replies", "photos", "description", "website", "posts", "credential"].includes(item)) return PRICE_PER_FIX;
+  throw new Error("Unknown purchase item");
+}
 
 /** Rough monthly revenue going to better-looking rivals. Placeholder model until real call data exists:
  * each point behind the local leaders costs about 0.4 enquiries a month, a third of which become paid jobs. */

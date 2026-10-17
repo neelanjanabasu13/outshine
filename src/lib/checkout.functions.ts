@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { PRICE_BUNDLE, PRICE_PER_FIX } from "./audit";
+import { checkoutPrice } from "./audit";
 
 const STRIPE = "https://api.stripe.com/v1";
 
@@ -18,8 +18,8 @@ export const createCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const origin = new URL(getRequest().url).origin;
     const bundle = data.item === "all";
-    const pence = Math.round((bundle ? PRICE_BUNDLE : PRICE_PER_FIX) * 100);
-    const name = bundle ? `FixFirst: every fix for ${data.businessName}` : `FixFirst fix: ${data.label}`;
+    const pence = Math.round(checkoutPrice(data.item) * 100);
+    const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : bundle ? `FixFirst: every fix for ${data.businessName}` : `FixFirst fix: ${data.label}`;
     const back = `${origin}/report/${encodeURIComponent(data.businessId)}`;
     const body = new URLSearchParams({
       mode: "payment",
@@ -37,12 +37,12 @@ export const createCheckout = createServerFn({ method: "POST" })
       headers: { Authorization: `Bearer ${key()}`, "Content-Type": "application/x-www-form-urlencoded" },
       body,
     });
-    const json = (await res.json()) as { url?: string; error?: { message?: string } };
+    const json = (await res.json()) as { id?: string; url?: string; error?: { message?: string } };
     if (!res.ok || !json.url) {
       console.error("Stripe checkout failed", json.error?.message);
-      return { url: null, error: "We could not open the payment page. Please try again." };
+      return { url: null, sessionId: null, error: "We could not open the payment page. Please try again." };
     }
-    return { url: json.url, error: null };
+    return { url: json.url, sessionId: json.id ?? null, error: null };
   });
 
 export const verifyCheckout = createServerFn({ method: "GET" })
