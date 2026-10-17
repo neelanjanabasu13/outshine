@@ -5,23 +5,18 @@ export const QUIET_CREW_URL = "https://quietcrew.ai/";
 export function Header() {
   return (
     <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-      <Link to="/" className="flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-ink font-display text-sm font-bold text-paper">F</span>
-        <span className="font-display text-xl font-semibold">FixFirst</span>
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link to="/" aria-label="FixFirst home" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink font-display text-sm font-bold text-paper">F</Link>
+        <div className="flex flex-col leading-tight">
+          <Link to="/" className="font-display text-xl font-semibold">FixFirst</Link>
+          <a href={QUIET_CREW_URL} target="_blank" rel="noopener" className="text-xs text-muted-foreground transition-colors hover:text-foreground">by <span className="font-semibold text-brand-gradient">Quiet Crew</span></a>
+        </div>
+      </div>
       <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
         {([["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
           <Link key={to} to={to} className="text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
         ))}
       </nav>
-      <a
-        href={QUIET_CREW_URL}
-        target="_blank"
-        rel="noopener"
-        className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground md:inline"
-      >
-        by <span className="font-semibold text-brand-gradient">Quiet Crew</span>
-      </a>
     </header>
   );
 }
