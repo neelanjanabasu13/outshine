@@ -200,7 +200,7 @@ function Home() {
             ))}
           </ul>
         </section>
-        <p className="mt-4 text-xs text-muted-foreground">*Where Google needs you to sign in, our AI agent hands you the finished work with a one-click copy and open, so you only paste and save.</p>
+        <p className="mt-4 text-xs text-muted-foreground">*When a sign-in is needed, whether for Google, a website builder or another tool, our AI agent hands you the finished work with a one-click copy and open, so you only paste and save.</p>
       </main>
     </div>
   );
