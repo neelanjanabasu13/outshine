@@ -34,12 +34,13 @@ function Scan() {
   const navigate = useNavigate();
   const s = b.signals;
   const own = (b.gallery?.length ? b.gallery : [photoOf(b)]).filter(Boolean) as string[];
+  const first = own[0] ?? TRADE_PHOTOS[b.trade];
   const rivalPhotos = b.competitors.filter((c) => c.photo).map((c) => ({ src: c.photo as string, caption: `Rival · ${c.name}` }));
   const steps: { name: string; status: string; lines: string[]; pill: string; frames: Frame[] }[] = [
     {
       name: "Finding your profile", status: "Locating you on Google Maps",
       lines: [`Matched “${b.name}” on Google Maps`, b.address, `Category: ${t.label}`],
-      pill: "Profile located", frames: [{ src: own[0], caption: "Google profile" }],
+      pill: "Profile located", frames: [{ src: first, caption: "Google profile" }],
     },
     {
       name: "Reading reviews", status: "Reading your reviews",
@@ -83,8 +84,9 @@ function Scan() {
   const current = Math.min(all[n]?.i ?? steps.length, steps.length - 1);
   const done = n >= all.length;
   const pct = Math.round((n / all.length) * 100);
-  const pool = steps[current].frames.length ? steps[current].frames : [{ src: own[0], caption: "Google profile" }];
-  const frame = pool[tick % pool.length];
+  const step = steps[current]!;
+  const pool = step.frames.length ? steps[current].frames : [{ src: first, caption: "Google profile" }];
+  const frame = pool[tick % pool.length]!;
 
   return (
     <div className="min-h-screen">
@@ -100,7 +102,7 @@ function Scan() {
             <span key={frame.caption} className="animate-rise absolute bottom-4 left-4 rounded-full bg-paper/90 px-3 py-1 text-xs font-medium">{frame.caption}</span>
           </div>
           <p key={current + String(done)} className="animate-rise mt-5 font-mono text-sm text-fix">
-            {done ? "Writing your report…" : `${steps[current].status}…`}
+            {done ? "Writing your report…" : `${step.status}…`}
           </p>
           <p className="mt-2 font-display text-3xl font-semibold">{b.name}</p>
           <p className="text-muted-foreground">{b.address}</p>
