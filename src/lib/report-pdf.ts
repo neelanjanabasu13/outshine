@@ -84,7 +84,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   };
   const screen = (s: UiScreen, x: number, top: number, w: number) => {
     const rowH = 7, cap = lines(s.caption, 7.5, w - 6);
-    const h = 9 + 6 + s.rows.length * (rowH + 1.5) + cap.length * 3.2 + 4;
+    const h = 9 + 6 + s.rows.length * (rowH + 1.5) + cap.length * 3.2 + 6;
     doc.setDrawColor(...line); doc.setFillColor(255, 255, 255); doc.roundedRect(x, top, w, h, 2, 2, "FD");
     doc.setFillColor(246, 247, 249); doc.rect(x + 0.3, top + 0.3, w - 0.6, 7, "F");
     doc.setFillColor(200, 203, 210); doc.circle(x + 3.5, top + 3.8, 0.9, "F"); doc.circle(x + 6.5, top + 3.8, 0.9, "F");
@@ -122,6 +122,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   doc.setFillColor(...accent); doc.rect(0, 0, W, 4, "F");
   y = 18;
   para("FIXFIRST REPORT AND DIY PACK", 8, accent, "bold", 0, 1);
+  y += 6;
   para(r.name, 22, ink, "bold", 0, 1);
   para([r.address, r.tradeLabel, `Prepared ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`].filter(Boolean).join("  ·  "), 9, muted, "normal", 0, 4);
 
