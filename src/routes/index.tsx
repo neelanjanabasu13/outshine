@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Brand";
 import { TRADES, type Trade } from "@/lib/audit";
-import { BUSINESSES, TRADE_PHOTOS, type Business } from "@/lib/sample";
+import { TRADE_PHOTOS } from "@/lib/sample";
+import { liveId, searchBusinesses } from "@/lib/places.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,16 +20,34 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+type Hit = { placeId: string; name: string; address: string; rating: number; reviewCount: number; trade: Trade | null; photo: string | null };
+
 function Home() {
   const [q, setQ] = useState("");
   const [trade, setTrade] = useState<Trade | null>(null);
-  const [picked, setPicked] = useState<Business | null>(null);
+  const [picked, setPicked] = useState<Hit | null>(null);
+  const [hits, setHits] = useState<Hit[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
+  const search = useServerFn(searchBusinesses);
 
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    return BUSINESSES.filter((b) => (!trade || b.trade === trade) && (!s || b.name.toLowerCase().includes(s) || b.area.toLowerCase().includes(s)));
-  }, [q, trade]);
+  useEffect(() => {
+    const s = q.trim();
+    if (s.length < 3) { setHits([]); return; }
+    let live = true;
+    setLoading(true);
+    const to = setTimeout(async () => {
+      try {
+        const r = await search({ data: { q: trade ? `${s} ${TRADES[trade].label}` : s } });
+        if (live) { setHits(r.results); setErr(r.error); }
+      } catch { if (live) setErr("Search is having a moment. Please try again."); }
+      if (live) setLoading(false);
+    }, 400);
+    return () => { live = false; clearTimeout(to); };
+  }, [q, trade, search]);
+
+  const pickedTrade = picked ? (picked.trade ?? trade) : null;
 
   return (
     <div className="min-h-screen">
@@ -44,8 +64,8 @@ function Home() {
         <div className="mt-8 max-w-2xl">
           <div className="flex flex-wrap gap-2">
             {(Object.keys(TRADES) as Trade[]).map((t) => (
-              <button key={t} onClick={() => { setTrade(trade === t ? null : t); setPicked(null); }}
-                className={`rounded-full border px-4 py-1.5 text-sm transition ${trade === t ? "border-ink bg-ink text-paper" : "border-border bg-card hover:border-ink"}`}>
+              <button key={t} onClick={() => setTrade(trade === t ? null : t)}
+                className={`rounded-full border px-4 py-1.5 text-sm transition ${(picked ? pickedTrade : trade) === t ? "border-ink bg-ink text-paper" : "border-border bg-card hover:border-ink"}`}>
                 {TRADES[t].label}
               </button>
             ))}
@@ -53,32 +73,33 @@ function Home() {
 
           {!picked ? (
             <div className="relative mt-4">
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name, e.g. Riverside Plumbing"
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Your business name and town, e.g. ProLux Cleaning London"
                 className="w-full rounded-2xl border border-border bg-card px-6 py-5 text-lg shadow-[0_20px_50px_-30px_var(--ink)] outline-none focus:border-ink" />
-              {(q.trim() || trade) && <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
-                {results.map((b) => (
-                  <li key={b.id}>
+              {q.trim().length >= 3 && <ul className="mt-2 overflow-hidden rounded-2xl border border-border bg-card">
+                {hits.map((b) => (
+                  <li key={b.placeId}>
                     <button onClick={() => setPicked(b)} className="flex w-full items-center gap-4 px-5 py-3 text-left hover:bg-secondary">
-                      <img src={TRADE_PHOTOS[b.trade]} alt="" className="h-10 w-10 rounded-lg object-cover" loading="lazy" width={40} height={40} />
+                      {b.photo ? <img src={b.photo} alt="" className="h-10 w-10 rounded-lg object-cover" loading="lazy" width={40} height={40} /> : <span className="h-10 w-10 rounded-lg bg-secondary" />}
                       <span className="flex-1"><span className="block font-medium">{b.name}</span><span className="text-sm text-muted-foreground">{b.address}</span></span>
-                      <span className="text-xs text-muted-foreground">{TRADES[b.trade].label}</span>
+                      {b.rating > 0 && <span className="text-xs text-muted-foreground">{b.rating.toFixed(1)} ★</span>}
                     </button>
                   </li>
                 ))}
-                {!results.length && <li className="px-5 py-4 text-sm text-muted-foreground">No match in the sample list yet. Live Google search arrives once it's connected.</li>}
+                {loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">Searching Google…</li>}
+                {!loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">{err ?? "No match on Google. Try adding your town or postcode."}</li>}
               </ul>}
-              <p className="mt-3 text-xs text-muted-foreground">Preview mode: these are sample businesses until live Google search is switched on.</p>
             </div>
           ) : (
             <div className="animate-rise mt-4 flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 sm:flex-row sm:items-center">
-              <img src={TRADE_PHOTOS[picked.trade]} alt={picked.name} className="h-32 w-full rounded-2xl object-cover sm:w-44" width={176} height={128} />
+              <img src={picked.photo ?? TRADE_PHOTOS[pickedTrade ?? "cleaning"]} alt={picked.name} className="h-32 w-full rounded-2xl object-cover sm:w-44" width={176} height={128} />
               <div className="flex-1">
                 <p className="font-display text-2xl font-semibold">{picked.name}</p>
                 <p className="text-sm text-muted-foreground">{picked.address}</p>
-                <p className="mt-1 text-sm">{picked.signals.rating.toFixed(1)} ★ · {picked.signals.reviewCount} reviews</p>
+                <p className="mt-1 text-sm">{picked.rating.toFixed(1)} ★ · {picked.reviewCount} reviews</p>
+                {!pickedTrade && <p className="mt-2 text-sm text-fix">Pick your trade above so we compare you with the right rivals.</p>}
                 <div className="mt-4 flex gap-3">
-                  <button onClick={() => navigate({ to: "/scan/$id", params: { id: picked.id } })}
-                    className="rounded-full bg-fix px-6 py-3 font-medium text-fix-foreground transition hover:opacity-90">Grade my business →</button>
+                  <button disabled={!pickedTrade} onClick={() => pickedTrade && navigate({ to: "/scan/$id", params: { id: liveId(pickedTrade, picked.placeId) } })}
+                    className="rounded-full bg-fix px-6 py-3 font-medium text-fix-foreground transition hover:opacity-90 disabled:opacity-40">Grade my business →</button>
                   <button onClick={() => setPicked(null)} className="text-sm text-muted-foreground underline-offset-4 hover:underline">Not this one</button>
                 </div>
               </div>
