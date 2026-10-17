@@ -4,7 +4,7 @@ import type { Business } from "./sample";
 
 export interface AgentRun { steps: string[]; output: string; }
 
-/** One active sentence per fix saying what FixFirst does for the owner. */
+/** One active sentence per fix saying what Outshine does for the owner. */
 export const AGENT_ACTION: Record<FixKind, string> = {
   website: "Our AI agent builds your website for you in one click, in under a minute.",
   "review-request": "Our AI agent creates your review link and writes the messages that ask happy customers for reviews.",

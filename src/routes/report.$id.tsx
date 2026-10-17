@@ -40,9 +40,9 @@ export const Route = createFileRoute("/report/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: loaderData ? `${loaderData.b.name} report · FixFirst` : "Report · FixFirst" },
+      { title: loaderData ? `${loaderData.b.name} report · Outshine` : "Report · Outshine" },
       { name: "description", content: "Your evidence-based letter grade, nearby competitors, real city reference businesses and the fixes that matter." },
-      { property: "og:title", content: loaderData ? `${loaderData.b.name}'s FixFirst grade` : "FixFirst report" },
+      { property: "og:title", content: loaderData ? `${loaderData.b.name}'s Outshine grade` : "Outshine report" },
       { property: "og:description", content: "Compare your profile with local rivals and preview how improvements could change your grade." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -154,12 +154,12 @@ function Report() {
   };
 
   const downloadReport = () => {
-    const lines = [`${b.name}`, `${b.address}`, `FixFirst free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
+    const lines = [`${b.name}`, `${b.address}`, `Outshine free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
       ...areaList.filter((a) => areas[a] !== undefined).map((a) => `${a}: ${gradeOf(areas[a]!)}`),
       "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${c.grade}`),
       "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
       ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
-      "", "FixFirst by Quietcrew · https://quietcrew.ai/"];
+      "", "Outshine by Quietcrew · https://quietcrew.ai/"];
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
     const a = document.createElement("a"); a.href = url; a.download = "fixfirst-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);

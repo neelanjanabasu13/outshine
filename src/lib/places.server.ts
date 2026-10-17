@@ -69,7 +69,7 @@ const FIELDS = "currentOpeningHours,id,displayName,formattedAddress,shortFormatt
 async function websiteCredential(url: string | undefined, trade: Trade): Promise<boolean | null> {
   if (!url) return null;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000), headers: { "User-Agent": "Mozilla/5.0 (compatible; FixFirst audit)" }, redirect: "follow" });
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000), headers: { "User-Agent": "Mozilla/5.0 (compatible; Outshine audit)" }, redirect: "follow" });
     if (!res.ok) return null;
     const html = (await res.text()).slice(0, 400_000).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ");
     return CREDENTIAL_WORDS[trade].test(html);
