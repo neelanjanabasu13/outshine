@@ -1,5 +1,6 @@
 import { TRADES, type Finding, type Trade } from "./audit";
 import { PLAYBOOKS } from "./playbook";
+import { descriptionPrompt, NO_CODE_TOOLS, reviewPrompt, SCREENS, websitePrompt, type AiPrompt, type ToolLink, type UiScreen } from "./sop-visuals";
 
 export interface Sop {
   /** What this SOP achieves, in one line. */
@@ -20,6 +21,12 @@ export interface Sop {
   shotList?: { shot: string; how: string }[];
   /** Lines the owner must not cross. */
   guardrails?: string[];
+  /** Annotated diagrams for steps tied to a specific interface (generic steps get none). */
+  screens?: UiScreen[];
+  /** Indicative tool links, always shown with the tools disclaimer. */
+  tools?: ToolLink[];
+  /** Fill-in-the-blank prompts for AI assistants. */
+  prompts?: AiPrompt[];
 }
 
 /**
@@ -29,6 +36,21 @@ export interface Sop {
  * by searching your own business name on Google while signed in).
  */
 export function sopFor(f: Finding, trade: Trade, businessName: string): Sop {
+  const sop = sopCore(f, trade, businessName);
+  const label = TRADES[trade].label;
+  if (f.id === "credential") return { ...sop, screens: [SCREENS.description] };
+  switch (f.fix) {
+    case "review-request": return { ...sop, screens: [SCREENS.askReviews, SCREENS.reviewLink], prompts: [reviewPrompt(businessName, label)] };
+    case "review-replies": return { ...sop, screens: [SCREENS.replyReviews] };
+    case "description": return { ...sop, screens: [SCREENS.description], prompts: [descriptionPrompt(businessName, label)] };
+    case "photos": return { ...sop, screens: [SCREENS.photos] };
+    case "posts": return { ...sop, screens: [SCREENS.posts] };
+    case "website": return { ...sop, screens: [SCREENS.website], tools: NO_CODE_TOOLS, prompts: [websitePrompt(businessName, label)] };
+    default: return sop;
+  }
+}
+
+function sopCore(f: Finding, trade: Trade, businessName: string): Sop {
   const p = PLAYBOOKS[trade];
   const t = TRADES[trade];
   if (f.id === "credential") return credentialSop(trade, businessName);
@@ -240,7 +262,7 @@ function baseSop(f: Finding, trade: Trade, businessName: string): Sop {
         youNeed: ["A Google account that manages your Business Profile"],
         steps: [
           "The fastest route: choose 'Fix it for me' on your report and our AI agent builds a clean one-page website for you from your real business data, in under a minute. You can preview it before anything goes live.",
-          "Doing it yourself instead? Use a free or cheap builder: Google Business Profile's own site builder, Canva Sites, or Wix. Pick the simplest one-page template.",
+          "Doing it yourself instead? Pick one of the no-code tools listed below (they are starting points, not the only options). The quickest DIY route is to open Lovable, paste the ready-made prompt below with your details filled in, and let it build the page for you.",
           "Your page needs exactly five things, in this order: what you do and where, your services as a short list, genuine reviews, real photos, and a big tap-to-call phone button plus a contact form.",
           "Keep it to one page. Customers from Google want to check you are real and ring you, not read an essay.",
           `Only show qualifications you genuinely hold, such as ${t.credential}. ${t.credentialPlain}`,
