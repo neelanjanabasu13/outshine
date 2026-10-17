@@ -61,9 +61,19 @@ function Report() {
   const diy = paidItems.includes("diy");
 
   useEffect(() => {
+    // Restore a previously verified purchase so returning owners keep their unlock.
+    try {
+      const saved = window.localStorage.getItem(`fixfirst-paid-${b.id}`);
+      if (saved) setPaidItems(JSON.parse(saved) as string[]);
+    } catch { /* private mode etc. */ }
     const sid = new URLSearchParams(window.location.search).get("session_id");
     if (sid) setPendingSession(sid);
   }, [b.id]);
+
+  useEffect(() => {
+    if (!paidItems.length) return;
+    try { window.localStorage.setItem(`fixfirst-paid-${b.id}`, JSON.stringify(paidItems)); } catch { /* ignore */ }
+  }, [paidItems, b.id]);
 
   useEffect(() => {
     if (!pendingSession) return;
