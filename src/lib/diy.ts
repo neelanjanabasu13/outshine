@@ -39,7 +39,7 @@ export function sopFor(f: Finding, trade: Trade, businessName: string): Sop {
         ...base,
         steps: [...base.steps.slice(0, 6), `Pick your asking moment. For ${t.label.toLowerCase()}, the best one is: ${p.askMoment}`, ...base.steps.slice(6)],
         scripts: [...base.scripts, p.expectationScript],
-        rootCauses: f.id === "rating" ? p.rootCauses : undefined,
+        ...(f.id === "rating" ? { rootCauses: p.rootCauses } : {}),
         proTips: [...base.proTips, ...(f.id === "rating" ? ["Fix the cause before chasing new reviews. More reviews only help once the complaint behind the low ones stops happening."] : [])],
         guardrails: p.guardrails,
       };
