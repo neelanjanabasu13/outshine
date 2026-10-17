@@ -32,6 +32,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   const ensure = (h: number) => { if (y + h > H - 20) newPage(); };
   const para = (text: string, size = 10, color = ink, style: "normal" | "bold" = "normal", indent = 0) => {
     doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(...color);
+    if (size > 14) y += size * 0.25;
     const lines = doc.splitTextToSize(clean(text), CW - indent) as string[];
     const lh = size * 0.45;
     for (const l of lines) { ensure(lh); doc.text(l, M + indent, y); y += lh; }
