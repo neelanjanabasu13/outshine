@@ -35,21 +35,22 @@ function Report() {
   const { b } = Route.useLoaderData();
   const findings = evaluate(b.trade, b.signals, b.name, b.live);
   const score = scoreOf(findings);
-  const grade = cappedGrade(score, !!b.live);
+  const grade = cappedGrade(findings);
   const areas = assessedAreaScores(findings);
+  const areaList: Area[] = b.live ? ["Reputation", "Activity", "Visuals", "Profile", "Credentials"] : ["Reputation", "Response", "Visuals", "Profile", "Credentials"];
   const reference = b.reference;
   const referenceBusiness = reference?.business;
   const referenceFindings = referenceBusiness ? evaluate(b.trade, referenceBusiness.signals, referenceBusiness.name, true) : [];
   const benchmark = referenceBusiness ? assessedAreaScores(referenceFindings) : null;
   const comps = b.competitors.map((c) => {
     const f = evaluate(b.trade, c.signals, c.name, b.live);
-    return { ...c, score: scoreOf(f), areas: assessedAreaScores(f) };
+    return { ...c, score: scoreOf(f), grade: cappedGrade(f), areas: assessedAreaScores(f) };
   }).sort((a, c) => c.score - a.score);
   const problems = topProblems(b.live ? findings.filter((f) => f.id !== "replies") : findings);
   const [selected, setSelected] = useState<string[]>([]);
   const projected = projectFindings(findings, selected);
   const projectedScore = scoreOf(projected);
-  const projectedGrade = cappedGrade(projectedScore, !!b.live);
+  const projectedGrade = cappedGrade(projected);
   const allClear = problems.length === 0;
   const projectedAreas = assessedAreaScores(projected);
   const [paidItems, setPaidItems] = useState<string[]>([]);
@@ -102,8 +103,8 @@ function Report() {
 
   const downloadReport = () => {
     const lines = [`${b.name}`, `${b.address}`, `FixFirst free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
-      ...(["Reputation", "Response", "Visuals", "Profile", "Credentials"] as Area[]).map((a) => `${a}: ${areas[a] === undefined ? "Not assessed" : gradeOf(areas[a]!)}`),
-      "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${cappedGrade(c.score, !!b.live)}`),
+      ...(areaList).map((a) => `${a}: ${areas[a] === undefined ? "Not assessed" : gradeOf(areas[a]!)}`),
+      "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${c.grade}`),
       "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
       ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
       "", "FixFirst by Quietcrew · https://quietcrew.ai/"];
@@ -127,12 +128,12 @@ function Report() {
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Your overall grade</p>
               <h2 className="mt-3 text-3xl font-semibold">{allClear ? "Nothing to fix in the public profile we can see." : grade === "A" ? "A strong profile, with room to stay ahead." : "A clearer path to a stronger profile."}</h2>
-              <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on {b.live ? "customer rating, total reviews, visible photos, website link and opening hours" : "reputation, response, visuals, profile and credentials"}, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
-              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Replies, review velocity, description, posts, photo dates and credentials are not graded because Google does not expose enough evidence. Photos reflect the limited public feed, not the full gallery. Because response and credentials cannot be checked, the highest grade a public scan can give is B.</p>}
+              <p className="mt-3 max-w-xl text-muted-foreground">Your grade is {grade}, based on {b.live ? "customer rating, review volume, how recent the newest review is, photos you upload yourself, website, opening hours and the credentials named on your own website" : "reputation, response, visuals, profile and credentials"}, weighted for {TRADES[b.trade].label.toLowerCase()}.</p>
+              {b.live && <p className="mt-3 max-w-xl text-xs text-muted-foreground">Public-profile grade, not a rating of service quality or a Google ranking. Every point comes from Google or your own website. Owner replies to reviews are not graded because Google does not publish them. If we cannot read your website, credentials show as not assessed and the highest grade is B.</p>}
             </div>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
-            {(["Reputation", "Response", "Visuals", "Profile", "Credentials"] as Area[]).map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
+            {areaList.map((area) => { const value = areas[area]; return <div key={area} className="border-b border-border pb-4"><p className="text-sm text-muted-foreground">{area}</p>{value === undefined ? <p className="mt-2 text-sm text-muted-foreground">Not assessed</p> : <p className={`mt-2 font-display text-4xl font-semibold ${gradeColor(gradeOf(value))}`}>{gradeOf(value)}</p>}</div>; })}
           </div>
         </section>
 
@@ -166,8 +167,8 @@ function Report() {
         <section className="mt-16">
           <h2 className="text-2xl font-semibold">You, your nearby rivals, and a real reference</h2>
           <div className="mt-6 flex snap-x gap-4 overflow-x-auto pb-2">
-            {[{ name: b.name, score, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), ...(referenceBusiness ? [{ name: referenceBusiness.name, score: scoreOf(referenceFindings), category: `${reference?.entry?.city} reference`, photo: photoOf(referenceBusiness) }] : [])].map((c) => {
-              const g = cappedGrade(c.score, !!b.live || c.category.endsWith("reference"));
+            {[{ name: b.name, score, grade, category: "You", photo: photoOf(b) }, ...comps.map((c) => ({ name: c.name, score: c.score, grade: c.grade, category: "Nearby rival", photo: c.photo ?? TRADE_PHOTOS[b.trade] })), ...(referenceBusiness ? [{ name: referenceBusiness.name, score: scoreOf(referenceFindings), grade: cappedGrade(referenceFindings), category: `${reference?.entry?.city} reference`, photo: photoOf(referenceBusiness) }] : [])].map((c) => {
+              const g = c.grade;
               return <div key={c.name} className={`w-56 shrink-0 snap-start overflow-hidden rounded-lg border bg-card ${c.category === "You" ? "border-ink" : "border-border"}`}>
                 <img src={c.photo} alt="" loading="lazy" width={400} height={200} className="h-32 w-full object-cover" />
                 <div className="p-4"><p className="text-xs text-muted-foreground">{c.category}</p><div className="mt-2 flex items-start justify-between gap-3"><p className="break-words font-medium leading-tight">{c.name}</p><p className={`shrink-0 font-display text-4xl font-bold ${gradeColor(g)}`}>{g}</p></div></div>

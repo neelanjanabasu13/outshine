@@ -2,7 +2,7 @@
 // When Google Places is connected, real profile data fills `Signals`; until then sample data does.
 
 export type Trade = "plumbing" | "electrician" | "cleaning" | "landscaping" | "salon";
-export type Area = "Reputation" | "Response" | "Visuals" | "Profile" | "Credentials";
+export type Area = "Reputation" | "Response" | "Activity" | "Visuals" | "Profile" | "Credentials";
 export type Grade = "A" | "B" | "C" | "D" | "F";
 export type FixKind = "review-replies" | "description" | "posts" | "review-request" | "website" | "photos";
 
@@ -19,6 +19,12 @@ export interface Signals {
   postsLast30: number;
   credentialMentioned: boolean;
   servicesListed: number;
+  /** Live only: days since the newest review Google returns (Google returns up to five). null when none are returned. */
+  newestReviewDays?: number | null;
+  /** Live only: photos in Google's public feed uploaded by the business itself. */
+  ownerPhotos?: number;
+  /** Live only: whether the business's own website names a trade credential. null when there is no readable website. */
+  websiteCredential?: boolean | null;
 }
 
 export interface TradeProfile {
@@ -31,7 +37,7 @@ export interface TradeProfile {
   expectedPhotos: string;
   minPhotos: number;
   minServices: number;
-  weights: Record<Area, number>;
+  weights: Record<Exclude<Area, "Activity">, number>;
 }
 
 export const TRADES: Record<Trade, TradeProfile> = {
@@ -184,6 +190,12 @@ function evaluatePublic(trade: Trade, s: Signals): Finding[] {
       title: s.hasWebsite ? "Your website is linked" : "No website linked to your profile", evidence: s.hasWebsite ? "Google returns a website link." : "Google returns no website link.", impact: "A website gives customers somewhere to learn more before contacting you.", before: s.hasWebsite ? "Website linked" : "No website link returned", after: "A website linked from your Google profile" },
     { id: "hours", area: "Profile", fix: "description", weight: t.weights.Profile / 4, score: s.hasHours ? 1 : 0,
       title: s.hasHours ? "Your opening hours are available" : "Your opening hours are not available", evidence: s.hasHours ? "Google returns regular opening hours." : "Google returns no regular opening hours; confirm whether hours apply to your business.", impact: "Clear availability helps customers decide when to contact you.", before: s.hasHours ? "Opening hours available" : "No regular opening hours returned", after: "Accurate opening hours for your business" },
+    ...(s.newestReviewDays == null ? [] : [{ id: "recency", area: "Activity" as Area, fix: "review-request" as FixKind, weight: t.weights.Response / 2, score: clamp(1 - (s.newestReviewDays - 30) / 150),
+      title: s.newestReviewDays <= 30 ? "Customers are reviewing you recently" : "No recent reviews showing", evidence: `The newest of the reviews Google shows is ${s.newestReviewDays} days old. Full marks need one within 30 days; it scores zero after 180.`, impact: "Recent reviews tell customers you are busy and still trading.", before: `Newest review ${s.newestReviewDays} days ago`, after: "A steady flow of fresh reviews after every job" }]),
+    { id: "ownerPhotos", area: "Activity", fix: "photos", weight: t.weights.Response / 2, score: clamp((s.ownerPhotos ?? 0) / 3),
+      title: (s.ownerPhotos ?? 0) >= 3 ? "You add your own photos" : "Few photos come from you", evidence: `${s.ownerPhotos ?? 0} of the photos Google shows were uploaded by the business itself. The target is 3 or more.`, impact: "Photos you upload show customers an owner who looks after the profile.", before: `${s.ownerPhotos ?? 0} owner photos`, after: `Your own photos of ${t.expectedPhotos}` },
+    ...(s.websiteCredential == null ? [] : [{ id: "credential", area: "Credentials" as Area, fix: "description" as FixKind, weight: t.weights.Credentials, score: s.websiteCredential ? 1 : 0,
+      title: s.websiteCredential ? "Your website shows your credentials" : "Your website does not show your credentials", evidence: s.websiteCredential ? `Your website mentions ${t.credential.toLowerCase()} or a similar trade standard.` : `We read your website and found no mention of ${t.credential.toLowerCase()}.`, impact: `${t.credentialWhy} In plain words for customers: ${t.credentialPlain}`, before: "Credentials not shown on your site", after: `${t.credential}, explained in plain English` }]),
   ];
 }
 
@@ -202,7 +214,7 @@ export function gradeOf(score: number): Grade {
 
 export function areaScores(findings: Finding[]): Record<Area, number> {
   const out = {} as Record<Area, number>;
-  (["Reputation", "Response", "Visuals", "Profile", "Credentials"] as Area[]).forEach((a) => {
+  (["Reputation", "Response", "Activity", "Visuals", "Profile", "Credentials"] as Area[]).forEach((a) => {
     const fs = findings.filter((f) => f.area === a);
     const tw = fs.reduce((x, f) => x + f.weight, 0) || 1;
     out[a] = Math.round((fs.reduce((x, f) => x + f.weight * f.score, 0) / tw) * 100);
@@ -253,8 +265,11 @@ export function estimateLostRevenue(trade: Trade, yourScore: number, rivalsScore
   return { jobs, pounds: jobs * TRADES[trade].avgJob };
 }
 
-/** Public-only grades cannot reach A: response and credentials evidence is missing, so the best verifiable grade is B. */
-export function cappedGrade(score: number, publicOnly: boolean): Grade {
-  const g = gradeOf(score);
-  return publicOnly && g === "A" ? "B" : g;
+/** An A needs evidence in every area and no weak area; otherwise the best grade is B. */
+export function cappedGrade(findings: Finding[]): Grade {
+  const g = gradeOf(scoreOf(findings));
+  const areas = new Set(findings.filter((f) => f.weight > 0).map((f) => f.area));
+  const complete = areas.has("Credentials") && (areas.has("Response") || areas.has("Activity"));
+  const weak = Object.values(assessedAreaScores(findings)).some((v) => gradeOf(v) === "D" || gradeOf(v) === "F");
+  return g === "A" && (!complete || weak) ? "B" : g;
 }

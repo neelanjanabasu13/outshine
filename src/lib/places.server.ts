@@ -15,7 +15,7 @@ const TRADE_QUERY: Record<Trade, string> = {
 const CREDENTIAL_WORDS: Record<Trade, RegExp> = {
   plumbing: /gas ?safe/i,
   electrician: /niceic|napit|part p|eca\b/i,
-  cleaning: /insured|insurance|dbs|waste carrier/i,
+  cleaning: /insured|insurance|dbs[ -]checked|dbs checks?|waste carrier|safecontractor|bics/i,
   landscaping: /bali|apl|waste carrier|insured/i,
   salon: /qualified|nvq|licen[cs]ed|hygiene/i,
 };
@@ -65,8 +65,21 @@ export const photoUrl = (name: string) => `/api/public/photo?name=${encodeURICom
 
 const FIELDS = "id,displayName,formattedAddress,shortFormattedAddress,addressComponents,location,rating,userRatingCount,reviews,photos,websiteUri,regularOpeningHours,editorialSummary,nationalPhoneNumber,types";
 
-function toSignals(p: any, trade: Trade): Signals {
+/** Reads the business's own homepage and checks it for trade credentials. null when no website can be read. */
+async function websiteCredential(url: string | undefined, trade: Trade): Promise<boolean | null> {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000), headers: { "User-Agent": "Mozilla/5.0 (compatible; FixFirst audit)" }, redirect: "follow" });
+    if (!res.ok) return null;
+    const html = (await res.text()).slice(0, 400_000).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ");
+    return CREDENTIAL_WORDS[trade].test(html);
+  } catch { return null; }
+}
+
+function toSignals(p: any, trade: Trade, credential: boolean | null = null): Signals {
   const now = Date.now();
+  const dates = ((p.reviews ?? []) as any[]).map((r) => Date.parse(r.publishTime)).filter((n) => !Number.isNaN(n));
+  const owner = (p.displayName?.text ?? "").trim().toLowerCase();
   const reviews = (p.reviews ?? []) as any[];
   const text = [p.displayName?.text, p.editorialSummary?.text, ...reviews.map((r) => r.text?.text)].join(" ");
   return {
@@ -83,6 +96,9 @@ function toSignals(p: any, trade: Trade): Signals {
     postsLast30: 0,
     credentialMentioned: false,
     servicesListed: 0,
+    newestReviewDays: dates.length ? Math.max(0, Math.floor((now - Math.max(...dates)) / 86_400_000)) : null,
+    ownerPhotos: ((p.photos ?? []) as any[]).filter((ph) => (ph.authorAttributions ?? []).some((a: any) => (a.displayName ?? "").trim().toLowerCase() === owner)).length,
+    websiteCredential: credential,
   };
 }
 
@@ -94,15 +110,18 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
   const p = (await res.json()) as any;
   const town = (p.addressComponents ?? []).find((c: any) => c.types?.includes("postal_town") || c.types?.includes("locality"))?.longText;
 
+  const ownCredential = websiteCredential(p.websiteUri, trade);
   let competitors: Business["competitors"] = [];
   if (p.location && includeCompetitors) {
     const near = await post("places:searchText", {
       textQuery: TRADE_QUERY[trade], regionCode: "GB", maxResultCount: 8,
       locationBias: { circle: { center: p.location, radius: 3000 } },
     }, "places." + FIELDS.split(",").join(",places."));
-    competitors = ((near.places ?? []) as any[]).filter((c) => c.id !== p.id).slice(0, 3).map((c) => ({
+    const picked = ((near.places ?? []) as any[]).filter((c) => c.id !== p.id).slice(0, 3);
+    const creds = await Promise.all(picked.map((c) => websiteCredential(c.websiteUri, trade)));
+    competitors = picked.map((c, i) => ({
       name: c.displayName?.text ?? "Nearby business",
-      signals: toSignals(c, trade),
+      signals: toSignals(c, trade, creds[i] ?? null),
       photo: c.photos?.[0]?.name ? photoUrl(c.photos[0].name) : undefined,
     }));
   }
@@ -112,7 +131,7 @@ export async function getLiveBusiness(id: string, trade: Trade, placeId: string,
     location: p.location,
     address: p.formattedAddress ?? "", area: town ?? p.shortFormattedAddress ?? "your area",
     phone: p.nationalPhoneNumber ?? "",
-    signals: toSignals(p, trade),
+    signals: toSignals(p, trade, await ownCredential),
     services: DEFAULT_SERVICES[trade],
     reviews: ((p.reviews ?? []) as any[]).slice(0, 3).map((r) => ({
       author: r.authorAttribution?.displayName ?? "Customer", stars: r.rating ?? 5, text: r.text?.text ?? "", replied: false,

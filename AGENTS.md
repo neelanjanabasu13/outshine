@@ -18,3 +18,4 @@
 - Homepage trade browsing reuses live Places search with pure query and review-count ordering helpers in `src/lib/discovery.ts`, keeping discovery distinct from audit grades.
 - Homepage discovery uses the shared Embla carousel with fixed-height slides, keeping live-result loading and horizontal browsing from expanding the list vertically.
 - Curated city/trade references live in the browser-safe reference catalogue with source links; public grades use only exposed fields and unknown areas remain unassessed to avoid fabricated evidence.
+- Live grading uses only verifiable evidence: Google Places fields (rating, review count, newest returned review date, owner-uploaded photos, website, hours) plus a server-side read of the business's own website for trade credentials; an overall A requires every area to be assessed and none graded D or F.
