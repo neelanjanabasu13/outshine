@@ -30,6 +30,7 @@ export const createCheckout = createServerFn({ method: "POST" })
       "metadata[item]": data.item,
       success_url: `${back}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: back,
+      allow_promotion_codes: "true",
     });
     const res = await fetch(`${STRIPE}/checkout/sessions`, {
       method: "POST",
@@ -49,6 +50,8 @@ export const verifyCheckout = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const res = await fetch(`${STRIPE}/checkout/sessions/${data.sessionId}`, { headers: { Authorization: `Bearer ${key()}` } });
     if (!res.ok) return { paid: false, item: null as string | null, businessId: null as string | null };
-    const s = (await res.json()) as { payment_status?: string; metadata?: Record<string, string> };
-    return { paid: s.payment_status === "paid", item: s.metadata?.["item"] ?? null, businessId: s.metadata?.["business_id"] ?? null };
+    const s = (await res.json()) as { status?: string; payment_status?: string; metadata?: Record<string, string> };
+    // A 100% promo code completes with "no_payment_required"; that is still a valid purchase.
+    const paid = s.payment_status === "paid" || (s.status === "complete" && s.payment_status === "no_payment_required");
+    return { paid, item: s.metadata?.["item"] ?? null, businessId: s.metadata?.["business_id"] ?? null };
   });
