@@ -74,7 +74,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   // SOPs
   r.sops.forEach((s, i) => {
     newPage();
-    const f = r.findings[i];
+    const f = r.findings[i]!;
     mark(`Guide ${i + 1}: ${f.title}`, 1);
     para(`GUIDE ${i + 1} · ${f.area.toUpperCase()} · ${s.time}`, 8, accent, "bold");
     heading(f.title, 18);
@@ -108,7 +108,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(...ink); doc.text("Contents", M, ty); ty += 12;
   toc.forEach((t) => {
     doc.setFont("helvetica", t.level ? "normal" : "bold"); doc.setFontSize(11); doc.setTextColor(...ink);
-    const title = (doc.splitTextToSize(clean(t.title), CW - 20) as string[])[0];
+    const title = (doc.splitTextToSize(clean(t.title), CW - 20) as string[])[0] ?? "";
     doc.textWithLink(title, M + t.level * 5, ty, { pageNumber: t.page });
     doc.setTextColor(...muted); doc.text(String(t.page), W - M, ty, { align: "right" });
     doc.outline.add(null, clean(t.title), { pageNumber: t.page });
