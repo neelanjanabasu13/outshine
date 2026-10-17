@@ -343,7 +343,7 @@ function ProblemCard({ f, n, b, autoRun }: { f: Finding; n: number; b: Business;
   const handoff = AGENT_HANDOFF[f.fix];
   const link = reviewLink(b);
   const copyAndOpen = async (text: string) => {
-    const tab = window.open(GOOGLE_PROFILE_URL, "_blank", "noopener");
+    const tab = window.open(GOOGLE_PROFILE_URL, "_blank"); if (tab) tab.opener = null;
     try { await navigator.clipboard.writeText(text); setCopied(true); } catch { setCopied(false); }
     if (!tab) window.location.assign(GOOGLE_PROFILE_URL);
   };
