@@ -79,20 +79,29 @@ function Report() {
   const all = paidItems.includes("all");
   const diy = paidItems.includes("diy");
 
+  const [demo, setDemo] = useState<string | null>(null);
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Showcase mode for demo businesses only: unlocks a tier without payment, never for live listings.
+    const d = !b.live ? params.get("demo") : null;
+    if (d === "diy" || d === "agent" || d === "free") {
+      setDemo(d);
+      setPaidItems(d === "diy" ? ["diy"] : d === "agent" ? ["all"] : []);
+      return;
+    }
     // Restore a previously verified purchase so returning owners keep their unlock.
     try {
       const saved = window.localStorage.getItem(`fixfirst-paid-${b.id}`);
       if (saved) setPaidItems(JSON.parse(saved) as string[]);
     } catch { /* private mode etc. */ }
-    const sid = new URLSearchParams(window.location.search).get("session_id");
+    const sid = params.get("session_id");
     if (sid) setPendingSession(sid);
-  }, [b.id]);
+  }, [b.id, b.live]);
 
   useEffect(() => {
-    if (!paidItems.length) return;
+    if (!paidItems.length || demo) return;
     try { window.localStorage.setItem(`fixfirst-paid-${b.id}`, JSON.stringify(paidItems)); } catch { /* ignore */ }
-  }, [paidItems, b.id]);
+  }, [paidItems, b.id, demo]);
 
   useEffect(() => {
     if (!pendingSession) return;
@@ -158,6 +167,7 @@ function Report() {
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
+        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "Fix it for me shown as if purchased, so you can watch our AI agent work through each fix."} This is a made-up business and no payment is taken.</p>}
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
