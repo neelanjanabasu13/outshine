@@ -247,3 +247,9 @@ export function estimateLostRevenue(trade: Trade, yourScore: number, rivalsScore
   const jobs = Math.round(gap * 0.4 / 3);
   return { jobs, pounds: jobs * TRADES[trade].avgJob };
 }
+
+/** Public-only grades cannot reach A: response and credentials evidence is missing, so the best verifiable grade is B. */
+export function cappedGrade(score: number, publicOnly: boolean): Grade {
+  const g = gradeOf(score);
+  return publicOnly && g === "A" ? "B" : g;
+}

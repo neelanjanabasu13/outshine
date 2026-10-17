@@ -88,3 +88,10 @@ describe("grading", () => {
     expect(estimateLostRevenue("plumbing", 50, 80)).toEqual({ jobs: 4, pounds: 720 });
   });
 });
+
+import { cappedGrade as _cappedGrade } from "./audit";
+describe("cappedGrade", () => {
+  it("caps public-only A grades at B", () => { expect(_cappedGrade(100, true)).toBe("B"); });
+  it("keeps A when full evidence exists", () => { expect(_cappedGrade(100, false)).toBe("A"); });
+  it("leaves lower public grades unchanged", () => { expect(_cappedGrade(0, true)).toBe(_cappedGrade(0, false)); });
+});
