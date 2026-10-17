@@ -4,9 +4,9 @@ import { ShellPage } from "@/components/Brand";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact us · FixFirst" },
+      { title: "Contact us · Outshine" },
       { name: "description", content: "Questions about your report or a fix? We would love to hear from you." },
-      { property: "og:title", content: "Contact us · FixFirst" },
+      { property: "og:title", content: "Contact us · Outshine" },
       { property: "og:description", content: "Questions about your report or a fix? We would love to hear from you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -4,11 +4,11 @@ import { Header } from "@/components/Brand";
 export const Route = createFileRoute("/demo")({
   head: () => ({
     meta: [
-      { title: "FixFirst showcase links (private)" },
-      { name: "description", content: "Private showcase links for the FixFirst free scan, DIY pack and AI agent tiers." },
+      { title: "Outshine showcase links (private)" },
+      { name: "description", content: "Private showcase links for the Outshine free scan, DIY pack and AI agent tiers." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "FixFirst showcase links" },
-      { property: "og:description", content: "Private showcase of the three FixFirst tiers." },
+      { property: "og:title", content: "Outshine showcase links" },
+      { property: "og:description", content: "Private showcase of the three Outshine tiers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

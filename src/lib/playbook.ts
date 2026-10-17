@@ -1,7 +1,7 @@
 import type { Trade } from "./audit";
 
 /**
- * Trade-specific operational knowledge distilled from the FixFirst research playbooks.
+ * Trade-specific operational knowledge distilled from the Outshine research playbooks.
  * Each entry targets the upstream cause behind a public profile symptom, so the DIY
  * pack tells an owner what to change in the business, not only what to post on Google.
  */

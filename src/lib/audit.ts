@@ -1,4 +1,4 @@
-// FixFirst benchmark catalogue and scoring engine. Pure functions, no I/O.
+// Outshine benchmark catalogue and scoring engine. Pure functions, no I/O.
 // When Google Places is connected, real profile data fills `Signals`; until then sample data does.
 
 export type Trade = "plumbing" | "electrician" | "cleaning" | "landscaping" | "salon";

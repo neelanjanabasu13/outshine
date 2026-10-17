@@ -64,7 +64,7 @@ function Site() {
             </form>
           )}
         </section>
-        <footer className="text-sm text-muted-foreground">{b.address} · {b.phone} · Site made with <a href="https://quietcrew.ai/" target="_blank" rel="noopener" className="underline underline-offset-4">FixFirst by Quietcrew</a></footer>
+        <footer className="text-sm text-muted-foreground">{b.address} · {b.phone} · Site made with <a href="https://quietcrew.ai/" target="_blank" rel="noopener" className="underline underline-offset-4">Outshine by Quietcrew</a></footer>
       </main>
     </div>
   );

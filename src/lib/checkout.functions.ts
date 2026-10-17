@@ -81,7 +81,7 @@ export const createCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const origin = returnOrigin(data.origin, getRequest());
     const pence = Math.round(checkoutPrice(data.item) * 100);
-    const name = data.item === "diy" ? `FixFirst DIY pack for ${data.businessName}` : `FixFirst done-for-you for ${data.businessName}`;
+    const name = data.item === "diy" ? `Outshine DIY pack for ${data.businessName}` : `Outshine done-for-you for ${data.businessName}`;
     const back = `${origin}/report/${encodeURIComponent(data.businessId)}`;
     const body = new URLSearchParams({
       mode: "payment",

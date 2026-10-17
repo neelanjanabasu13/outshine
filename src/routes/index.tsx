@@ -13,9 +13,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FixFirst · Free online presence audit for UK trades" },
+      { title: "Outshine · Free online presence audit for UK trades" },
       { name: "description", content: "Get a free A to F grade for your plumbing, electrical, cleaning, landscaping or salon business in under a minute, then let our agent fix it." },
-      { property: "og:title", content: "FixFirst · Free online presence audit for UK trades" },
+      { property: "og:title", content: "Outshine · Free online presence audit for UK trades" },
       { property: "og:description", content: "A to F grade, the five things costing you calls, and an agent that fixes them for you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

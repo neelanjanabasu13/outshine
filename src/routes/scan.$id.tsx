@@ -15,9 +15,9 @@ export const Route = createFileRoute("/scan/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: loaderData ? `Grading ${loaderData.b.name} · FixFirst` : "Grading · FixFirst" },
-      { name: "description", content: "FixFirst is checking this business's Google profile against local competitors." },
-      { property: "og:title", content: "Live audit in progress · FixFirst" },
+      { title: loaderData ? `Grading ${loaderData.b.name} · Outshine` : "Grading · Outshine" },
+      { name: "description", content: "Outshine is checking this business's Google profile against local competitors." },
+      { property: "og:title", content: "Live audit in progress · Outshine" },
       { property: "og:description", content: "Checking available Google reviews, photos and profile information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

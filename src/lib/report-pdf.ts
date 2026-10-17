@@ -30,8 +30,8 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   const chrome = () => {
     const n = doc.getNumberOfPages();
     doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted);
-    if (n > 1) { doc.text(`${clean(r.name)}  ·  FixFirst report and DIY pack`, M, 11); doc.setDrawColor(...line); doc.line(M, 13, W - M, 13); }
-    doc.text("FixFirst by Quietcrew", M, H - 8);
+    if (n > 1) { doc.text(`${clean(r.name)}  ·  Outshine report and DIY pack`, M, 11); doc.setDrawColor(...line); doc.line(M, 13, W - M, 13); }
+    doc.text("Outshine by Quietcrew", M, H - 8);
     doc.text(`Page ${n}`, W - M, H - 8, { align: "right" });
   };
   const newPage = () => { doc.addPage(); chrome(); y = TOP; };
@@ -189,7 +189,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
     doc.outline.add(null, clean(t.title), { pageNumber: t.page });
     ty += 5.5;
   });
-  doc.setProperties({ title: `${r.name} FixFirst report`, author: "FixFirst by Quietcrew" });
+  doc.setProperties({ title: `${r.name} Outshine report`, author: "Outshine by Quietcrew" });
   return doc.output("blob");
 }
 
