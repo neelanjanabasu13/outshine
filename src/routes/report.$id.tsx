@@ -106,7 +106,7 @@ function Report() {
       "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${cappedGrade(c.score, !!b.live)}`),
       "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
       ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
-      "", "FixFirst by Quiet Crew · https://quietcrew.ai/"];
+      "", "FixFirst by Quietcrew · https://quietcrew.ai/"];
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
     const a = document.createElement("a"); a.href = url; a.download = "fixfirst-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
