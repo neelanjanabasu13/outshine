@@ -4,9 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Brand";
 import { TRADES, type Trade } from "@/lib/audit";
 import { TRADE_PHOTOS } from "@/lib/sample";
-import { liveId, searchBusinesses } from "@/lib/places.functions";
+import { discoverBusinesses, liveId, searchBusinesses } from "@/lib/places.functions";
 import { Button } from "@/components/ui/button";
-import { discoveryQuery, discoveryResults } from "@/lib/discovery";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export const Route = createFileRoute("/")({
@@ -35,6 +34,7 @@ function Home() {
   const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
   const search = useServerFn(searchBusinesses);
+  const discover = useServerFn(discoverBusinesses);
 
   useEffect(() => {
     const s = q.trim();
@@ -52,7 +52,7 @@ function Home() {
       if (live) setLoading(false);
     }, browsing ? 0 : 400);
     return () => { live = false; clearTimeout(to); };
-  }, [q, trade, city, search]);
+  }, [q, trade, city, search, discover]);
 
   const pickedTrade = picked ? (picked.trade ?? trade) : null;
   const browsing = trade !== null && q.trim().length < 3;
