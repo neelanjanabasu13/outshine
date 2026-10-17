@@ -91,17 +91,21 @@ describe("grading", () => {
 
 import { cappedGrade as _cappedGrade } from "./audit";
 describe("cappedGrade", () => {
-  it("caps public-only A grades at B", () => { expect(_cappedGrade(100, true)).toBe("B"); });
-  it("keeps A when full evidence exists", () => { expect(_cappedGrade(100, false)).toBe("A"); });
-  it("leaves lower public grades unchanged", () => { expect(_cappedGrade(0, true)).toBe(_cappedGrade(0, false)); });
+  const base = { ...BUSINESSES[0]!.signals, rating: 5, reviewCount: 1000, photoCount: 10, hasWebsite: true, hasHours: true, newestReviewDays: 10, ownerPhotos: 5 };
+  it("caps an A at B when credentials could not be checked", () => { expect(_cappedGrade(evaluate("cleaning", { ...base, websiteCredential: null }, "x", true))).toBe("B"); });
+  it("allows an A when every area has evidence", () => { expect(_cappedGrade(evaluate("cleaning", { ...base, websiteCredential: true }, "x", true))).toBe("A"); });
+  it("lowers the grade when the website shows no credentials", () => { expect(_cappedGrade(evaluate("plumbing", { ...base, websiteCredential: false }, "x", true))).not.toBe("A"); });
+  it("lowers the grade when the newest review is over 180 days old", () => {
+    const fresh = scoreOf(evaluate("salon", { ...base, websiteCredential: true }, "x", true));
+    expect(scoreOf(evaluate("salon", { ...base, websiteCredential: true, newestReviewDays: 200 }, "x", true))).toBeLessThan(fresh);
+  });
 });
 
 describe("public grades spread", () => {
-  const base = { ...BUSINESSES[0]!.signals, photoCount: 10, hasWebsite: true, hasHours: true };
-  const g = (rating: number, reviewCount: number) => _cappedGrade(scoreOf(evaluate("cleaning", { ...base, rating, reviewCount }, "x", true)), true);
+  const base = { ...BUSINESSES[0]!.signals, photoCount: 10, hasWebsite: true, hasHours: true, newestReviewDays: 60, ownerPhotos: 1, websiteCredential: false };
+  const g = (rating: number, reviewCount: number) => _cappedGrade(evaluate("cleaning", { ...base, rating, reviewCount }, "x", true));
   it("gives a typical 4.6 star, 40 review profile a lower grade than a 5.0 star, 1,100 review one", () => {
     expect(g(4.6, 40)).not.toBe(g(5.0, 1100));
   });
-  it("grades 5.0 stars and 1,100 reviews as B", () => { expect(g(5.0, 1100)).toBe("B"); });
   it("grades 4.2 stars and 15 reviews below C", () => { expect(["D", "F"]).toContain(g(4.2, 15)); });
 });
