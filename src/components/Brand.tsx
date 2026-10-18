@@ -40,8 +40,20 @@ export function Footer() {
           Quietcrew
         </a>
       </span>
-      <span className="flex gap-4"><Link to="/privacy" className="hover:text-foreground">Privacy</Link><Link to="/terms" className="hover:text-foreground">Terms</Link><span>Free audits for UK trades</span></span>
+      <span className="flex flex-wrap items-center gap-4"><McpLink /><Link to="/privacy" className="hover:text-foreground">Privacy</Link><Link to="/terms" className="hover:text-foreground">Terms</Link><span>Free audits for UK trades</span></span>
     </footer>
+  );
+}
+
+const MCP_URL = "https://outshine.lovable.app/mcp";
+function McpLink() {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button type="button" title={`Add ${MCP_URL} to Claude, ChatGPT or Cursor as a connector to grade businesses from your AI assistant`}
+      onClick={() => { navigator.clipboard?.writeText(MCP_URL); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+      className="rounded-full border border-border px-3 py-1 font-medium hover:border-fix hover:text-foreground">
+      {copied ? "Connector link copied" : "Use Outshine in your AI assistant (MCP)"}
+    </button>
   );
 }
 
