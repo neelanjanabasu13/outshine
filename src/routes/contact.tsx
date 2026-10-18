@@ -7,7 +7,7 @@ export const Route = createFileRoute("/contact")({
   component: () => (
     <ShellPage title="Contact us" intro="Questions about your report, a payment or the DIY pack? We would love to hear from you.">
       <Block h="Get in touch">
-        <p>Our support inbox is being set up right now. Until then, you can reach the team through the <a href={QUIET_CREW_URL} target="_blank" rel="noopener" className="font-semibold text-foreground underline underline-offset-4">Quietcrew website</a>.</p>
+        <p>Email us at <a href="mailto:hello@quietcrew.ai" className="font-semibold text-foreground underline underline-offset-4">hello@quietcrew.ai</a> and we will get back to you. You can also learn more on the <a href={QUIET_CREW_URL} target="_blank" rel="noopener" className="font-semibold text-foreground underline underline-offset-4">Quietcrew website</a>.</p>
         <p>If your question is about a payment, include the business name from your report so we can find it quickly.</p>
       </Block>
     </ShellPage>
