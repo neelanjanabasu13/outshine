@@ -1,4 +1,4 @@
-const SITE = "https://grade-your-trade.lovable.app";
+const SITE = "https://outshine.lovable.app";
 
 export function pageHead(path: string, title: string, description: string) {
   return {

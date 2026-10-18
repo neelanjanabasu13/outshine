@@ -42,9 +42,9 @@ export const Route = createFileRoute("/report/$id")({
   head: ({ loaderData }) => ({
     meta: [
       { title: loaderData ? `${loaderData.b.name} report · Outshine` : "Report · Outshine" },
-      { name: "description", content: "Your evidence-based letter grade, nearby competitors, real city reference businesses and the fixes that matter." },
-      { property: "og:title", content: loaderData ? `${loaderData.b.name}'s Outshine grade` : "Outshine report" },
-      { property: "og:description", content: "Compare your profile with local rivals and preview how improvements could change your grade." },
+      { name: "description", content: loaderData ? `Online presence report for ${loaderData.b.name}, a ${TRADES[loaderData.b.trade].label.toLowerCase()} business in ${loaderData.b.area}, with an evidence-based letter grade and a comparison against nearby rivals.` : "An evidence-based online presence report with a letter grade and nearby rivals." },
+      { property: "og:title", content: loaderData ? `${loaderData.b.name} online presence report · Outshine` : "Outshine report" },
+      { property: "og:description", content: loaderData ? `See how ${loaderData.b.name} in ${loaderData.b.area} grades against local ${TRADES[loaderData.b.trade].label.toLowerCase()} rivals, and where it can stand out online.` : "See how this business grades against local rivals." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -181,7 +181,7 @@ function Report() {
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
           {b.address && <p className="mt-1 text-sm text-muted-foreground">{b.address}{b.phone ? ` · ${b.phone}` : ""}</p>}
-          <h1 className="mt-2 break-words text-4xl font-semibold md:text-6xl">{b.name}</h1>
+          <h1 className="mt-2 break-words text-4xl font-semibold md:text-6xl">{b.name}<span className="mt-2 block text-lg font-medium text-muted-foreground md:text-2xl">Online presence report and local rival comparison</span></h1>
           <div className="mt-8 grid items-center gap-8 border-y border-border py-8 sm:grid-cols-[auto_1fr]">
             <Gauge score={score} grade={grade} />
             <div>

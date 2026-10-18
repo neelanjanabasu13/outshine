@@ -106,7 +106,7 @@ function Scan() {
         <div className="text-left">
           <Button asChild variant="link" className="px-0"><Link to="/"><ArrowLeft />Try another business</Link></Button>
         </div>
-        <h1 className="mt-2 font-display text-xl font-semibold">{b.name}</h1>
+        <h1 className="mt-2 font-display text-xl font-semibold">Auditing the online presence of {b.name}</h1>
         <p className="text-sm text-muted-foreground">{b.address}</p>
 
         <div className="mt-5 flex justify-center gap-2" aria-hidden>
