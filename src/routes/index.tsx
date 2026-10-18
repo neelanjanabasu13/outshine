@@ -21,6 +21,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Outshine · Free online presence audit for UK trades" },
       { property: "og:description", content: "See your grade against local rivals, then outshine them yourself or let our AI agent do it for you." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://outshine.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
