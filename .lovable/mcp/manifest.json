@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "sdk_version": "3.1.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "outshine",
+      "version": "0.1.0",
+      "title": "Outshine"
+    },
+    "tools": [
+      {
+        "name": "search_businesses",
+        "title": "Search UK trade businesses",
+        "description": "Find UK cleaning, plumbing, electrical, landscaping or hair and beauty businesses by name and town, returning ids for get_business_report.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120,
+              "description": "Business name and town, e.g. 'Mops Stars Cleaning London'."
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Maximum results, default 5."
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_business_report",
+        "title": "Get Outshine report",
+        "description": "Get the free Outshine letter grade, top improvement areas and nearby rival grades for a business id from search_businesses.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400,
+              "description": "Business id returned by search_businesses."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
