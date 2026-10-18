@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DemoRouteImport } from './routes/demo'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SolutionRouteImport } from './routes/solution'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as SiteIdRouteImport } from './routes/site.$id'
@@ -42,6 +44,11 @@ const DemoRoute = DemoRouteImport.update({
   path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -62,6 +69,12 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ReportIdRoute = ReportIdRouteImport.update({
   id: '/report/$id',
   path: '/report/$id',
@@ -88,10 +101,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
+  '/mcp': typeof McpRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -102,10 +117,12 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
+  '/mcp': typeof McpRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -117,10 +134,12 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
+  '/mcp': typeof McpRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/solution': typeof SolutionRoute
   '/terms': typeof TermsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/report/$id': typeof ReportIdRoute
   '/scan/$id': typeof ScanIdRoute
   '/site/$id': typeof SiteIdRoute
@@ -133,10 +152,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/demo'
+    | '/mcp'
     | '/pricing'
     | '/privacy'
     | '/solution'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -147,10 +168,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/demo'
+    | '/mcp'
     | '/pricing'
     | '/privacy'
     | '/solution'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -161,10 +184,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/demo'
+    | '/mcp'
     | '/pricing'
     | '/privacy'
     | '/solution'
     | '/terms'
+    | '/.well-known/oauth-protected-resource'
     | '/report/$id'
     | '/scan/$id'
     | '/site/$id'
@@ -176,10 +201,12 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
+  McpRoute: typeof McpRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SolutionRoute: typeof SolutionRoute
   TermsRoute: typeof TermsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ReportIdRoute: typeof ReportIdRoute
   ScanIdRoute: typeof ScanIdRoute
   SiteIdRoute: typeof SiteIdRoute
@@ -216,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -242,6 +276,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/report/$id': {
@@ -280,10 +321,13 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
+  McpRoute: McpRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SolutionRoute: SolutionRoute,
   TermsRoute: TermsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ReportIdRoute: ReportIdRoute,
   ScanIdRoute: ScanIdRoute,
   SiteIdRoute: SiteIdRoute,
