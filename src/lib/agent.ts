@@ -55,7 +55,7 @@ export function runAgent(kind: FixKind, b: Business): AgentRun {
     case "website":
       return {
         steps: ["Pulling your photos, reviews and services", "Writing your page", "Adding click-to-call and a quote form", "Publishing to a live address"],
-        output: `Your website is live at fixfirst.app/site/${b.id}`,
+        output: `Your website is live at outshine.lovable.app/site/${b.id}`,
       };
   }
 }

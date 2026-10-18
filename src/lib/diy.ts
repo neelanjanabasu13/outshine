@@ -261,7 +261,7 @@ function baseSop(f: Finding, trade: Trade, businessName: string): Sop {
         time: "Under a minute with our AI agent, or an afternoon doing it yourself",
         youNeed: ["A Google account that manages your Business Profile"],
         steps: [
-          "The fastest route: choose 'Fix it for me' on your report and our AI agent builds a clean one-page website for you from your real business data, in under a minute. You can preview it before anything goes live.",
+          "The fastest route: choose 'Done for you' on your report and our AI agent builds a clean one-page website for you from your real business data, in under a minute. You can preview it before anything goes live.",
           "Doing it yourself instead? Pick one of the no-code tools listed below (they are starting points, not the only options). The quickest DIY route is to open Lovable, paste the ready-made prompt below with your details filled in, and let it build the page for you.",
           "Your page needs exactly five things, in this order: what you do and where, your services as a short list, genuine reviews, real photos, and a big tap-to-call phone button plus a contact form.",
           "Keep it to one page. Customers from Google want to check you are real and ring you, not read an essay.",

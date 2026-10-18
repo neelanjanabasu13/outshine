@@ -15,7 +15,7 @@ export function Header() {
         </div>
       </div>
       <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
-        {([["/", "Home"], ["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
+        {([["/", "Home"], ["/report/mops-stars-cleaning", "Demo showcase"], ["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
           <Link key={to} to={to} className="text-muted-foreground transition-colors hover:text-foreground" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
         ))}
       </nav>

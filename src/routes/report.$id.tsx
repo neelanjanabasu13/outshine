@@ -151,7 +151,7 @@ function Report() {
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = `${b.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-fixfirst-pack.pdf`;
+      a.href = url; a.download = `${b.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-outshine-pack.pdf`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 30000);
     } finally { setPdfBusy(false); }
@@ -165,7 +165,7 @@ function Report() {
       ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
       "", "Outshine by Quietcrew · https://quietcrew.ai/"];
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a"); a.href = url; a.download = "fixfirst-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
+    const a = document.createElement("a"); a.href = url; a.download = "outshine-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
   };
 
@@ -174,7 +174,7 @@ function Report() {
       <Header />
       <main className="mx-auto max-w-6xl px-6 pb-40">
         <Button asChild variant="link" className="h-auto px-0 py-2"><Link to="/"><ArrowLeft />Try another business</Link></Button>
-        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "the full vision of Fix it for me, with our AI agent connected to the owner's Google profile and making every change itself. The Google updates are simulated for this demo."} This is a made-up business and no payment is taken.</p>}
+        {demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Demo showcase:</span> {demo === "free" ? "the free scan, with the report ready to download." : demo === "diy" ? "the DIY pack shown as if purchased, with every guide and the PDF unlocked." : "the full vision of Done for you, with our AI agent connected to the owner's Google profile and making every change itself. The Google updates are simulated for this demo."} This is a made-up business and no payment is taken.</p>}
         {b.seeded && !demo && <p role="status" className="mt-2 rounded-lg border border-fix bg-card px-4 py-2 text-sm"><span className="font-semibold">Showcase business:</span> Mops Stars Cleaning is made up for judging. {all ? "Done for you is unlocked, and the Google and Gmail connections are simulated as if our partnerships were in place." : "Both paid options work here with a 100% off code at checkout."}</p>}
         <section className="animate-rise pt-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{TRADES[b.trade].label} · {b.area}</p>
@@ -279,7 +279,7 @@ function Report() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="text-3xl font-semibold md:text-4xl">{all ? "Included: how every fix was done" : "How to fix it yourself, step by step"}</h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">{all ? "Fix it for me includes the full DIY playbook at no extra cost, so you can see exactly what our AI agent changed and repeat it any time." : "A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before."}</p>
+              <p className="mt-3 max-w-2xl text-muted-foreground">{all ? "Done for you includes the full DIY playbook at no extra cost, so you can see exactly what our AI agent changed and repeat it any time." : "A standard operating procedure for every finding above: exactly where to click, what to type, word-for-word scripts, and the links you need. Written for someone who has never done this before."}</p>
             </div>
           </div>
           {diy ? (
@@ -301,7 +301,7 @@ function Report() {
                   <p className="mt-4 text-xl font-semibold">Unlock the full DIY pack</p>
                   <p className="mt-2 text-sm text-muted-foreground">{problems.length} detailed SOP{problems.length === 1 ? "" : "s"} for your report, with exact clicks, scripts and links. One-off payment, no subscription.</p>
                   <div className="mt-5"><PayButton b={b} item="diy" label="DIY pack" onSession={setPendingSession}>Unlock DIY pack · £{PRICE_DIY.toFixed(2)} <s className="ml-1 text-xs opacity-70">£{WAS_DIY.toFixed(2)}</s></PayButton></div>
-                  <p className="mt-3 text-xs text-muted-foreground">Prefer not to do it yourself? Choose Fix it for me above and our AI agent does the work.</p>
+                  <p className="mt-3 text-xs text-muted-foreground">Prefer not to do it yourself? Choose Done for you above and our AI agent does the work.</p>
                 </div>
               </div>
             </div>
@@ -480,7 +480,7 @@ function SopCard({ f, n, b }: { f: Finding; n: number; b: Business }) {
       <pre className="mt-2 whitespace-pre-wrap font-sans text-sm text-muted-foreground">{pr.text}</pre>
       <p className="mt-3 text-xs text-muted-foreground">Fill in the [square brackets], then paste it into: {pr.openIn.map((t, i) => <span key={t.name}>{i > 0 && ", "}<a href={t.url} target="_blank" rel="noopener noreferrer" className="font-medium text-fix underline">{t.name}</a></span>)}. {sop.tools ? "" : TOOLS_DISCLAIMER}</p>
     </div>)}
-    {f.fix === "website" && <p className="mt-6 rounded-lg bg-fix p-4 text-sm font-semibold text-fix-foreground">Rather not do it yourself? Choose Fix it for me and our AI agent builds your one-page website in under a minute.</p>}
+    {f.fix === "website" && <p className="mt-6 rounded-lg bg-fix p-4 text-sm font-semibold text-fix-foreground">Rather not do it yourself? Choose Done for you and our AI agent builds your one-page website in under a minute.</p>}
     {sop.shotList && <div className="mt-6">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Your five-shot photo set</p>
       <ul className="mt-2 space-y-2 text-sm">{sop.shotList.map((c) => <li key={c.shot}><span className="font-medium">{c.shot}:</span> <span className="text-muted-foreground">{c.how}</span></li>)}</ul>

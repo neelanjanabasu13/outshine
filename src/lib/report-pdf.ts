@@ -121,7 +121,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   chrome();
   doc.setFillColor(...accent); doc.rect(0, 0, W, 4, "F");
   y = 18;
-  para("FIXFIRST REPORT AND DIY PACK", 8, accent, "bold", 0, 1);
+  para("OUTSHINE REPORT AND DIY PACK", 8, accent, "bold", 0, 1);
   y += 6;
   para(r.name, 22, ink, "bold", 0, 1);
   para([r.address, r.tradeLabel, `Prepared ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`].filter(Boolean).join("  ·  "), 9, muted, "normal", 0, 4);
@@ -173,7 +173,7 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
     }
     if (s.prompts?.length) { label("Ready-made AI prompts"); s.prompts.forEach((p) => box(p.label, p.text, { links: p.openIn, footnote: `Fill in the [square brackets] first.${s.tools ? "" : " " + TOOLS_DISCLAIMER}` })); }
     if (s.scripts.length) { label("Word-for-word scripts"); s.scripts.forEach((sc) => box(sc.label, sc.text)); }
-    if (f.fix === "website") box("Rather not do it yourself?", "Choose Fix it for me on your report and our AI agent builds your one-page website in under a minute, using your real business details and reviews.");
+    if (f.fix === "website") box("Rather not do it yourself?", "Choose Done for you on your report and our AI agent builds your one-page website in under a minute, using your real business details and reviews.");
     if (s.proTips.length) { label("Pro tips"); s.proTips.forEach((p) => bullet(p, muted)); }
     if (s.guardrails?.length) { label("Do not", [190, 40, 50]); s.guardrails.forEach((g) => bullet(g)); }
   });
