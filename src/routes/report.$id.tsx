@@ -204,7 +204,7 @@ function Report() {
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
             <div className="flex flex-col gap-3">
               <p className="font-medium">Free scan</p><p className="font-display text-3xl font-semibold">Free</p>
-              <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and the problems worth fixing.</p>
+              <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and where you can stand out.</p>
               <p className="flex items-center gap-2 text-sm text-grade-a"><Check className="h-4 w-4" />Your report is ready</p>
               <Button onClick={downloadReport} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />Download free report</Button>
             </div>
@@ -216,7 +216,7 @@ function Report() {
             <div className="flex flex-col gap-3">
               <p className="font-medium">Done for you</p><p className="font-display text-3xl font-semibold">{showcase || b.seeded ? <><span className="mr-2 text-lg text-muted-foreground line-through">£{WAS_BUNDLE.toFixed(2)}</span>£{PRICE_BUNDLE.toFixed(2)}</> : "Coming soon"}</p>
               <p className="flex-1 text-sm text-muted-foreground">Our fully automated AI agent makes every change on your Google listing and website for you. Nothing to copy, nothing to paste.</p>
-              {showcase ? <p className="text-grade-a">{connected ? "Our AI agent is fixing everything below." : "Connect Google below and our AI agent starts."}</p> : b.seeded ? <PayButton b={b} item="all" label="Done for you" onSession={setPendingSession}>Let our AI agent do it · £{PRICE_BUNDLE.toFixed(2)}</PayButton> : <Button disabled variant="outline" className="h-auto min-h-10 w-full whitespace-normal py-3">Coming soon</Button>}
+              {showcase ? <p className="text-grade-a">{connected ? "Our AI agent is working through everything below." : "Connect Google below and our AI agent starts."}</p> : b.seeded ? <PayButton b={b} item="all" label="Done for you" onSession={setPendingSession}>Let our AI agent do it · £{PRICE_BUNDLE.toFixed(2)}</PayButton> : <Button disabled variant="outline" className="h-auto min-h-10 w-full whitespace-normal py-3">Coming soon</Button>}
             </div>
           </div>
           <p className="mt-5 text-xs text-muted-foreground">Secure one-off payment through Stripe. No subscription.</p>
@@ -273,7 +273,7 @@ function Report() {
 
         {showcase && !connected && !allClear && <ConnectGate b={b} onDone={() => setConnected(true)} />}
         {!allClear && <section className="mt-16">
-          <h2 className="text-3xl font-semibold md:text-4xl">{showcase ? `Our AI agent is fixing your ${problems.length} biggest problems` : `The ${problems.length} things costing you the most`}</h2>
+          <h2 className="text-3xl font-semibold md:text-4xl">{showcase ? `Our AI agent is helping you outshine on ${problems.length} fronts` : `The ${problems.length} things costing you the most`}</h2>
           <div className="mt-8 space-y-6">{problems.map((f, i) => <ProblemCard key={f.id} f={f} n={i + 1} b={b} autoRun={all && (!showcase || connected)} showcase={showcase} />)}</div>
         </section>}
 
@@ -382,7 +382,7 @@ function ProblemCard({ f, n, b, autoRun, showcase = false }: { f: Finding; n: nu
       <h3 className="mt-3 text-2xl font-semibold">{f.title}</h3>
       <p className="mt-3"><span className="text-muted-foreground">Evidence: </span>{f.evidence}</p>
       <div className="mt-5 rounded-lg border-l-4 border-fix bg-accent/60 px-4 py-3">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">{state === "done" ? "Fixed by our AI agent" : "Our AI agent is fixing this"}</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fix">{state === "done" ? "Done by our AI agent" : "Our AI agent is on it"}</p>
         <p className="mt-1 text-base font-bold leading-snug">{AGENT_ACTION[f.fix]}</p>
       </div>
       <ul className="mt-5 space-y-2 rounded-lg bg-secondary p-4 font-mono text-xs">{steps.map((s, i) => <li key={s} className={i < step ? "text-fix" : i === step && state === "running" ? "animate-pulse text-foreground" : "text-muted-foreground"}>{i < step ? "✓" : i === step && state === "running" ? "›" : "○"} {s}</li>)}</ul>

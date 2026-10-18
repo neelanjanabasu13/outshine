@@ -26,7 +26,7 @@ const RESULT: Record<FixKind, (b: Business) => string> = {
 
 export function ShowcaseResult({ fix, b }: { fix: FixKind; b: Business }) {
   return <div className="space-y-3">
-    <p className="inline-flex items-center gap-1.5 rounded-full bg-grade-a/15 px-3 py-1 text-xs font-bold text-grade-a"><Check className="h-3.5 w-3.5" />Live on Google</p>
+    <p className="inline-flex items-center gap-1.5 rounded-full bg-grade-a/15 px-3 py-1 text-xs font-bold text-grade-a"><Check className="h-3.5 w-3.5" />Live online</p>
     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground">
       <p className="font-semibold">{b.name}</p>
       <p className="flex items-center gap-1 text-xs text-muted-foreground"><Star className="h-3 w-3 fill-current" />{b.signals.rating.toFixed(1)} · {b.area}</p>
