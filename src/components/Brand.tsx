@@ -3,22 +3,29 @@ import { Link } from "@tanstack/react-router";
 import { Shine } from "./Shine";
 
 export const QUIET_CREW_URL = "https://quietcrew.ai/";
+const NAV = [["/", "Home"], ["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const;
 
 export function Header() {
   return (
-    <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-      <div className="flex items-center gap-2">
+    <header className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-6 sm:px-6 lg:flex lg:justify-between">
+      <div className="flex min-w-0 items-center gap-2">
         <Link to="/" aria-label="Outshine home" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold text-paper">O</Link>
-        <div className="flex flex-col leading-tight">
-          <Link to="/" className="font-display text-3xl font-extrabold tracking-tight"><Shine>Outshine</Shine></Link>
+        <div className="flex min-w-0 flex-col leading-tight">
+          <Link to="/" className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl"><Shine>Outshine</Shine></Link>
           <a href={QUIET_CREW_URL} target="_blank" rel="noopener" title="Visit the Quietcrew website" className="-my-1 py-1 text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">by <span className="font-quietcrew font-extrabold tracking-[-0.02em] text-quietcrew">Quietcrew</span></a>
         </div>
       </div>
-      <nav aria-label="Main" className="flex items-center gap-4 text-sm sm:gap-6">
-        {([["/", "Home"], ["/solution", "Solution"], ["/pricing", "Pricing"], ["/about", "About"], ["/contact", "Contact us"]] as const).map(([to, label]) => (
-          <Link key={to} to={to} className="text-muted-foreground transition-colors hover:text-foreground" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
+      <nav aria-label="Main" className="flex items-center gap-3 text-sm lg:gap-6">
+        {NAV.map(([to, label]) => (
+          <Link key={to} to={to} className="hidden text-muted-foreground transition-colors hover:text-foreground lg:inline" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground font-medium" }}>{label}</Link>
         ))}
-        <Link to="/scan/$id" params={{ id: "mops-stars-cleaning" }} className="rounded-full bg-fix px-3 py-1.5 font-semibold text-fix-foreground transition hover:-translate-y-0.5">Demo showcase</Link>
+        <Link to="/scan/$id" params={{ id: "mops-stars-cleaning" }} className="shrink-0 whitespace-nowrap rounded-full bg-fix px-3 py-1.5 font-semibold text-fix-foreground transition hover:-translate-y-0.5">Demo showcase</Link>
+        <details className="relative lg:hidden">
+          <summary aria-label="Menu" className="cursor-pointer list-none rounded-full border border-border px-3 py-1.5 font-medium">Menu</summary>
+          <div className="absolute right-0 z-50 mt-2 flex w-44 flex-col rounded-lg border border-border bg-card p-2 shadow-lg">
+            {NAV.map(([to, label]) => <Link key={to} to={to} className="rounded px-3 py-2 hover:bg-muted">{label}</Link>)}
+          </div>
+        </details>
       </nav>
     </header>
   );

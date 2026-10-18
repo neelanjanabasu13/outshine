@@ -157,15 +157,17 @@ function Report() {
     } finally { setPdfBusy(false); }
   };
 
-  const downloadReport = () => {
-    const lines = [`${b.name}`, `${b.address}`, `Outshine free report · ${TRADES[b.trade].label}`, "", `Overall grade: ${grade}`,
-      ...areaList.filter((a) => areas[a] !== undefined).map((a) => `${a}: ${gradeOf(areas[a]!)}`),
-      "", "Nearby rivals:", ...comps.map((c) => `- ${c.name}: ${c.grade}`),
-      "", problems.length ? "What is costing you the most:" : "Nothing to fix on the public profile. Ideas to stay ahead:",
-      ...(problems.length ? problems.map((f, i) => `${i + 1}. ${f.title}\n   ${f.evidence}\n   ${f.impact}`) : extraTips(b.trade).map((t) => `- ${t.title}: ${t.body}`)),
-      "", "Outshine by Quietcrew · https://quietcrew.ai/"];
-    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a"); a.href = url; a.download = "outshine-free-report.txt"; document.body.appendChild(a); a.click(); a.remove();
+  const downloadReport = async () => {
+    const { buildFreeReportPdf } = await import("@/lib/report-pdf");
+    const blob = await buildFreeReportPdf({
+      name: b.name, address: b.address, tradeLabel: TRADES[b.trade].label, grade,
+      areas: areaList.filter((a) => areas[a] !== undefined).map((a) => ({ area: a, grade: gradeOf(areas[a]!) })),
+      rivals: comps.map((c) => ({ name: c.name, grade: c.grade })),
+      findings: problems.map((f) => ({ title: f.title, evidence: f.evidence, impact: f.impact })),
+      tips: problems.length ? [] : extraTips(b.trade),
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `${b.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-outshine-free-report.pdf`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
   };
 

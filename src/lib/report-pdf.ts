@@ -193,6 +193,88 @@ export async function buildReportPdf(r: PdfReportInput): Promise<Blob> {
   return doc.output("blob");
 }
 
+export interface FreeReportInput {
+  name: string; address?: string; tradeLabel: string; grade: string;
+  areas: { area: string; grade: string }[];
+  rivals: { name: string; grade: string }[];
+  findings: { title: string; evidence: string; impact: string }[];
+  tips: { title: string; body: string }[];
+}
+
+/** Styled one-to-two page free report: brand band, grade badge, area tiles, rivals, findings. */
+export async function buildFreeReportPdf(r: FreeReportInput): Promise<Blob> {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const W = 210, H = 297, M = 16, CW = W - M * 2;
+  const ink: RGB = [20, 24, 33], muted: RGB = [95, 101, 115], coral: RGB = [233, 69, 96], gold: RGB = [242, 170, 60], violet: RGB = [107, 78, 245], cream: RGB = [250, 246, 238], line: RGB = [222, 224, 230];
+  const gradeRGB = (g: string): RGB => ({ A: [34, 160, 90], B: [90, 170, 60], C: [230, 160, 30], D: [235, 110, 40], F: [210, 50, 60] } as Record<string, RGB>)[g] ?? muted;
+  let y = 0;
+  const footer = () => { doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted); doc.text("Outshine by Quietcrew  ·  quietcrew.ai", M, H - 8); doc.text(`Page ${doc.getNumberOfPages()}`, W - M, H - 8, { align: "right" }); };
+  const ensure = (h: number) => { if (y + h > H - 18) { doc.addPage(); footer(); y = 20; } };
+
+  // Brand band: coral to gold stripes
+  const steps = 40;
+  for (let i = 0; i < steps; i++) { const t = i / (steps - 1); doc.setFillColor(coral[0] + (gold[0] - coral[0]) * t, coral[1] + (gold[1] - coral[1]) * t, coral[2] + (gold[2] - coral[2]) * t); doc.rect((W / steps) * i, 0, W / steps + 0.3, 42, "F"); }
+  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.text("Outshine", M, 20);
+  doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.textWithLink("by Quietcrew", M, 26, { url: "https://quietcrew.ai/" });
+  doc.setFontSize(8); doc.text("FREE ONLINE PRESENCE REPORT", W - M, 20, { align: "right" });
+  doc.text(new Date().toLocaleDateString("en-GB"), W - M, 26, { align: "right" });
+  footer();
+
+  // Business + grade badge
+  y = 58;
+  doc.setTextColor(...muted); doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.text(clean(r.tradeLabel).toUpperCase(), M, y);
+  doc.setTextColor(...ink); doc.setFontSize(20); const nameLines = doc.splitTextToSize(clean(r.name), CW - 45) as string[]; doc.text(nameLines, M, y + 9);
+  let ny = y + 9 + nameLines.length * 8;
+  if (r.address) { doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted); doc.text(doc.splitTextToSize(clean(r.address), CW - 45), M, ny); ny += 6; }
+  const gc = gradeRGB(r.grade);
+  doc.setFillColor(...gc); doc.circle(W - M - 17, y + 8, 17, "F");
+  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(30); doc.text(r.grade, W - M - 17, y + 13, { align: "center" });
+  doc.setFontSize(7); doc.setTextColor(...muted); doc.text("OVERALL GRADE", W - M - 17, y + 31, { align: "center" });
+  y = Math.max(ny, y + 36) + 6;
+
+  // Area tiles
+  if (r.areas.length) {
+    const n = r.areas.length, gap = 4, tw = (CW - gap * (n - 1)) / n;
+    r.areas.forEach((a, i) => { const x = M + i * (tw + gap); doc.setFillColor(...cream); doc.roundedRect(x, y, tw, 22, 2, 2, "F"); doc.setFillColor(...gradeRGB(a.grade)); doc.rect(x, y, tw, 1.4, "F"); doc.setTextColor(...muted); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.text(clean(a.area), x + 4, y + 8); doc.setTextColor(...gradeRGB(a.grade)); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text(a.grade, x + 4, y + 18); });
+    y += 30;
+  }
+
+  const heading = (t: string) => { ensure(14); doc.setTextColor(...violet); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text(t.toUpperCase(), M, y); doc.setDrawColor(...line); doc.line(M, y + 2, W - M, y + 2); y += 8; };
+
+  if (r.rivals.length) {
+    heading("You and your nearby rivals");
+    [{ name: `${r.name} (you)`, grade: r.grade }, ...r.rivals].forEach((c) => { ensure(8); doc.setTextColor(...ink); doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text(clean(c.name), M, y); doc.setFillColor(...gradeRGB(c.grade)); doc.roundedRect(W - M - 10, y - 4.5, 10, 6, 1.5, 1.5, "F"); doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.text(c.grade, W - M - 5, y, { align: "center" }); y += 8; });
+    y += 3;
+  }
+
+  if (r.findings.length) {
+    heading("What is holding you back the most");
+    r.findings.forEach((f, i) => {
+      doc.setFontSize(9); const ev = doc.splitTextToSize(clean(f.evidence), CW - 14) as string[]; const im = doc.splitTextToSize(clean(f.impact), CW - 14) as string[];
+      const h = 9 + (ev.length + im.length) * 4 + 4; ensure(h);
+      doc.setFillColor(...cream); doc.roundedRect(M, y - 4, CW, h, 2, 2, "F"); doc.setFillColor(...coral); doc.rect(M, y - 4, 1.2, h, "F");
+      doc.setFillColor(...coral); doc.circle(M + 6, y + 0.5, 2.6, "F"); doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text(String(i + 1), M + 6, y + 1.5, { align: "center" });
+      doc.setTextColor(...ink); doc.setFontSize(10.5); doc.text(clean(f.title), M + 11, y + 1.5);
+      let fy = y + 7; doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...ink); ev.forEach((l) => { doc.text(l, M + 11, fy); fy += 4; }); doc.setTextColor(...muted); im.forEach((l) => { doc.text(l, M + 11, fy); fy += 4; });
+      y += h + 3;
+    });
+  } else if (r.tips.length) {
+    heading("Ideas to stay ahead");
+    r.tips.forEach((t) => { doc.setFontSize(9); const b = doc.splitTextToSize(clean(t.body), CW - 6) as string[]; ensure(6 + b.length * 4); doc.setTextColor(...ink); doc.setFont("helvetica", "bold"); doc.text(clean(t.title), M, y); y += 4.5; doc.setFont("helvetica", "normal"); doc.setTextColor(...muted); b.forEach((l) => { doc.text(l, M, y); y += 4; }); y += 3; });
+  }
+
+  // Next step callout
+  ensure(26); y += 2;
+  doc.setFillColor(...ink); doc.roundedRect(M, y, CW, 22, 3, 3, "F");
+  doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("Ready to outshine them?", M + 6, y + 8);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.text("Get the DIY pack with ready-to-use wording and step-by-step guides, or let our AI agent do it for you.", M + 6, y + 14);
+  doc.setTextColor(...gold); doc.textWithLink("outshine.lovable.app", M + 6, y + 19, { url: "https://outshine.lovable.app" });
+
+  doc.setProperties({ title: `${r.name} free Outshine report`, author: "Outshine by Quietcrew" });
+  return doc.output("blob");
+}
+
 /** Built-in PDF fonts only cover basic Latin, so swap typographic characters for safe ones. */
 function clean(s: string) {
   return s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/…/g, "...").replace(/★/g, "*").replace(/✓/g, "").replace(/[^\x20-\x7E£•·\n]/g, "");
