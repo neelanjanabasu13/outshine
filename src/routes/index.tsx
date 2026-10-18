@@ -23,6 +23,8 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://outshine.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://outshine.lovable.app/og.jpg" },
+      { name: "twitter:image", content: "https://outshine.lovable.app/og.jpg" },
     ],
   }),
   component: Home,
