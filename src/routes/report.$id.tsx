@@ -204,7 +204,7 @@ function Report() {
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
             <div className="flex flex-col gap-3">
               <p className="font-medium">Free scan</p><p className="font-display text-3xl font-semibold">Free</p>
-              <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and the problems worth fixing.</p>
+              <p className="flex-1 text-sm text-muted-foreground">Your grade, nearby rivals and where you can stand out.</p>
               <p className="flex items-center gap-2 text-sm text-grade-a"><Check className="h-4 w-4" />Your report is ready</p>
               <Button onClick={downloadReport} className="h-auto min-h-10 w-full whitespace-normal py-3"><Download />Download free report</Button>
             </div>
