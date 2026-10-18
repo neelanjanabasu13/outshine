@@ -14,17 +14,6 @@ const TILES: { trade: Trade; name: string; pun: string; img: string }[] = [
   { trade: "landscaping", name: "Gardeners", pun: "Grow your customer base.", img: landscaping },
 ];
 
-const S = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-
-function Icon({ trade }: { trade: Trade }) {
-  const box = { viewBox: "0 0 24 24", className: "trade-ico h-5 w-5 shrink-0 overflow-visible text-fix", "aria-hidden": true } as const;
-  if (trade === "salon") return <svg {...box}><g className="snip-top"><circle cx="5" cy="7" r="2.6" {...S} /><path d="M7.3 8.2 20 14" {...S} /></g><g className="snip-bot"><circle cx="5" cy="17" r="2.6" {...S} /><path d="M7.3 15.8 20 10" {...S} /></g></svg>;
-  if (trade === "cleaning") return <svg {...box}><g className="spray-bottle"><path d="M6 10h6v11H6z M7 10V7h4v3 M11 7h4l-1 2" {...S} /></g><g className="mist" fill="currentColor"><circle cx="18" cy="6" r="1" /><circle cx="21" cy="8" r=".9" /><circle cx="19" cy="10" r=".8" /></g></svg>;
-  if (trade === "electrician") return <svg {...box}><rect x="7" y="4" width="10" height="16" rx="2" {...S} /><rect className="switch-knob" x="10" y="12" width="4" height="5" rx="1" fill="currentColor" /><circle className="bulb" cx="20.5" cy="4" r="2" fill="var(--grade-c)" opacity=".15" /></svg>;
-  if (trade === "landscaping") return <svg {...box}><g className="shovel"><path d="M18 3 10 13 M7 12l4 4-3 3c-1.5 1-4 .5-4-1.5z" {...S} /></g><path className="sprout" d="M18 21v-5 M18 17c-2 0-3-1-3-3 2 0 3 1 3 3zm0-1c1.5 0 2.5-1 2.5-2.5-1.5 0-2.5 1-2.5 2.5z" {...S} stroke="var(--grade-a)" /><path d="M14 21h8" {...S} /></svg>;
-  return <svg {...box}><path d="M3 8h9v4H3 M12 9h3v9" {...S} /><path className="wrench" d="M20 3a3 3 0 0 0-3.5 4L9 14.5l1.5 1.5L18 8.5A3 3 0 0 0 22 5l-2 .5-.5-2z" {...S} /><circle className="drip" cx="15" cy="20" r="1" fill="currentColor" opacity="0" /></svg>;
-}
-
 function Tile({ t, i, on, onPick }: { t: (typeof TILES)[number]; i: number; on: boolean; onPick: (t: Trade) => void }) {
   const [play, setPlay] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -38,7 +27,7 @@ function Tile({ t, i, on, onPick }: { t: (typeof TILES)[number]; i: number; on: 
           className={`h-14 w-14 shrink-0 rounded-xl object-cover transition duration-500 ${on ? "rotate-6 scale-105" : "saturate-[.55] group-hover:saturate-100"}`} />
         <span className="min-w-0">
           <span className="flex items-center gap-1.5 font-display font-bold leading-tight">
-            <span className={t.trade === "cleaning" ? "wipe-word" : undefined}>{t.name}</span><Icon trade={t.trade} />
+            <span>{t.name}</span>
           </span>
           <span className="block text-xs text-muted-foreground">{t.pun}</span>
         </span>
