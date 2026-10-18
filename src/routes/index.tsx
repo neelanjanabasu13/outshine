@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ReportStack } from "@/components/ReportStack";
 import { TradeDeck } from "@/components/TradeDeck";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import walkthrough from "@/assets/walkthrough.mp4.asset.json";
+import poster from "@/assets/walkthrough-poster.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -148,6 +150,19 @@ function Home() {
         <div className="pt-8"><ReportStack />
         </div>
         </div>
+
+        <section aria-labelledby="watch-title" className="mt-20">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-fix">See it in action</p>
+          <h2 id="watch-title" className="mt-3 max-w-3xl font-display text-3xl font-extrabold md:text-4xl">
+            Watch our AI agent take a cleaning business from <Shine>Grade F</Shine> to ready to outshine its rivals.
+          </h2>
+          <div className="mt-6 overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_30px_70px_-40px_var(--ink)]">
+            <video src={walkthrough.url} poster={poster.url} controls playsInline preload="metadata" className="aspect-video w-full bg-secondary" aria-label="Outshine walkthrough video" />
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">A 90 second walkthrough using our showcase business, Mops Stars Cleaning. The agent's online profile updates are simulated for the demo.</p>
+        </section>
+
+
 
 
         <ul className="mt-20 grid gap-4 md:grid-cols-3">
