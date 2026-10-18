@@ -75,7 +75,7 @@ function Home() {
             every rival down the road.
           </h1>
           <p className="animate-rise mt-6 max-w-xl text-lg text-muted-foreground">
-            Free scan of your Google listing and website against local rivals. Fix it yourself, or <span className="font-semibold text-brand-gradient">let our AI agent fix it for you.</span>
+            Free scan of your online presence against local rivals. Stand out yourself, or <span className="font-semibold text-brand-gradient">let our AI agent do it for you.</span>
           </p>
 
           {!picked ? (
@@ -126,8 +126,8 @@ function Home() {
                     </Button>
                   </li>
                 ))}
-                {loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">Searching Google…</li>}
-                {!loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">{err ?? "No match on Google. Try adding your town or postcode."}</li>}
+                {loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">Searching…</li>}
+                {!loading && !hits.length && <li className="px-5 py-4 text-sm text-muted-foreground">{err ?? "No match found. Try adding your town or postcode."}</li>}
               </ul>}
             </div>
           ) : (
@@ -154,7 +154,7 @@ function Home() {
         <section aria-labelledby="watch-title" className="mt-20">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-fix">See it in action</p>
           <h2 id="watch-title" className="mt-3 max-w-3xl font-display text-3xl font-extrabold md:text-4xl">
-            Watch our AI agent take a cleaning business from <Shine>Grade F</Shine> to ready to outshine its rivals.
+            Watch our AI agent take a cleaning business from Grade F to ready to <Shine>outshine its rivals</Shine>.
           </h2>
           <div className="mt-6 overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_30px_70px_-40px_var(--ink)]">
             <video src={walkthrough.url} poster={poster.url} controls playsInline preload="metadata" className="aspect-video w-full bg-secondary" aria-label="Outshine walkthrough video" />
@@ -190,7 +190,7 @@ function Home() {
             {[
               <>Your scan is always free</>,
               <>DIY pack £7.99 <s className="opacity-60">£14.99</s></>,
-              <>Fix it for me £29.99 <s className="opacity-60">£49.99</s></>,
+              <>Done for you £29.99 <s className="opacity-60">£49.99</s></>,
             ].map((t, i) => (
               <li key={i} className={`rounded-2xl bg-accent px-5 py-4 font-medium text-accent-foreground`}>{t}</li>
             ))}

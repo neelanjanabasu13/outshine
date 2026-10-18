@@ -19,7 +19,7 @@ export const Route = createFileRoute("/demo")({
 const LINKS = [
   { id: "sparkle-and-co", demo: "free", t: "1. Free scan", d: "We show you the problems: grade, nearby rivals and a free report download." },
   { id: "the-hair-lab", demo: "diy", t: "2. DIY pack", d: "We tell you how to fix them: every step-by-step guide and the full PDF, unlocked." },
-  { id: "riverside-plumbing", demo: "agent", t: "3. Fix it for me", d: "Our AI agent fixes them for you, live on screen, with the playbook included." },
+  { id: "riverside-plumbing", demo: "agent", t: "3. Done for you", d: "Our AI agent fixes them for you, live on screen, with the playbook included." },
 ];
 
 function Demo() {

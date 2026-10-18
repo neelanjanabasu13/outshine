@@ -16,9 +16,9 @@ export const Route = createFileRoute("/scan/$id")({
   head: ({ loaderData }) => ({
     meta: [
       { title: loaderData ? `Grading ${loaderData.b.name} · Outshine` : "Grading · Outshine" },
-      { name: "description", content: "Outshine is checking this business's Google profile against local competitors." },
+      { name: "description", content: "Outshine is checking this business's online presence against local competitors." },
       { property: "og:title", content: "Live audit in progress · Outshine" },
-      { property: "og:description", content: "Checking available Google reviews, photos and profile information." },
+      { property: "og:description", content: "Checking public reviews, photos and profile information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -69,7 +69,7 @@ function Scan() {
   const reviews = b.reviews.filter((r) => r.text).slice(0, 3);
 
   const stages = [
-    { title: "Scanning Google Business Profile", sub: "Reviewing photos, rating, hours, address and business details." },
+    { title: "Scanning Your Online Profile", sub: "Reviewing photos, rating, hours, address and business details." },
     { title: "Analysing Visual Content", sub: "Looking at every photo customers see before they decide to call." },
     { title: "Scanning Customer Reviews", sub: "Reading what your customers actually say." },
     { title: "Scanning Website", sub: `Checking your website for ${t.credential}.` },
@@ -96,7 +96,7 @@ function Scan() {
   const websiteChecks = [
     { label: "Website loads", ok: s.websiteCredential != null },
     { label: t.credential, ok: !!s.websiteCredential },
-    { label: "Opening hours on Google", ok: s.hasHours },
+    { label: "Opening hours listed", ok: s.hasHours },
   ];
 
   return (
@@ -161,7 +161,7 @@ function Scan() {
             <div key="site" className="animate-rise absolute inset-0 flex flex-col bg-card">
               <div className="flex items-center gap-2 border-b border-border px-3 py-2">
                 <span className="flex gap-1">{[0, 1, 2].map((i) => <span key={i} className="h-2 w-2 rounded-full bg-border" />)}</span>
-                <span className="flex-1 truncate rounded-md bg-secondary px-2 py-0.5 text-[11px] text-muted-foreground">{site ?? "No website listed on Google"}</span>
+                <span className="flex-1 truncate rounded-md bg-secondary px-2 py-0.5 text-[11px] text-muted-foreground">{site ?? "No website listed"}</span>
               </div>
               <div className="relative flex-1 space-y-2 p-4">
                 <div className="h-3 w-2/3 rounded bg-secondary" />
@@ -189,7 +189,7 @@ function Scan() {
                   </span>
                   <span className="flex items-center gap-1 text-xs font-medium"><Star className="h-3 w-3 fill-current text-fix" />{c.signals.rating.toFixed(1)}</span>
                 </div>
-              )) : <p className="p-4 text-sm text-muted-foreground">No nearby rivals returned by Google.</p>}
+              )) : <p className="p-4 text-sm text-muted-foreground">No nearby rivals found.</p>}
               <ScanLine />
             </div>
           )}
