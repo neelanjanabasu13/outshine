@@ -12,4 +12,4 @@
 - [x] All-clear reports give tips and a reference example; free report downloadable
 - [ ] Fix Stripe checkout blank pages (next, awaiting user)
 - [ ] Final name (blocked: user)
-- [ ] Redo sharing image in a refined, grown-up style (user found first one childish)
+- [x] Redo sharing image in a refined, grown-up style (user found first one childish)
