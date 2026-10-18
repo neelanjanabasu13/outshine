@@ -1,4 +1,5 @@
 import type React from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Shine } from "./Shine";
 
