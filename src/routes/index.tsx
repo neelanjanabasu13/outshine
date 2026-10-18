@@ -148,7 +148,7 @@ function Home() {
             </div>
           )}
         </div>
-        <div className="pt-8"><ReportStack />
+        <div className="overflow-x-clip pb-10 pt-8 lg:overflow-visible"><ReportStack />
         </div>
         </div>
 
