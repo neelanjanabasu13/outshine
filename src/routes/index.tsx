@@ -67,10 +67,10 @@ function Home() {
     <div className="min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-5 pb-24 pt-8 md:pt-14">
-        <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
-        <div>
+        <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_1fr] [&>*]:min-w-0">
+        <div className="min-w-0">
           <p className="animate-rise inline-block text-sm font-medium uppercase tracking-[0.2em] text-fix">One-off payments. No subscription.</p>
-          <h1 className="animate-rise mt-6 font-display text-5xl font-extrabold leading-[0.95] md:text-6xl">
+          <h1 className="animate-rise mt-6 font-display text-4xl font-extrabold leading-[0.95] sm:text-5xl md:text-6xl">
             Make your business{" "}
             <Shine halo>outshine</Shine>{" "}
             every rival down the road.
